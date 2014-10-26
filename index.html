@@ -40,6 +40,11 @@
           margin: 10px 30px;
         }
       }
+
+      /** A little adblock adjustments */
+      .icon-li:before { content: "\f0e1"; }
+      .icon-f:before { content: "\f09a"; }
+      .icon-g:before { content: "\f0d4"; } 
     </style>
   </head>
   <body>
@@ -75,29 +80,29 @@
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li title="Mail">
+            <li>
               <a ng-href="mailto:{{emailHash}}-site@shaunburdick.com">
                 <i class="fa fa-envelope"></i>
               </a>
             </li>
-            <li title="LinkedIn">
+            <li>
               <a href="https://www.linkedin.com/in/shaunburdick">
-                <i class="fa fa-linkedin"></i>
+                <i class="fa icon-li"></i>
               </a>
             </li>
-            <li title="GitHub">
+            <li>
               <a href="https://github.com/shaunburdick">
                 <i class="fa fa-github-square"></i>
               </a>
             </li>
-            <li title="Facebook">
+            <li>
               <a href="https://facebook.com/shaunburdick">
-                <i class="fa fa-facebook"></i>
+                <i class="fa icon-f"></i>
               </a>
             </li>
-            <li title="Google">
+            <li>
               <a href="https://plus.google.com/+ShaunBurdickafewcharacters">
-                <i class="fa fa-google"></i>
+                <i class="fa icon-g"></i>
               </a>
             </li>
           </ul>
