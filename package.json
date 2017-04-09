@@ -1,0 +1,17 @@
+{
+    "name": "shaunburdick.com",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "ssh://git@github.com/shaunburdick/shaunburdick.com.git",
+    "author": "Shaun Burdick <github@shaunburdick.com>",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "koa": "^2.2.0",
+        "koa-logger": "^2.0.1",
+        "koa-static": "^3.0.0"
+    }
+}
