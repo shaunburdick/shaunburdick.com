@@ -24,7 +24,7 @@
         padding: 10px;
         margin-bottom: 10px;
         border: 1px solid #999999;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.85);
         color: #eeeeee;
       }
 
@@ -84,7 +84,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a ng-href="mailto:{{emailHash}}-site@shaunburdick.com">
+              <a ng-href="mailto:{{email}}">
                 <i class="fa fa-envelope"></i>
                 <span ng-hide="collapse">Mail</span>
               </a>
@@ -149,16 +149,16 @@
               <pre>
       localhost:~ $ whois shaunburdick
       Name: Shaun Burdick
-      Occupation: [ Father, Software Engineer ]
+      Occupation: [ Father, Leader, Engineer ]
       Location: Syracuse, NY
       Expertise: [
+        Engineering Leader
         Web Architecting and Design
         Large scale data collection
         API Design and Implementation
         Agile/Scrum team management
         Project Management
-      ]
-              </pre>
+      ]</pre>
               <p>
                 For more information, please use the menu at the top.
               </p>
@@ -168,48 +168,98 @@
     <script type="text/ng-template" id="professional">
       <section>
         <header>
-          <h3>Professional Accomplishments</h3>
+          <h3>Professional Summary</h3>
         </header>
         <article>
-          <h4>Node Health</h4>
           <p>
-            Designed and built algorithm/tool to track multiple data points on networking and customer delivery systems. The algorithm combines and normalizes a subset of important data and provide a meaningful score to be ranked against peers. The system eventually became the defacto indicator of service health and is used nationally as part of the customer care and maintenance reviews, distributing millions in individual bonuses.
+            Shaun Burdick is a software engineering leader with over 20 years of experience in the industry. He currently works as Director of Engineering at Vidaloop, where he leads a team of skilled engineers in designing and developing cutting-edge software solutions.
           </p>
-        </article>
-          <h4>iVMS</h4>
           <p>
-            Designed and built tool to track and configure multi-million dollar deployment of channel monitoring appliances. The tool tracks and arranges tens of thousand of video streams and allows users to automatically generate configurations for probes as well as enforce a strict set of standardized formats to ensure proper balancing and reporting. Project was stuck idle for over a year prior until my inclusion and the tool and its processes helped launch the project.
+            Shaun holds a Bachelor's degree in Computer Science from Alfred University, where he gained a strong foundation in software development and problem-solving.
           </p>
-        </article>
-        <article>
-          <h4>STORM</h4>
           <p>
-            Converted existing website into a modular platform and framework. This allows for quick and targeted development of tools as modules that exist separately from the base platform and each other. We can now develop multiple tools in parallel without overlap and cross-developer efforts.
+            Throughout his career, Shaun has consistently demonstrated exceptional technical and leadership skills, collaborating effectively with stakeholders at all levels of the organization. His accomplishments include successfully delivering complex software projects, improving engineering processes, and fostering a culture of innovation and collaboration.
           </p>
-        </article>
-        <article>
-          <h4>ORM</h4>
           <p>
-            Developed conversion of Regional Operations report, moving from Manual Excel Spreadsheet to interactive web front end with automatic data collection, maintenance and adjustments. Added graphing and modularity to control web front end display and range selection. Maintained exportability to Excel for meeting distribution. Report and frontend used by Regional Executives to monitor and target trouble areas and plan for future initiatives. Report has grown to over 350 different metrics.
+            Shaun is committed to continuous learning and professional development, and in his free time, he enjoys exploring new technologies, mentoring aspiring engineers, and contributing to open-source projects.
           </p>
         </article>
       </section>
-      <section ng-controller="SkillsCtrl">
+      <section>
         <header>
-          <div class="row">
-            <div class="col-xs-6 col-sm-1">
-              <h3>Skills</h3>
-            </div>
-            <div class="col-xs-6 col-sm-5">
-              <h3>Comfort</h3>
-            </div>
+          <h3>Experience</h3>
         </header>
-        <div class="row" ng-repeat="skill in skills | orderBy:'name'">
-          <div class="col-xs-6 col-sm-1">{{::skill.name}}</div>
-          <div class="col-xs-6 col-sm-5">
-            <progressbar value="skill.comfort"></progressbar>
-          </div>
-        </div>
+        <article>
+          <section>
+            <header>
+              <h4>VIDALOOP, (Remote, San Diego)	2021 to present</h4>
+            </header>
+            <p><strong>Director of Engineering</strong>
+            <p>As Director, I design and direct all aspects of engineering activities, ensuring all engineering projects align with company objectives. I provide technical guidance, policies and procedures to ensure quality output. I am responsible for all department goals, ensuring they are met efficiently and within budget.
+            As the technical leader of the company, I understood all aspects of the products, interfaced with Product and Operations, traveled to conferences as a technical expert, and worked with AWS to run a Well Architected Review.
+            <ul>
+              <li>Build and manage teams across multiple products
+              <li>Understand and contribute to company objectives
+              <li>Forecast department abilities and needs
+              <li>Design department standards and goals
+              <li>Evaluate department performance, working with teams to achieve their goals
+              <li>Design, initiate and support staffing plans
+            </ul>
+          </section>
+          <section>
+            <header>
+              <h4>SWIMLANE, (Remote, Denver)	2016 to 2021</h4>
+            </header>
+            <p><strong>Engineering Manager</strong>
+            <p>As an Engineering Manager, I lead a talented team of engineers building the core software infrastructure that powers the Swimlane Platform. In this role, I work with leading-edge technologies in order to power the engine that drives Swimlane and directly influence the technology platform that powers the SOAR market.
+              <ul>
+                <li>Recruit, manage, motivate and mentor teams of engineers
+                <li>Leading the engineering organization to increase throughput, improve quality, and continuously improve processes
+                <li>Provide performance feedback for the teams
+                <li>Hold the teams accountable for their commitments
+                <li>Provide pace setting for the teams to drive team performance
+                <li>Liaise with other leaders to identify technical and customer-facing impacts
+                <li>Recommend best practices and/or alternative approaches to solving challenging problems
+              </ul>
+            <p><strong>Principal Software Engineer, API</strong>
+            <p>As a Principal Software Engineer, I act as a champion and advocate for software development best practices. I am trusted to implement some of our most critical systems, lead and mentor other engineers, and drive a delivery team to meet product initiatives.
+              <ul>
+                <li>Built a horizontally scalable cloud/on-prem hybrid application made up of multiple NodeJS/Typescript microservice Docker images using RabbitMQ as a transport and MongoDB for storage
+                <li>Created and contributed to multiple open source packages available via NPM
+                <li>Lead an agile team by running daily standups, sprint planning (via JIRA), backlog grooming, and architectural spikes
+              </ul>
+          </section>
+          <section>
+            <header>
+              <h4>CHARTER COMMUNICATIONS, (Remote, Herndon)	2016</h4>
+            </header>
+            <p><strong>API Team Lead, RIO</strong>
+            <p>Drove quality by leading discussions on standards and practices as well as architecting and implementing overarching designs and improvements. Contributed to recruiting, interviewing, and reviewing team members, designing scrum teams, and peer reviewing code changes.
+              <ul>
+                <li>Built RESTful application programming interface (APIs) utilized by 75% of entire business peaking at 40K requests per minute, supporting CSRs, NOC Agents, engineers, and various analysts with daily operations.
+                <li>Sped up daily workflows of users by building integrations and automations using MySQL / Oracle, Microservices, and other REST / SOAP APIs.
+              <ul>
+          </section>
+          <section>
+            <header>
+              <h4>TIME WARNER CABLE, East Syracuse, NY	2010 to 2016</h4>
+            </header>
+            <p><strong>Senior OSS Software Engineer, STORM 	2013 to 2016</strong>
+            <p>Served as UI / API developer on a centralized data aggregation tool.
+              <ul>
+                <li>Added development messaging between API and UI, providing more informative transaction history for each API call, including: Queries executed, PHP Error / Warn / Notices thrown, and Application Timing.
+                <li>Became primary review and merge officer, authoring developer guidelines, including performance goals, syntax style, and best practices.
+                <li>Developed code review policy, outlining expected standard adherence, example format, and merge policy.
+              </ul>
+            <p><strong>Senior Software Engineer, BOAT/STORM	2010 to 2013</strong>
+            <p>Worked primarily as a LAMP(HP) developer with significant use of Perl / Oracle for back-end data collection and processing. Developed a set of tools internally to provide reports and metrics in multiple formats as well as build and maintain custom platform. Served as Scrummaster for an agile development team.
+              <ul>
+                <li>Built PHP based reporting tool, replacing massive manual excel report.
+                <li>Supported multiple unrelated applications by converting targeted application into wider framework.
+                <li>Led multiple initiatives such as code reviews, think tanks, quality designs, and other complex issues, enhancing products and producing quality development of new features.
+              </ul>
+          </section>
+        </article
       </section>
     </script>
 
@@ -219,7 +269,7 @@
         <article>
           <h4>My Family</h4>
           <p>
-            <img src="img/burdick-family.jpg"
+            <img src="img/burdick-family.jpeg"
               class="img-responsive img-rounded" />
           </p>
           <p>
