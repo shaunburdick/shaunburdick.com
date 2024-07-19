@@ -53,16 +53,25 @@ function ShellPrompt() {
       description: "Provides a list of commands. Usage: `help [command]`",
       run: (command?: string) => {
         if (command) {
-          return [[commands[command]?.description || `Unknown command: ${command}`]];
+          if (commands[command]?.secret) {
+            return [["I'm not helping you. It's a secret!"]];
+          } else {
+            return [[commands[command]?.description || `Unknown command: ${command}`]];
+          }
+        } else {
+          return [
+            ['List of Commands:'],
+            ...Object.keys(commands)
+              .filter(commandName => !commands[commandName].secret)
+              .map(commandName => [`${commandName}:`, commands[commandName].description])
+          ];
         }
-
-        return [
-          ['List of Commands:'],
-          ...Object.keys(commands)
-            .filter(commandName => !commands[commandName].secret)
-            .map(commandName => [`${commandName}:`, commands[commandName].description])
-        ]
       }
+    },
+    secret: {
+      description: "A secret command",
+      secret: true,
+      run: () => [["You found it!"]]
     },
     users: {
       description: "List users",
