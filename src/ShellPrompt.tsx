@@ -12,8 +12,8 @@ function ShellPrompt() {
 
   type ConsoleLine = string | React.JSX.Element;
 
-  const [history, setHistory] = useState<Array<ConsoleLine>[]>(welcomeMessage);
-  const [sessionCommands, setSessionCommands] = useState<string[]>([]);
+  const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(welcomeMessage);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [commandPointer, setCommandPointer] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -58,6 +58,13 @@ function ShellPrompt() {
   };
 
   const COMMANDS: Record<string, Command> = {
+    clear: {
+      description: "Clears the screen",
+      run: () => {
+        setTimeout(() => setConsoleLines([]));
+        return [];
+      }
+    },
     help: {
       description: "Provides a list of commands. Usage: `help [command]`",
       run: (command?: string) => {
@@ -76,6 +83,10 @@ function ShellPrompt() {
           ];
         }
       }
+    },
+    history: {
+      description: "Show previous commands",
+      run: () => commandHistory.map((command, index) => [`${index + 1}: ${command}`])
     },
     secret: {
       description: "A secret command",
@@ -114,23 +125,31 @@ function ShellPrompt() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const input = history[history.length - 1].filter(w => w !== '$');
-
-    const command = input.shift();
-    const args = input.filter(i => typeof i === 'string');
-    const response = typeof command === 'string' ? execCommand(command, ...args as string[]) : [['']];
-    setHistory([...history, ...response]);
-    setCommandPointer(0);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Enter":
         if (inputRef.current) {
-          setHistory([...history, ["$", ...inputRef.current.value.split(' ')]]);
+          const input = inputRef.current.value.trimEnd().split(' ');
+          const newLines: ConsoleLine[][] = [ ["$", ...input.slice()]];
+
           // add to history
-          setSessionCommands([...sessionCommands, inputRef.current.value]);
+          setCommandHistory([...commandHistory, inputRef.current.value]);
+
+          // execute command
+          const command = input.shift();
+          const args = input.filter(i => typeof i === 'string');
+          const response = typeof command === 'string' && command.length > 0 ?
+            execCommand(command, ...args as string[]) : [['']];
+          newLines.push(...response);
+
+          // clear input
           inputRef.current.value = '';
+          //write lines
+          setConsoleLines([...consoleLines, ...newLines]);
+          // reset command pointer
+          setCommandPointer(0);
         }
         break;
       case "Tab":
@@ -139,7 +158,7 @@ function ShellPrompt() {
         break;
       case "ArrowUp":
         event.preventDefault();
-        if (commandPointer < sessionCommands.length) {
+        if (commandPointer < commandHistory.length) {
           setCommandPointer(commandPointer + 1);
         }
         break;
@@ -178,10 +197,10 @@ function ShellPrompt() {
   })
 
   useEffect(() => {
-    if (commandPointer > 0 && commandPointer <= sessionCommands.length && inputRef.current !== null) {
-      inputRef.current.value = sessionCommands[sessionCommands.length - commandPointer];
+    if (commandPointer > 0 && commandPointer <= commandHistory.length && inputRef.current !== null) {
+      inputRef.current.value = commandHistory[commandHistory.length - commandPointer];
     }
-  }, [commandPointer, sessionCommands])
+  }, [commandPointer, commandHistory])
 
   // set last login
   localStorage.setItem('lastLogin', (new Date()).toISOString());
@@ -189,7 +208,7 @@ function ShellPrompt() {
   return (
     <div className="shell">
       <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex", whiteSpace: "pre-wrap"}}>
-        {history.slice().reverse().map((line, index) => (
+        {consoleLines.slice().reverse().map((line, index) => (
           <p key={index}>{line.reduce((result, item) => <>{result}{' '}{item}</>)}</p>
         ))}
       </pre>
