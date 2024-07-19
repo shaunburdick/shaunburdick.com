@@ -5,7 +5,7 @@ function ShellPrompt() {
     ["****************************************"],
     ["Welcome to Shaun Burdick's Console!"],
     ["****************************************"],
-    ["Your last login was: ", localStorage.getItem('lastLogin') || 'never'],
+    ["Your last login was:", localStorage.getItem('lastLogin') || 'never'],
     ["Type `help` for assistance."],
     [""],
   ];
@@ -242,7 +242,7 @@ function ShellPrompt() {
 
   return (
     <div className="shell">
-      <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex", whiteSpace: "pre-wrap"}}>
+      <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex"}}>
         {consoleLines.slice().reverse().map((line, index) => (
           <p key={index}>{line.reduce((result, item) => <>{result}{' '}{item}</>)}</p>
         ))}

@@ -5,6 +5,7 @@ import { helmetJsonLdProp } from "react-schemaorg";
 import Helmet from "react-helmet";
 
 import ShellPrompt from './ShellPrompt'
+import CookieNotice from './CookieNotice';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       />
       <h1>Shaun Burdick's Console</h1>
       <ShellPrompt />
+      <CookieNotice />
     </>
   );
 }
