@@ -22,7 +22,11 @@ function ShellPrompt() {
     image: string;
     occupation: string[],
     location: string,
-    expertise: string[]
+    expertise: string[],
+    links: Array<{
+      url: string;
+      text: string;
+    }>
   }
 
   const users: Record<string, User> = {
@@ -38,6 +42,11 @@ function ShellPrompt() {
         'API Design and Implementation',
         'Agile/Scrum team management',
         'Project Management'
+      ],
+      links: [
+        { url: "https://www.linkedin.com/in/shaunburdick/", text: "LinkedIn" },
+        { url: "https://github.com/shaunburdick/", text: "GitHub" },
+        { url: "mailto://site-contact@shaunburdick.com", text: "Email" }
       ]
     }
   };
@@ -93,7 +102,8 @@ function ShellPrompt() {
             ["Name: ", user.name],
             ["Occupation: ", JSON.stringify(user.occupation)],
             ["Location: ", user.location],
-            ["Expertise: ", JSON.stringify(user.expertise, null, 2)]
+            ["Expertise: ", JSON.stringify(user.expertise, null, 2)],
+            ["Links: ", ...user.links.map(link => <a href={link.url}>{link.text}</a>)]
           ];
         } else {
           return [[`Unknown user: ${username || ''}`]];
