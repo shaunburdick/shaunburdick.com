@@ -250,7 +250,7 @@ function ShellPrompt() {
       <form onSubmit={handleSubmit}>
         <div style={{display: 'flex', alignItems: 'stretch'}}>
           <span>$ </span>
-          <input style={{width: "100%", marginLeft: "1em"}} ref={inputRef} onKeyDown={handleKeyDown} />
+          <input placeholder='Type `help` for assistance.' style={{width: "100%", marginLeft: "1em"}} ref={inputRef} onKeyDown={handleKeyDown} />
         </div>
       </form>
     </div>
