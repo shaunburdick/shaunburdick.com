@@ -15,6 +15,7 @@ function ShellPrompt() {
   const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(welcomeMessage);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [commandPointer, setCommandPointer] = useState<number>(0);
+  const [workingDir, setWorkingDir] = useState<string>('/');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   type User = {
@@ -87,6 +88,33 @@ function ShellPrompt() {
     history: {
       description: "Show previous commands",
       run: () => commandHistory.map((command, index) => [`${index + 1}: ${command}`])
+    },
+    open: {
+      description: "Open a file or URL",
+      run: (target) => {
+        try {
+          const url = new URL(target);
+          if (['http:', 'https:'].includes(url.protocol)) {
+            window.open(target);
+            return [[`Opening ${target}...`]];
+          } else {
+            return [[`Unknown protocol: ${url.protocol}`]];
+          }
+        } catch (e) {
+          return [[`Cannot open: ${target}`]];
+        }
+      }
+    },
+    pwd: {
+      description: 'Return the working directory',
+      run: () => [[workingDir]]
+    },
+    rm: {
+      description: "Remove directory entries",
+      run: (...args) => {
+        window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+        return [];
+      }
     },
     secret: {
       description: "A secret command",
