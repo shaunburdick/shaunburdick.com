@@ -20,11 +20,11 @@ function ShellPrompt() {
 
   type User = {
     name: string;
-    image: string;
-    occupation: string[],
-    location: string,
-    expertise: string[],
-    links: Array<{
+    image?: string;
+    occupation?: string[],
+    location?: string,
+    expertise?: string[],
+    links?: Array<{
       url: string;
       text: string;
     }>
@@ -136,14 +136,16 @@ function ShellPrompt() {
       run: (username: string) => {
         if (username in USERS) {
           const user = USERS[username];
-          return [
-            [<img src={user.image} alt={user.name} width={"50%"}/>],
-            ["Name: ", user.name],
-            ["Occupation: ", JSON.stringify(user.occupation)],
-            ["Location: ", user.location],
-            ["Expertise: ", JSON.stringify(user.expertise, null, 2)],
-            ["Links: ", ...user.links.map(link => <a href={link.url}>{link.text}</a>)]
-          ];
+          const response: ConsoleLine[][] = [];
+
+          if (user.image) response.push([<img src={user.image} alt={user.name} width={"50%"}/>]);
+          response.push(["Name: ", user.name]);
+          if (user.occupation) response.push(["Occupation: ", JSON.stringify(user.occupation)]);
+          if (user.location) response.push(["Location: ", user.location]);
+          if (user.expertise) response.push(["Expertise: ", JSON.stringify(user.expertise, null, 2)]);
+          if (user.links) response.push(["Links: ", ...user.links.map(link => <a href={link.url}>{link.text}</a>)]);
+
+          return response;
         } else if(/miki|mikey|faktrl/.test(username)) {
           window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
           return [[`Hello, ${username}`]];
