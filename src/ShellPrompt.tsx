@@ -15,7 +15,7 @@ function ShellPrompt() {
   const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(welcomeMessage);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [commandPointer, setCommandPointer] = useState<number>(0);
-  const [workingDir, setWorkingDir] = useState<string>('/');
+  const [workingDir/*, setWorkingDir*/] = useState<string>('/');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   type User = {
@@ -144,6 +144,11 @@ function ShellPrompt() {
             ["Expertise: ", JSON.stringify(user.expertise, null, 2)],
             ["Links: ", ...user.links.map(link => <a href={link.url}>{link.text}</a>)]
           ];
+        } else if(/miki|mikey|faktrl/.test(username)) {
+          window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
+          return [[`Hello, ${username}`]];
+        } else if (username === "gamefront") {
+          return [[<a href='https://gamefront.com'>Gamefront</a>, "is just FilesNetwork with a better skin"]];
         } else {
           return [[`Unknown user: ${username || ''}`]];
         }
