@@ -12,9 +12,15 @@ function ShellPrompt() {
 
   type ConsoleLine = string | React.JSX.Element;
 
+  const defaultEnvironment = {
+    SHELL: '/bin/blah',
+    USER: 'you'
+  };
+
   const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(welcomeMessage);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [commandPointer, setCommandPointer] = useState<number>(0);
+  const [environment, setEnvironment] = useState<Record<string,string>>(defaultEnvironment);
   const [workingDir/*, setWorkingDir*/] = useState<string>('/');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -62,8 +68,28 @@ function ShellPrompt() {
     clear: {
       description: "Clears the screen",
       run: () => {
+        // use setTimeout to clear screen after this loop is finished
         setTimeout(() => setConsoleLines([]));
         return [];
+      }
+    },
+    env: {
+      description: 'Print Environment',
+      run: () => {
+        const response: ConsoleLine[][] = [];
+
+        for (const key in environment) {
+          response.push([`${key}=${environment[key]}`]);
+        }
+
+        return response;
+      }
+    },
+    export: {
+      description: 'Set an environment variable',
+      run: (key, value) => {
+        setEnvironment({ ...environment, [key]: value});
+        return [[`${key}=${value}`]];
       }
     },
     help: {
@@ -111,7 +137,7 @@ function ShellPrompt() {
     },
     rm: {
       description: "Remove directory entries",
-      run: (...args) => {
+      run: () => {
         window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
         return [];
       }
@@ -167,7 +193,7 @@ function ShellPrompt() {
       case "Enter":
         if (inputRef.current) {
           const input = inputRef.current.value.trimEnd().split(' ');
-          const newLines: ConsoleLine[][] = [ ["$", ...input.slice()]];
+          const newLines: ConsoleLine[][] = [['\n'], ["$", ...input.slice()]];
 
           // add to history
           setCommandHistory([...commandHistory, inputRef.current.value]);
@@ -244,7 +270,7 @@ function ShellPrompt() {
     <div className="shell">
       <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex"}}>
         {consoleLines.slice().reverse().map((line, index) => (
-          <p key={index}>{line.reduce((result, item) => <>{result}{' '}{item}</>)}</p>
+            <span key={index}>{line.reduce((result, item) => <>{result}{' '}{item}</>)}</span>
         ))}
       </pre>
       <form onSubmit={handleSubmit}>
