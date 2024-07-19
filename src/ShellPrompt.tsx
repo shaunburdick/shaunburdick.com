@@ -29,7 +29,7 @@ function ShellPrompt() {
     }>
   }
 
-  const users: Record<string, User> = {
+  const USERS: Record<string, User> = {
     shaun: {
       name: 'Shaun Burdick',
       image: 'shaun.png',
@@ -57,22 +57,22 @@ function ShellPrompt() {
     run: (...args: string[]) => Array<ConsoleLine[]>;
   };
 
-  const commands: Record<string, Command> = {
+  const COMMANDS: Record<string, Command> = {
     help: {
       description: "Provides a list of commands. Usage: `help [command]`",
       run: (command?: string) => {
         if (command) {
-          if (commands[command]?.secret) {
+          if (COMMANDS[command]?.secret) {
             return [["I'm not helping you. It's a secret!"]];
           } else {
-            return [[commands[command]?.description || `Unknown command: ${command}`]];
+            return [[COMMANDS[command]?.description || `Unknown command: ${command}`]];
           }
         } else {
           return [
             ['List of Commands:'],
-            ...Object.keys(commands)
-              .filter(commandName => !commands[commandName].secret)
-              .map(commandName => [`${commandName}:`, commands[commandName].description])
+            ...Object.keys(COMMANDS)
+              .filter(commandName => !COMMANDS[commandName].secret)
+              .map(commandName => [`${commandName}:`, COMMANDS[commandName].description])
           ];
         }
       }
@@ -84,7 +84,7 @@ function ShellPrompt() {
     },
     users: {
       description: "List users",
-      run: () => Object.keys(users).map(userName => [userName])
+      run: () => Object.keys(USERS).map(userName => [userName])
     },
     whoami: {
       description: "Tell you a little about yourself",
@@ -95,8 +95,8 @@ function ShellPrompt() {
     whois: {
       description: "Tell you a little about a user. Usage: `whois <username>`",
       run: (username: string) => {
-        if (username in users) {
-          const user = users[username];
+        if (username in USERS) {
+          const user = USERS[username];
           return [
             [<img src={user.image} alt={user.name} width={"50%"}/>],
             ["Name: ", user.name],
@@ -162,8 +162,8 @@ function ShellPrompt() {
   }
 
   const execCommand = (commandName: string, ...args: string[]): Array<ConsoleLine[]> => {
-    if (commandName.toLowerCase() in commands) {
-      const command = commands[commandName.toLowerCase()];
+    if (commandName.toLowerCase() in COMMANDS) {
+      const command = COMMANDS[commandName.toLowerCase()];
       return command.run(...args);
     } else {
       return [
