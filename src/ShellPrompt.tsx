@@ -1,26 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 function ShellPrompt() {
-  const welcomeMessage = [
+  const LS_KEY_LAST_LOGIN = 'lastLogin';
+  const LS_KEY_COMMAND_HISTORY = 'commandHistory';
+
+  const WELCOME_MESSAGE = [
     ["****************************************"],
     ["Welcome to Shaun Burdick's Console!"],
     ["****************************************"],
-    ["Your last login was:", localStorage.getItem('lastLogin') || 'never'],
+    ["Your last login was:", localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never'],
     ["Type `help` for assistance."],
     [""],
   ];
 
   type ConsoleLine = string | React.JSX.Element;
 
-  const defaultEnvironment = {
+  const DEFAULT_ENVIRONMENT = {
     SHELL: '/bin/blah',
     USER: 'you'
   };
 
-  const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(welcomeMessage);
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [commandPointer, setCommandPointer] = useState<number>(0);
-  const [environment, setEnvironment] = useState<Record<string,string>>(defaultEnvironment);
+  const DEFAULT_COMMAND_POINTER = 0;
+  let defaultCommandHistory = [];
+  try {
+    const storedCommandHistory = localStorage.getItem(LS_KEY_COMMAND_HISTORY);
+    defaultCommandHistory = storedCommandHistory !== null ? JSON.parse(storedCommandHistory) : [];
+  } catch (e) {
+    localStorage.setItem(LS_KEY_COMMAND_HISTORY, '[]');
+  }
+
+  const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(WELCOME_MESSAGE);
+  const [commandHistory, setCommandHistory] = useState<string[]>(defaultCommandHistory);
+  const [commandPointer, setCommandPointer] = useState<number>(DEFAULT_COMMAND_POINTER);
+  const [environment, setEnvironment] = useState<Record<string,string>>(DEFAULT_ENVIRONMENT);
   const [workingDir/*, setWorkingDir*/] = useState<string>('/');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -139,7 +151,7 @@ function ShellPrompt() {
       description: "Remove directory entries",
       run: () => {
         window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-        return [];
+        return [["rm never gonna give you up!"]];
       }
     },
     secret: {
@@ -225,13 +237,17 @@ function ShellPrompt() {
         break;
       case "ArrowDown":
         event.preventDefault();
-        if (commandPointer > -1) {
+        if (commandPointer > DEFAULT_COMMAND_POINTER) {
           setCommandPointer(commandPointer - 1);
+        } else {
+          if (inputRef.current !== null) {
+            inputRef.current.value = '';
+          }
         }
         break;
       case "Escape":
         event.preventDefault()
-        setCommandPointer(-1);
+        setCommandPointer(DEFAULT_COMMAND_POINTER);
         if (inputRef.current !== null) {
           inputRef.current.value = '';
         }
@@ -253,18 +269,27 @@ function ShellPrompt() {
     }
   }
 
+  // focus on input on load
   useEffect(() => {
     inputRef.current?.focus();
   })
 
+  // update input on history toggle
   useEffect(() => {
-    if (commandPointer > 0 && commandPointer <= commandHistory.length && inputRef.current !== null) {
+    if (
+      commandPointer > DEFAULT_COMMAND_POINTER
+      && commandPointer <= commandHistory.length
+      && inputRef.current !== null
+    ) {
       inputRef.current.value = commandHistory[commandHistory.length - commandPointer];
     }
+
+    // update history with max last 20 commands
+    localStorage.setItem(LS_KEY_COMMAND_HISTORY, JSON.stringify(commandHistory.slice(-20)));
   }, [commandPointer, commandHistory])
 
   // set last login
-  localStorage.setItem('lastLogin', (new Date()).toISOString());
+  localStorage.setItem(LS_KEY_LAST_LOGIN, (new Date()).toISOString());
 
   return (
     <div className="shell">
