@@ -297,6 +297,7 @@ function ShellPrompt() {
     <div className="shell">
       <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex"}}
         aria-label='A text-based console.'
+        // eslint-disable-next-line jsx-a11y/aria-props
         aria-description='This area is meant to depict an older styled computer console where commands can be typed and responses will be shown.'
         aria-live='polite'>
         {consoleLines.slice().reverse().map((line, index) => (
@@ -314,6 +315,7 @@ function ShellPrompt() {
             autoCorrect='off'
             autoCapitalize='none'
             aria-label='An input to enter commands.'
+            // eslint-disable-next-line jsx-a11y/aria-props
             aria-description='When a command is entered, it will be run by the console interpreter and the above output will be updated with the result'
           />
         </div>
