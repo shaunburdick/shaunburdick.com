@@ -4,11 +4,13 @@ function ShellPrompt() {
   const LS_KEY_LAST_LOGIN = 'lastLogin';
   const LS_KEY_COMMAND_HISTORY = 'commandHistory';
 
+  const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
+
   const WELCOME_MESSAGE = [
     ["****************************************"],
     ["Welcome to Shaun Burdick's Console!"],
     ["****************************************"],
-    ["Your last login was:", localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never'],
+    ["Your last login was:", <span aria-label='Last Login Timestamp'>{LAST_LOGIN}</span>],
     ["Type `help` for assistance."],
     [""],
   ];
@@ -293,15 +295,27 @@ function ShellPrompt() {
 
   return (
     <div className="shell">
-      <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex"}}>
+      <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex"}}
+        aria-label='A text-based console.'
+        aria-description='This area is meant to depict an older styled computer console where commands can be typed and responses will be shown.'
+        aria-live='polite'>
         {consoleLines.slice().reverse().map((line, index) => (
             <span key={index}>{line.reduce((result, item) => <>{result}{' '}{item}</>)}</span>
         ))}
       </pre>
       <form onSubmit={handleSubmit}>
         <div style={{display: 'flex', alignItems: 'stretch'}}>
-          <span>$ </span>
-          <input placeholder='Type `help` for assistance.' style={{width: "100%", marginLeft: "1em"}} ref={inputRef} onKeyDown={handleKeyDown} />
+          <span aria-hidden>$ </span>
+          <input
+            placeholder='Type `help` for assistance.'
+            style={{width: "100%", marginLeft: "1em"}}
+            ref={inputRef}
+            onKeyDown={handleKeyDown}
+            autoCorrect='off'
+            autoCapitalize='none'
+            aria-label='An input to enter commands.'
+            aria-description='When a command is entered, it will be run by the console interpreter and the above output will be updated with the result'
+          />
         </div>
       </form>
     </div>

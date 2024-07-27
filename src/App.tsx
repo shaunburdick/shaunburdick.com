@@ -28,9 +28,11 @@ function App() {
           }),
         ]}
       />
-      <h1>Shaun Burdick's Console</h1>
-      <ShellPrompt />
-      <CookieNotice />
+      <h1 id='page-desc'>Shaun Burdick's Console</h1>
+      <div aria-describedby='page-desc'>
+        <ShellPrompt />
+        <CookieNotice />
+      </div>
     </>
   );
 }

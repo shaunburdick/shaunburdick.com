@@ -2,14 +2,14 @@ import { useState } from "react";
 
 function CookieNotice() {
 
-  const SHOW_COOKIE_MESSAGE_KEY = 'showCookieMessage';
-  const cm = (localStorage.getItem(SHOW_COOKIE_MESSAGE_KEY) || 'true') === 'true';
-  const [showCookieMessage, setShowCookieMessage] = useState<boolean>(cm);
+  const LS_COOKIE_ACKNOWLEDGE = 'cookieAcknowledge';
+  const initialShowCookie = (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'true') === 'true';
+  const [showCookieMessage, setShowCookieMessage] = useState<boolean>(initialShowCookie);
 
   const cookieAcknowledge = (ack: boolean) => {
     if (ack) {
       setShowCookieMessage(false);
-      localStorage.setItem(SHOW_COOKIE_MESSAGE_KEY, 'false');
+      localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'false');
     } else {
       window.location.href = "https://www.oreo.com/";
     }
@@ -19,7 +19,7 @@ function CookieNotice() {
     <>
       {showCookieMessage &&
         <div style={{position: "fixed", bottom: 0, maxWidth: "750px"}}>
-          <pre>
+          <pre aria-label="Cookie Notice">
             This site uses cookies to feed its developer in an effort to get them to write code.
             So far it seems to be working.
             <br />
