@@ -165,6 +165,13 @@ function ShellPrompt() {
       description: "List users",
       run: () => Object.keys(USERS).map(userName => [userName])
     },
+    "view-source": {
+      description: "View the source of this app",
+      run: () => {
+        window.open("https://github.com/shaunburdick/shaunburdick.com");
+        return [["Opening GH Page..."]];
+      }
+    },
     whoami: {
       description: "Tell you a little about yourself",
       run: () => [
