@@ -1,15 +1,18 @@
 {
   "short_name": "shsh",
   "name": "Shaun Burdick - Console",
+  "description": "An app meant to depict an older styled computer console where commands can be typed and responses will be shown.",
   "icons": [
     {
       "src": "favicon.svg",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/svg+xml"
+      "sizes": "144x144 24x24",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ],
   "start_url": ".",
+  "id": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#EEEEEE",
+  "background_color": "#002700"
 }
