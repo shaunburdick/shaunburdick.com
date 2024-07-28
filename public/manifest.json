@@ -12,7 +12,8 @@
   ],
   "start_url": ".",
   "id": "/",
-  "display": "standalone",
   "theme_color": "#EEEEEE",
-  "background_color": "#002700"
+  "background_color": "#002700",
+  "display_override": ["fullscreen", "minimal-ui"],
+  "display": "standalone"
 }
