@@ -308,6 +308,7 @@ function ShellPrompt() {
         <div style={{display: 'flex', alignItems: 'stretch'}}>
           <span aria-hidden>$ </span>
           <input
+            id='console-input'
             placeholder='Type `help` for assistance.'
             style={{width: "100%", marginLeft: "1em"}}
             ref={inputRef}
