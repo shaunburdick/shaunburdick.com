@@ -67,7 +67,7 @@ function ShellPrompt() {
       links: [
         { url: "https://www.linkedin.com/in/shaunburdick/", text: "LinkedIn" },
         { url: "https://github.com/shaunburdick/", text: "GitHub" },
-        { url: "mailto://site-contact@shaunburdick.com", text: "Email" }
+        { url: `mailto://${atob('c2l0ZS1jb250YWN0QHNoYXVuYnVyZGljay5jb20=')}`, text: "Email" }
       ]
     }
   };
