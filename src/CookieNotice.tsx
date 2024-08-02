@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { TrackerContext } from "./Tracker";
 
 function CookieNotice() {
+
+  const tracker = useContext(TrackerContext);
 
   const LS_COOKIE_ACKNOWLEDGE = 'cookieAcknowledge';
   const initialShowCookie = (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'true') === 'true';
   const [showCookieMessage, setShowCookieMessage] = useState<boolean>(initialShowCookie);
 
   const cookieAcknowledge = (ack: boolean) => {
+    tracker.trackEvent('cookieAcknowledge', { props: { ack } });
+
     if (ack) {
       setShowCookieMessage(false);
       localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'false');

@@ -1,6 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { TrackerContext } from './Tracker';
 
 function ShellPrompt() {
+
+  const tracker = useContext(TrackerContext);
+
   const LS_KEY_LAST_LOGIN = 'lastLogin';
   const LS_KEY_COMMAND_HISTORY = 'commandHistory';
 
@@ -240,6 +244,7 @@ function ShellPrompt() {
         break;
       case "ArrowUp":
         event.preventDefault();
+        tracker.trackEvent('historyUpArrow');
         if (commandPointer < commandHistory.length) {
           setCommandPointer(commandPointer + 1);
         }
@@ -267,6 +272,8 @@ function ShellPrompt() {
   }
 
   const execCommand = (commandName: string, ...args: string[]): Array<ConsoleLine[]> => {
+    // record command
+    tracker.trackEvent('execCommand', { props: { commandName, args: args.join(' ') }});
     if (commandName.toLowerCase() in COMMANDS) {
       const command = COMMANDS[commandName.toLowerCase()];
       return command.run(...args);
