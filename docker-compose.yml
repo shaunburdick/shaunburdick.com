@@ -1,5 +1,6 @@
 services:
   frontend:
+    image: ghcr.io/shaunburdick/shaunburdick.com:${FE_TAG:-main}
     build:
       context: .
     container_name: frontend
