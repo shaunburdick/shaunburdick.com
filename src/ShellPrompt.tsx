@@ -10,16 +10,24 @@ function ShellPrompt() {
 
   const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
 
-  const WELCOME_MESSAGE = [
-    ["****************************************"],
-    ["Welcome to Shaun Burdick's Console!"],
-    ["****************************************"],
-    ["Your last login was:", <span aria-label='Last Login Timestamp'>{LAST_LOGIN}</span>],
-    ["Type `help` for assistance."],
-    [""],
-  ];
-
   type ConsoleLine = string | React.JSX.Element;
+  type CommandResult = {
+    timestamp: Date;
+    command?: string;
+    response: Array<ConsoleLine[]>;
+  };
+
+  const WELCOME_MESSAGE: CommandResult = {
+    timestamp: new Date(),
+    response: [
+      ["****************************************"],
+      ["Welcome to Shaun Burdick's Console!"],
+      ["****************************************"],
+      ["Your last login was:", <span aria-label='Last Login Timestamp'>{LAST_LOGIN}</span>],
+      ["Type `help` for assistance."],
+      [""],
+    ]
+  };
 
   const DEFAULT_ENVIRONMENT = {
     SHELL: '/bin/blah',
@@ -35,12 +43,13 @@ function ShellPrompt() {
     localStorage.setItem(LS_KEY_COMMAND_HISTORY, '[]');
   }
 
-  const [consoleLines, setConsoleLines] = useState<Array<ConsoleLine>[]>(WELCOME_MESSAGE);
+  const [consoleLines, setConsoleLines] = useState<CommandResult[]>([WELCOME_MESSAGE]);
   const [commandHistory, setCommandHistory] = useState<string[]>(defaultCommandHistory);
   const [commandPointer, setCommandPointer] = useState<number>(DEFAULT_COMMAND_POINTER);
   const [environment, setEnvironment] = useState<Record<string,string>>(DEFAULT_ENVIRONMENT);
   const [workingDir/*, setWorkingDir*/] = useState<string>('/');
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const preBottomRef = useRef<HTMLSpanElement | null>(null);
 
   type User = {
     name: string;
@@ -217,23 +226,29 @@ function ShellPrompt() {
     switch (event.key) {
       case "Enter":
         if (inputRef.current) {
-          const input = inputRef.current.value.trimEnd().split(' ');
-          const newLines: ConsoleLine[][] = [['\n'], ["$", ...input.slice()]];
+          const input = inputRef.current.value.trimEnd();
+          const newCommandResult: CommandResult = {
+            timestamp: new Date(),
+            command: input,
+            response: [['']]
+          };
 
           // add to history
-          setCommandHistory([...commandHistory, inputRef.current.value]);
+          setCommandHistory([...commandHistory, input]);
 
-          // execute command
-          const command = input.shift();
-          const args = input.filter(i => typeof i === 'string');
-          const response = typeof command === 'string' && command.length > 0 ?
-            execCommand(command, ...args as string[]) : [['']];
-          newLines.push(...response);
+          if (newCommandResult.command) {
+            // execute command
+            const [command, ...args] = newCommandResult.command.split(' ');
+            // const command = input.shift();
+            // const args = input.filter(i => typeof i === 'string');
+            newCommandResult.response = typeof command === 'string' && command.length > 0 ?
+              execCommand(command, ...args as string[]) : [['']];
+          }
 
           // clear input
           inputRef.current.value = '';
           //write lines
-          setConsoleLines([...consoleLines, ...newLines]);
+          setConsoleLines([...consoleLines, newCommandResult]);
           // reset command pointer
           setCommandPointer(0);
         }
@@ -304,19 +319,31 @@ function ShellPrompt() {
     localStorage.setItem(LS_KEY_COMMAND_HISTORY, JSON.stringify(commandHistory.slice(-20)));
   }, [commandPointer, commandHistory])
 
+  // Scroll the pre to the bottom after each command
+  useEffect(() => {
+    // wait for a loop so content can load
+    setTimeout(() => preBottomRef.current?.scrollIntoView({ behavior: 'smooth' }));
+  }, [consoleLines]);
+
   // set last login
   localStorage.setItem(LS_KEY_LAST_LOGIN, (new Date()).toISOString());
 
   return (
     <div className="shell">
-      <pre style={{maxHeight: "80vh", minHeight: "20vh", flexDirection: "column-reverse", display: "flex"}}
+      <pre style={{maxHeight: "80vh", minHeight: "20vh"}}
         aria-label='A text-based console.'
         // eslint-disable-next-line jsx-a11y/aria-props
         aria-description='This area is meant to depict an older styled computer console where commands can be typed and responses will be shown.'
         aria-live='polite'>
-        {consoleLines.slice().reverse().map((line, index) => (
-            <span key={index}>{line.reduce((result, item) => <>{result}{' '}{item}</>)}</span>
+        {consoleLines.map((commandResult, commandIndex) => (
+            <span key={commandIndex}>
+              {commandResult.command && <span title={commandResult.timestamp.toISOString()}>{`\n\n$ ${commandResult.command}`}</span>}
+              {commandResult.response.map((commandLine, lineIndex) => (
+                <span key={lineIndex}>{'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}</span>
+              ))}
+            </span>
         ))}
+        <span ref={preBottomRef} />
       </pre>
       <form onSubmit={handleSubmit}>
         <div style={{display: 'flex', alignItems: 'stretch'}}>
