@@ -186,10 +186,9 @@ function ShellPrompt() {
 
     COMMANDS.set('users', {
         description: 'List users',
-        run: () => Object.keys(USERS).map(userName => [userName])
+        run: () => [...USERS.keys()].map(userName => [userName])
     });
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     COMMANDS.set('view-source', {
         description: 'View the source of this app',
         run: () => {
@@ -331,8 +330,8 @@ function ShellPrompt() {
     useEffect(() => {
         if (
             commandPointer > DEFAULT_COMMAND_POINTER
-      && commandPointer <= commandHistory.length
-      && inputRef.current !== null
+            && commandPointer <= commandHistory.length
+            && inputRef.current !== null
         ) {
             inputRef.current.value = commandHistory[commandHistory.length - commandPointer];
         }
@@ -361,7 +360,9 @@ function ShellPrompt() {
                 {consoleLines.map((commandResult, commandIndex) => (
                     <span key={commandIndex}>
                         {commandResult.command &&
-                        <span title={commandResult.timestamp.toISOString()}>{`\n\n$ ${commandResult.command}`}</span>}
+                        <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
+                            {'\n\n'}{<span aria-hidden>$</span>} {commandResult.command}
+                        </span>}
                         {commandResult.response.map((commandLine, lineIndex) => (
                             <span key={lineIndex}>
                                 {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}

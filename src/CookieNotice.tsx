@@ -32,7 +32,7 @@ function CookieNotice() {
                     Do you acknowledge that this site uses cookies?
                         <div style={{ textAlign: 'right' }}>
                             <button onClick={() => cookieAcknowledge(true)}>Yes</button>
-                    &nbsp;
+                            &nbsp;
                             <button onClick={() => cookieAcknowledge(false)}>No</button>
                         </div>
                     </pre>
