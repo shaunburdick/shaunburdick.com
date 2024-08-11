@@ -39,7 +39,7 @@ function ShellPrompt() {
     try {
         const storedCommandHistory = localStorage.getItem(LS_KEY_COMMAND_HISTORY);
         defaultCommandHistory = storedCommandHistory !== null ? JSON.parse(storedCommandHistory) : [];
-    } catch (e) {
+    } catch {
         localStorage.setItem(LS_KEY_COMMAND_HISTORY, '[]');
     }
 
@@ -136,7 +136,7 @@ function ShellPrompt() {
                 return [
                     ['List of Commands:'],
                     ...[...COMMANDS]
-                        .filter(([k, v]) => !v.secret)
+                        .filter(cmd => !cmd[1].secret)
                         .map(([commandName, commandInfo]) => [`${commandName}:`, commandInfo.description])
                 ];
             }
@@ -159,7 +159,7 @@ function ShellPrompt() {
                 } else {
                     return [[`Unknown protocol: ${url.protocol}`]];
                 }
-            } catch (e) {
+            } catch {
                 return [[`Cannot open: ${target}`]];
             }
         }
@@ -244,6 +244,21 @@ function ShellPrompt() {
         event.preventDefault();
     };
 
+    const execCommand = (commandName: string, ...args: string[]): ConsoleLine[][] => {
+        // record command
+        tracker.trackEvent('execCommand', { props: { commandName, args: args.join(' ') } });
+
+        const command = COMMANDS.get(commandName.toLowerCase());
+        if (command) {
+            return command.run(...args);
+        } else {
+            return [
+                ['Unknown Command: ', commandName],
+                ['Type `help` for assistance']
+            ];
+        }
+    };
+
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         switch (event.key) {
             case 'Enter':
@@ -306,21 +321,6 @@ function ShellPrompt() {
         }
     };
 
-    const execCommand = (commandName: string, ...args: string[]): ConsoleLine[][] => {
-        // record command
-        tracker.trackEvent('execCommand', { props: { commandName, args: args.join(' ') } });
-
-        const command = COMMANDS.get(commandName.toLowerCase());
-        if (command) {
-            return command.run(...args);
-        } else {
-            return [
-                ['Unknown Command: ', commandName],
-                ['Type `help` for assistance']
-            ];
-        }
-    };
-
     // focus on input on load
     useEffect(() => {
         inputRef.current?.focus();
@@ -353,7 +353,7 @@ function ShellPrompt() {
         <div className="shell">
             <pre style={{ maxHeight: '80vh', minHeight: '20vh' }}
                 aria-label='A text-based console.'
-                // eslint-disable-next-line jsx-a11y/aria-props
+                // *eslint-disable-next-line jsx-a11y/aria-props
                 aria-description='This area is meant to depict an older styled computer console
                 where commands can be typed and responses will be shown.'
                 aria-live='polite'>
@@ -384,7 +384,7 @@ function ShellPrompt() {
                         autoCorrect='off'
                         autoCapitalize='none'
                         aria-label='An input to enter commands.'
-                        // eslint-disable-next-line jsx-a11y/aria-props
+                        // *eslint-disable-next-line jsx-a11y/aria-props
                         aria-description='When a command is entered, it will be run by the console interpreter
                         and the above output will be updated with the result'
                     />

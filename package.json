@@ -46,11 +46,9 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@types/react-helmet": "^6.1.11",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "eslint": "^8.57.0",
-    "eslint-config-shaunburdick": "^0.0.1",
-    "eslint-plugin-import": "^2.29.1"
+    "eslint": "^9.9.0",
+    "eslint-config-shaunburdick": "^1.0.0",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.9.0"
   }
 }

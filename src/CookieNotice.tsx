@@ -25,11 +25,11 @@ function CookieNotice() {
             {showCookieMessage &&
                 <div style={{ position: 'fixed', bottom: 0, maxWidth: '750px' }}>
                     <pre aria-label="Cookie Notice">
-                    This site uses cookies to feed its developer in an effort to get them to write code.
-                    So far it seems to be working.
+                        This site uses cookies to feed its developer in an effort to get them to write code.
+                        So far it seems to be working.
                         <br />
                         <br />
-                    Do you acknowledge that this site uses cookies?
+                        Do you acknowledge that this site uses cookies?
                         <div style={{ textAlign: 'right' }}>
                             <button onClick={() => cookieAcknowledge(true)}>Yes</button>
                             &nbsp;
