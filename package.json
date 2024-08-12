@@ -41,8 +41,6 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "eslint": "^9.9.0",
-    "eslint-config-shaunburdick": "^1.0.0",
-    "eslint-plugin-react": "^7.35.0",
-    "globals": "^15.9.0"
+    "eslint-config-shaunburdick": "^2.0.1"
   }
 }
