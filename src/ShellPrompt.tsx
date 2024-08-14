@@ -10,11 +10,11 @@ function ShellPrompt() {
 
     const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
 
-    type ConsoleLine = string | React.JSX.Element;
+    type ConsoleLine = Array<string | React.JSX.Element>;
     interface CommandResult {
         timestamp: Date;
         command?: string;
-        response: ConsoleLine[][];
+        response: ConsoleLine[];
     }
 
     const WELCOME_MESSAGE: CommandResult = {
@@ -88,7 +88,7 @@ function ShellPrompt() {
     interface Command {
         description: string;
         secret?: boolean;
-        run: (...args: string[]) => ConsoleLine[][];
+        run: (...args: string[]) => ConsoleLine[];
     }
 
     const COMMANDS = new Map<string, Command>();
@@ -105,7 +105,7 @@ function ShellPrompt() {
     COMMANDS.set('env', {
         description: 'Print Environment',
         run: () => {
-            const response: ConsoleLine[][] = [];
+            const response: ConsoleLine[] = [];
 
             environment.forEach((k, v) => {
                 response.push([`${k}=${v}`]);
@@ -209,7 +209,7 @@ function ShellPrompt() {
         run: (username: string) => {
             const user = USERS.get(username);
             if (user) {
-                const response: ConsoleLine[][] = [];
+                const response: ConsoleLine[] = [];
 
                 if (user.image) {
                     response.push([<img src={user.image} alt={user.name} width={'50%'}/>]);
@@ -244,7 +244,7 @@ function ShellPrompt() {
         event.preventDefault();
     };
 
-    const execCommand = (commandName: string, ...args: string[]): ConsoleLine[][] => {
+    const execCommand = (commandName: string, ...args: string[]): ConsoleLine[] => {
         // record command
         tracker.trackEvent('execCommand', { props: { commandName, args: args.join(' ') } });
 
