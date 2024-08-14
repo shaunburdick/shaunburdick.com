@@ -1,5 +1,5 @@
-import { MouseEventHandler, useContext, useState } from 'react';
-import { TrackerContext } from './Tracker';
+import { useContext, useState } from 'react';
+import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 
 type HintsProps = {
     hintClick?: (hint: string) => void
@@ -12,7 +12,7 @@ function Hints({ hintClick }: HintsProps) {
     const [showHints, setShowHints] = useState<boolean>(false);
 
     const toggleHints = (ack: boolean) => {
-        tracker.trackEvent('toggleHints', { props: { ack } });
+        tracker.trackEvent(TRACKER_EVENTS.ToggleHints, { props: { ack } });
         setShowHints(ack);
     };
 

@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { TrackerContext } from './Tracker';
+import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 
 function CookieNotice() {
 
@@ -10,7 +10,7 @@ function CookieNotice() {
     const [showCookieMessage, setShowCookieMessage] = useState<boolean>(initialShowCookie);
 
     const cookieAcknowledge = (ack: boolean) => {
-        tracker.trackEvent('cookieAcknowledge', { props: { ack } });
+        tracker.trackEvent(TRACKER_EVENTS.CookieAcknowledge, { props: { ack } });
 
         if (ack) {
             setShowCookieMessage(false);

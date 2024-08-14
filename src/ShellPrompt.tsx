@@ -1,9 +1,15 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { TrackerContext } from './Tracker';
+import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 import Hints from './Hints';
 
+/**
+ * Creates an interactive shell prompt that allows users to run commands
+ * The commands attempt to replicate a common bash shell interface
+ * with fun little quirks
+ *
+ * @return JSX representing a Shell Prompt
+ */
 function ShellPrompt() {
-
     const tracker = useContext(TrackerContext);
 
     const LS_KEY_LAST_LOGIN = 'lastLogin';
@@ -12,7 +18,7 @@ function ShellPrompt() {
     const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
 
     type ConsoleLine = Array<string | React.JSX.Element>;
-    interface CommandResult {
+    type CommandResult = {
         timestamp: Date;
         command?: string;
         response: ConsoleLine[];
@@ -64,6 +70,9 @@ function ShellPrompt() {
         }[]
     }
 
+    /**
+     * A map of users known on the system
+     */
     const USERS = new Map<string, User>();
 
     USERS.set('shaun', {
@@ -92,6 +101,9 @@ function ShellPrompt() {
         run: (...args: string[]) => ConsoleLine[];
     }
 
+    /**
+     * A map of commands available to run
+     */
     const COMMANDS = new Map<string, Command>();
 
     COMMANDS.set('clear', {
@@ -247,7 +259,7 @@ function ShellPrompt() {
 
     const execCommand = (commandName: string, ...args: string[]): ConsoleLine[] => {
         // record command
-        tracker.trackEvent('execCommand', { props: { commandName, args: args.join(' ') } });
+        tracker.trackEvent(TRACKER_EVENTS.ExecCommand, { props: { commandName, args: args.join(' ') } });
 
         const command = COMMANDS.get(commandName.toLowerCase());
         if (command) {
@@ -295,7 +307,7 @@ function ShellPrompt() {
                 break;
             case 'ArrowUp':
                 event.preventDefault();
-                tracker.trackEvent('historyUpArrow');
+                tracker.trackEvent(TRACKER_EVENTS.HistoryUpArrow);
                 if (commandPointer < commandHistory.length) {
                     setCommandPointer(commandPointer + 1);
                 }
@@ -322,6 +334,12 @@ function ShellPrompt() {
         }
     };
 
+    /**
+     * Set the command input to the value specified
+     * Used with the Hints component, when a user clicks a hint it is copied into the input
+     *
+     * @param command The command value to specify
+     */
     const hintClick = (command: string) => {
         if (inputRef.current !== null) {
             inputRef.current.value = command;
@@ -329,12 +347,17 @@ function ShellPrompt() {
         }
     };
 
-    // focus on input on load
+    /**
+     * When the page loads, set the command input as the current focus
+     */
     useEffect(() => {
         inputRef.current?.focus();
     });
 
-    // update input on history toggle
+    /**
+     * Set the command input value to the command history value when the pointer changes
+     * This is used for the up/down arrow history function
+     */
     useEffect(() => {
         if (
             commandPointer > DEFAULT_COMMAND_POINTER
@@ -348,7 +371,10 @@ function ShellPrompt() {
         localStorage.setItem(LS_KEY_COMMAND_HISTORY, JSON.stringify(commandHistory.slice(-20)));
     }, [commandPointer, commandHistory]);
 
-    // Scroll the pre to the bottom after each command
+    /**
+     * Scroll the console window to the bottom of the latest command
+     * each time a new command line is added
+     */
     useEffect(() => {
         // wait for a loop so content can load
         setTimeout(() => preBottomRef.current?.scrollIntoView({ behavior: 'smooth' }));
@@ -367,17 +393,17 @@ function ShellPrompt() {
                 aria-live='polite'
                 role='log'>
                 {consoleLines.map((commandResult, commandIndex) => (
-                    <span key={commandIndex}>
+                    <div key={commandIndex} style={{ marginBottom: "1.5em"}}>
                         {commandResult.command &&
                         <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
-                            {'\n\n'}{<span aria-hidden>$</span>} {commandResult.command}
+                            {<span aria-hidden>$</span>} {commandResult.command}
                         </span>}
                         {commandResult.response.map((commandLine, lineIndex) => (
                             <span key={lineIndex}>
                                 {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
                             </span>
                         ))}
-                    </span>
+                    </div>
                 ))}
                 <span ref={preBottomRef} />
             </pre>
