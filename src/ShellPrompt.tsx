@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TrackerContext } from './Tracker';
+import Hints from './Hints';
 
 function ShellPrompt() {
 
@@ -321,6 +322,13 @@ function ShellPrompt() {
         }
     };
 
+    const hintClick = (command: string) => {
+        if (inputRef.current !== null) {
+            inputRef.current.value = command;
+            inputRef.current.focus();
+        }
+    };
+
     // focus on input on load
     useEffect(() => {
         inputRef.current?.focus();
@@ -391,6 +399,7 @@ function ShellPrompt() {
                     />
                 </div>
             </form>
+            <Hints hintClick={hintClick} />
         </div>
     );
 }
