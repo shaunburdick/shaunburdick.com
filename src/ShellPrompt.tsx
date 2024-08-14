@@ -390,7 +390,6 @@ function ShellPrompt() {
                 // *eslint-disable-next-line jsx-a11y/aria-props
                 aria-description='This area is meant to depict an older styled computer console
                 where commands can be typed and responses will be shown.'
-                aria-live='polite'
                 role='log'>
                 {consoleLines.slice(0, -1).map((commandResult, commandIndex) => (
                     <div key={commandIndex} style={{ marginTop: "1.5em"}}>
