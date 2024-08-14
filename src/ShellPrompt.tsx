@@ -393,7 +393,7 @@ function ShellPrompt() {
                 aria-live='polite'
                 role='log'>
                 {consoleLines.map((commandResult, commandIndex) => (
-                    <div key={commandIndex} style={{ marginBottom: "1.5em"}}>
+                    <div key={commandIndex} style={{ marginTop: "1.5em"}}>
                         {commandResult.command &&
                         <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
                             {<span aria-hidden>$</span>} {commandResult.command}
