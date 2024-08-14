@@ -392,7 +392,7 @@ function ShellPrompt() {
                 where commands can be typed and responses will be shown.'
                 aria-live='polite'
                 role='log'>
-                {consoleLines.map((commandResult, commandIndex) => (
+                {consoleLines.slice(0, -1).map((commandResult, commandIndex) => (
                     <div key={commandIndex} style={{ marginTop: "1.5em"}}>
                         {commandResult.command &&
                         <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
@@ -405,6 +405,20 @@ function ShellPrompt() {
                         ))}
                     </div>
                 ))}
+                <div style={{ marginTop: '1em' }} aria-live='polite'>
+                    {consoleLines.length > 0 &&
+                        <>
+                            <span title={consoleLines[consoleLines.length-1].timestamp.toISOString()} aria-label='The command that was run'>
+                                {<span aria-hidden>$</span>} {consoleLines[consoleLines.length-1].command}
+                            </span>
+                            {consoleLines[consoleLines.length-1].response.map((commandLine, lineIndex) => (
+                                <span key={lineIndex}>
+                                    {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
+                                </span>
+                            ))}
+                        </>
+                    }
+                </div>
                 <span ref={preBottomRef} />
             </pre>
             <form onSubmit={handleSubmit}>
