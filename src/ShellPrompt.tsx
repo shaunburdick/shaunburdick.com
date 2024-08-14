@@ -302,8 +302,11 @@ function ShellPrompt() {
                 }
                 break;
             case 'Tab':
-                event.preventDefault();
-                // add tab completion?
+                // if input is empty, allow them to tab out
+                if (inputRef.current?.value) {
+                    // add tab completion?
+                    event.preventDefault();
+                }
                 break;
             case 'ArrowUp':
                 event.preventDefault();
@@ -389,8 +392,7 @@ function ShellPrompt() {
                 aria-label='A text-based console.'
                 // *eslint-disable-next-line jsx-a11y/aria-props
                 aria-description='This area is meant to depict an older styled computer console
-                where commands can be typed and responses will be shown.'
-                role='log'>
+                where commands can be typed and responses will be shown.'>
                 {consoleLines.slice(0, -1).map((commandResult, commandIndex) => (
                     <div key={commandIndex} style={{ marginTop: "1.5em"}}>
                         {commandResult.command &&
@@ -407,9 +409,10 @@ function ShellPrompt() {
                 <div style={{ marginTop: '1em' }} aria-live='polite'>
                     {consoleLines.length > 0 &&
                         <>
+                            {consoleLines[consoleLines.length-1].command &&
                             <span title={consoleLines[consoleLines.length-1].timestamp.toISOString()} aria-label='The command that was run'>
                                 {<span aria-hidden>$</span>} {consoleLines[consoleLines.length-1].command}
-                            </span>
+                            </span>}
                             {consoleLines[consoleLines.length-1].response.map((commandLine, lineIndex) => (
                                 <span key={lineIndex}>
                                     {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
