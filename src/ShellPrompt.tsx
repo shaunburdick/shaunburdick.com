@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 import Hints from './Hints';
+import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
 
 /**
  * Creates an interactive shell prompt that allows users to run commands
@@ -16,13 +17,6 @@ function ShellPrompt() {
     const LS_KEY_COMMAND_HISTORY = 'commandHistory';
 
     const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
-
-    type ConsoleLine = Array<string | React.JSX.Element>;
-    type CommandResult = {
-        timestamp: Date;
-        command?: string;
-        response: ConsoleLine[];
-    }
 
     const WELCOME_MESSAGE: CommandResult = {
         timestamp: new Date(),
@@ -53,6 +47,7 @@ function ShellPrompt() {
     const [consoleLines, setConsoleLines] = useState<CommandResult[]>([WELCOME_MESSAGE]);
     const [commandHistory, setCommandHistory] = useState<string[]>(defaultCommandHistory);
     const [commandPointer, setCommandPointer] = useState<number>(DEFAULT_COMMAND_POINTER);
+    const [lastCommand, setLastCommand] = useState<CommandResult | undefined>(WELCOME_MESSAGE);
     const [environment, setEnvironment] = useState<Map<string,string>>(DEFAULT_ENVIRONMENT);
     const [workingDir/* , setWorkingDir*/] = useState<string>('/');
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -110,7 +105,11 @@ function ShellPrompt() {
         description: 'Clears the screen',
         run: () => {
             // use setTimeout to clear screen after this loop is finished
-            setTimeout(() => setConsoleLines([]));
+            setTimeout(() => {
+                setConsoleLines([]);
+                setLastCommand(undefined);
+            });
+
             return [];
         }
     });
@@ -295,6 +294,8 @@ function ShellPrompt() {
 
                     // clear input
                     inputRef.current.value = '';
+                    // set last command
+                    setLastCommand(newCommandResult);
                     // write lines
                     setConsoleLines([...consoleLines, newCommandResult]);
                     // reset command pointer
@@ -394,32 +395,27 @@ function ShellPrompt() {
                 aria-description='This area is meant to depict an older styled computer console
                 where commands can be typed and responses will be shown.'>
                 {consoleLines.slice(0, -1).map((commandResult, commandIndex) => (
-                    <div key={commandIndex} style={{ marginTop: "1.5em"}}>
-                        {commandResult.command &&
-                        <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
-                            {<span aria-hidden>$</span>} {commandResult.command}
-                        </span>}
-                        {commandResult.response.map((commandLine, lineIndex) => (
-                            <span key={lineIndex}>
-                                {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
-                            </span>
-                        ))}
-                    </div>
+                    <ConsoleOutput key={commandIndex} commandResult={commandResult}/>
                 ))}
-                <div style={{ marginTop: '1em' }} aria-live='polite'>
-                    {consoleLines.length > 0 &&
+                {/*
+                  * aria-live works best when the element is always present and visible on the page
+                  * To make the console outputs announce consistently, I take the last item from the
+                  * consoleLines and update a persisted output. That way the element is not being redrawn
+                  * on each update
+                  */}
+                <div style={{ marginTop: '1.5em' }} aria-live='polite'>
+                    {lastCommand &&
                         <>
-                            {consoleLines[consoleLines.length-1].command &&
-                            <span title={consoleLines[consoleLines.length-1].timestamp.toISOString()} aria-label='The command that was run'>
-                                {<span aria-hidden>$</span>} {consoleLines[consoleLines.length-1].command}
+                            {lastCommand.command &&
+                            <span title={lastCommand.timestamp.toISOString()} aria-label='The command that was run'>
+                                {<span aria-hidden>$</span>} {lastCommand?.command}
                             </span>}
-                            {consoleLines[consoleLines.length-1].response.map((commandLine, lineIndex) => (
+                            {lastCommand.response.map((commandLine, lineIndex) => (
                                 <span key={lineIndex}>
                                     {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
                                 </span>
                             ))}
-                        </>
-                    }
+                        </>}
                 </div>
                 <span ref={preBottomRef} />
             </pre>
