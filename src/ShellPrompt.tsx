@@ -3,6 +3,9 @@ import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 import Hints from './Hints';
 import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
 
+export const LS_KEY_LAST_LOGIN = 'lastLogin';
+export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
+
 /**
  * Creates an interactive shell prompt that allows users to run commands
  * The commands attempt to replicate a common bash shell interface
@@ -12,9 +15,6 @@ import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
  */
 function ShellPrompt() {
     const tracker = useContext(TrackerContext);
-
-    const LS_KEY_LAST_LOGIN = 'lastLogin';
-    const LS_KEY_COMMAND_HISTORY = 'commandHistory';
 
     const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
 
