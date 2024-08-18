@@ -381,7 +381,12 @@ function ShellPrompt() {
      */
     useEffect(() => {
         // wait for a loop so content can load
-        setTimeout(() => preBottomRef.current?.scrollIntoView({ behavior: 'smooth' }));
+        setTimeout(() => {
+            // this causes timing issues with some tests, better safe to check the method exists
+            if (preBottomRef.current?.scrollIntoView) {
+                preBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
     }, [consoleLines]);
 
     // set last login
