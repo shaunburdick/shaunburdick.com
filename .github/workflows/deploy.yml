@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Run tests
-        run: ${{ steps.detect-package-manager.outputs.manager }} npm t
+        run: ${{ steps.detect-package-manager.outputs.runner }} npm t
       - name: Build project
         run: ${{ steps.detect-package-manager.outputs.runner }} npm run build
       - name: Upload artifact
