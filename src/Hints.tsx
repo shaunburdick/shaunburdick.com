@@ -1,9 +1,9 @@
 import { useContext, useState } from 'react';
 import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 
-type HintsProps = {
+interface HintsProps {
     hintClick?: (hint: string) => void
-};
+}
 
 function Hints({ hintClick }: HintsProps) {
 
@@ -36,11 +36,15 @@ function Hints({ hintClick }: HintsProps) {
                     </thead>
                     <tbody>
                         <tr>
-                            <td><a onClick={onHintClick} href='#' title='Click to copy command to input'>whois shaun</a></td>
+                            <td>
+                                <a onClick={onHintClick} href='#' title='Click to copy command to input'>whois shaun</a>
+                            </td>
                             <td>Show information on Shaun</td>
                         </tr>
                         <tr>
-                            <td><a onClick={onHintClick} href='#' title='Click to copy command to input'>rm -rf /</a></td>
+                            <td>
+                                <a onClick={onHintClick} href='#' title='Click to copy command to input'>rm -rf /</a>
+                            </td>
                             <td>Delete all files</td>
                         </tr>
                     </tbody>

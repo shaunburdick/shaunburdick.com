@@ -1,16 +1,16 @@
 import React from 'react';
 
-export type ConsoleLine = Array<string | React.JSX.Element>;
-export type CommandResult = {
+export type ConsoleLine = (string | React.JSX.Element)[];
+export interface CommandResult {
     timestamp: Date;
     command?: string;
     response: ConsoleLine[];
-}
+};
 
-type ConsoleOutputProps = {
+interface ConsoleOutputProps {
     ariaLive?: React.AriaAttributes['aria-live'],
     commandResult?: CommandResult
-}
+};
 
 /**
  * Creates a representation of a Console output
