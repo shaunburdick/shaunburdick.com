@@ -23,7 +23,7 @@ function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
         <div style={{ marginTop: '1.5em' }} aria-live={ariaLive}>
             {commandResult &&
                 <>
-                    {commandResult.command &&
+                    {'command' in commandResult &&
                     <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
                         {<span aria-hidden>$</span>} {commandResult?.command}
                     </span>}

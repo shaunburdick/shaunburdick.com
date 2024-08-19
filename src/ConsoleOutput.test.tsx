@@ -17,6 +17,11 @@ describe('ConsoleOutput', () => {
                 ['no command']
             ]
         },
+        emptyCommand:  {
+            timestamp: new Date(),
+            command: '',
+            response: []
+        },
         multiLine: {
             timestamp: new Date(),
             command: 'multiline',
@@ -41,6 +46,15 @@ describe('ConsoleOutput', () => {
         expect(screen.getByText(`${testCommands.basic.command}`)).toBeInTheDocument();
         expect(screen.getByText(`${testCommands.basic.response[0][0]}`)).toBeInTheDocument();
         expect(document.body.querySelector('div [aria-live=polite]')).toBeInTheDocument();
+    });
+
+    test('Show empty command if an empty command is sent', () => {
+        act(() => render(<ConsoleOutput commandResult={testCommands.emptyCommand} />));
+
+        const commandSpan = document.body.querySelector('[aria-hidden]');
+        expect(commandSpan).toBeInTheDocument();
+        expect(commandSpan?.parentElement?.textContent).toBe('$ ');
+        expect(document.body.querySelector('[aria-label="The command that was run"]')).toBeInTheDocument();
     });
 
     test('Show no command if none is provided', () => {

@@ -57,6 +57,18 @@ describe('ShellPrompt', () => {
                 expect(consoleCommands[0]).toBeEmptyDOMElement();
             });
         });
+
+        test('Empty command should show an empty result', async () => {
+            userEvent.setup();
+            act(() => render(<ShellPrompt />));
+
+            await userEvent.keyboard('{Enter}');
+
+            const latestCommand = document.body.querySelector('[aria-live="polite"]');
+            const commandSpan = latestCommand?.querySelector('[aria-hidden]');
+            expect(commandSpan).toBeInTheDocument();
+            expect(commandSpan?.parentElement?.textContent).toBe('$ ');
+        });
     });
 
     describe('Hints', () => {

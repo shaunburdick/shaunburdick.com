@@ -411,7 +411,7 @@ function ShellPrompt() {
                 <div style={{ marginTop: '1.5em' }} aria-live='polite'>
                     {lastCommand &&
                         <>
-                            {lastCommand.command &&
+                            {'command' in lastCommand &&
                             <span title={lastCommand.timestamp.toISOString()} aria-label='The command that was run'>
                                 {<span aria-hidden>$</span>} {lastCommand?.command}
                             </span>}
