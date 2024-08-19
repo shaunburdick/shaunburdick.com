@@ -20,11 +20,11 @@ describe('CookieNotice', () => {
         // click the show button
         fireEvent.click(button);
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).not.toBeInTheDocument();
-        expect(localStorage.getItem(LS_COOKIE_ACKNOWLEDGE)).toEqual('false');
+        expect(localStorage.getItem(LS_COOKIE_ACKNOWLEDGE)).toEqual('true');
     });
 
     test('Hide cookie notice if they have already accepted', () => {
-        localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'false');
+        localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'true');
 
         act(() => render(<CookieNotice />));
 

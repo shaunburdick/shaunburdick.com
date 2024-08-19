@@ -8,7 +8,7 @@ function CookieNotice() {
     const tracker = useContext(TrackerContext);
 
 
-    const initialShowCookie = (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'true') === 'true';
+    const initialShowCookie = (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'false') !== 'true';
     const [showCookieMessage, setShowCookieMessage] = useState<boolean>(initialShowCookie);
 
     const cookieAcknowledge = (ack: boolean) => {
@@ -16,7 +16,7 @@ function CookieNotice() {
 
         if (ack) {
             setShowCookieMessage(false);
-            localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'false');
+            localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'true');
         } else {
             window.location.href = 'https://www.oreo.com/';
         }
