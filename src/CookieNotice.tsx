@@ -25,7 +25,7 @@ function CookieNotice() {
     return (
         <>
             {showCookieMessage &&
-                <div style={{ position: 'fixed', bottom: 0, maxWidth: '750px' }}>
+                <div style={{ position: 'fixed', bottom: 0, maxWidth: '750px', paddingRight: '2em' }}>
                     <pre aria-label="Cookie Notice">
                         This site uses cookies to feed its developer in an effort to get them to write code.
                         So far it seems to be working.
