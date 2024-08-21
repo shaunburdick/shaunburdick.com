@@ -40,7 +40,11 @@ jobs:
             - name: Install dependencies
               run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
             - name: Run tests
-              run: ${{ steps.detect-package-manager.outputs.manager }} t
+              run: ${{ steps.detect-package-manager.outputs.manager }} run test:ci
+            - name: Test Coverage
+              uses: ArtiomTr/jest-coverage-report-action@v2
+              with:
+                  coverage-file: ./coverage/coverage-final.json
             - name: Build project
               run: ${{ steps.detect-package-manager.outputs.manager }} run build
             - name: Upload artifact

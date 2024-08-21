@@ -11,14 +11,15 @@
     "react-dom": "^18.3.1"
   },
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
     "build": "NODE_ENV=production webpack --config webpack.production.js",
+    "lint:fix": "npm run lint -- --fix",
+    "lint": "eslint .",
     "start": "webpack serve --config webpack.development.js",
-    "test": "npm run lint && npm run test:unit",
+    "test:ci": "npm run lint && npm run test:coverage",
+    "test:coverage": "jest --coverage",
     "test:unit": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test": "npm run lint && npm run test:unit"
   },
   "browserslist": {
     "production": [

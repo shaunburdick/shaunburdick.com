@@ -3,6 +3,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import CookieNotice, { LS_COOKIE_ACKNOWLEDGE } from './CookieNotice';
 
 describe('CookieNotice', () => {
+    beforeEach(() => {
+        localStorage.clear();
+    });
+
     test('Display the cookie notice', () => {
         act(() => render(<CookieNotice />));
 
@@ -29,6 +33,42 @@ describe('CookieNotice', () => {
         act(() => render(<CookieNotice />));
 
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).not.toBeInTheDocument();
+    });
+
+    test('Show cookie joke if you click no', () => {
+        const { location } = window;
+        const getHrefSpy = jest.fn(() => 'example.com');
+        const setHrefSpy = jest.fn(href => href);
+
+        // @ts-ignore - clear out the locations object and redefine
+        delete window.location;
+        // @ts-ignore
+        window.location = {};
+
+        Object.defineProperty(window.location, 'href', {
+            get: getHrefSpy,
+            set: setHrefSpy,
+        });
+
+        act(() => render(<CookieNotice />));
+
+        const button = screen.getByText('No');
+
+        expect(button).toBeInTheDocument();
+        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
+
+        // click the show button
+        fireEvent.click(button);
+
+        expect(setHrefSpy).toHaveBeenCalledTimes(1)
+        expect(setHrefSpy).toHaveBeenCalledWith(
+            'https://www.oreo.com/',
+        );
+
+        // notice should stay on the screen
+        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
+
+        window.location = location;
     });
 });
 

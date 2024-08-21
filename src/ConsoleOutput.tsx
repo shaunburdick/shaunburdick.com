@@ -25,7 +25,7 @@ function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
                 <>
                     {'command' in commandResult &&
                     <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
-                        {<span aria-hidden>$</span>} {commandResult?.command}
+                        {<span aria-hidden>$</span>} {commandResult.command}
                     </span>}
                     {commandResult.response.map((commandLine, lineIndex) => (
                         <span key={lineIndex}>
