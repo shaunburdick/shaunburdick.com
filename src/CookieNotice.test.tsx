@@ -40,9 +40,9 @@ describe('CookieNotice', () => {
         const getHrefSpy = jest.fn(() => 'example.com');
         const setHrefSpy = jest.fn(href => href);
 
-        // @ts-ignore - clear out the locations object and redefine
+        // @ts-expect-error - clear out the locations object and redefine
         delete window.location;
-        // @ts-ignore
+        // @ts-expect-error - set an empty object to fill
         window.location = {};
 
         Object.defineProperty(window.location, 'href', {
@@ -60,7 +60,7 @@ describe('CookieNotice', () => {
         // click the show button
         fireEvent.click(button);
 
-        expect(setHrefSpy).toHaveBeenCalledTimes(1)
+        expect(setHrefSpy).toHaveBeenCalledTimes(1);
         expect(setHrefSpy).toHaveBeenCalledWith(
             'https://www.oreo.com/',
         );
