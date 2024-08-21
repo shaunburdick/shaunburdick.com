@@ -1,5 +1,8 @@
 # ShaunBurdick.com
 
+![Deploy](https://github.com/shaunburdick/shaunburdick.com/actions/workflows/deploy.yml/badge.svg)
+![Docker](https://github.com/shaunburdick/shaunburdick.com/actions/workflows/docker.yml/badge.svg)
+
 My Personal Website and Playground for various technologies and ideas I wish to play with.
 
 ## Current Iteration
