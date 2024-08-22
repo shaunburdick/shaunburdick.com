@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 import Hints from './Hints';
 import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
+import { displayUser, USERS } from './Users';
 
 export const LS_KEY_LAST_LOGIN = 'lastLogin';
 export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
@@ -52,44 +53,6 @@ function ShellPrompt() {
     const [workingDir/* , setWorkingDir*/] = useState<string>('/');
     const inputRef = useRef<HTMLInputElement | null>(null);
     const preBottomRef = useRef<HTMLSpanElement | null>(null);
-
-    interface User {
-        name: string;
-        image?: string;
-        occupation?: string[],
-        location?: string,
-        expertise?: string[],
-        links?: {
-            url: string;
-            text: string;
-        }[]
-    }
-
-    /**
-     * A map of users known on the system
-     */
-    const USERS = new Map<string, User>();
-
-    USERS.set('shaun', {
-        name: 'Shaun Burdick',
-        image: 'shaun.png',
-        occupation: [ 'Father', 'Husband', 'Leader', 'Engineer' ],
-        location: 'Syracuse, NY',
-        expertise: [
-            'Engineering Leader',
-            'Web Architecture and Design',
-            'Large scale data collection',
-            'API Design and Implementation',
-            'Agile/Scrum team management',
-            'Project Management'
-        ],
-        links: [
-            { url: 'https://www.linkedin.com/in/shaunburdick/', text: 'LinkedIn' },
-            { url: 'https://github.com/shaunburdick/', text: 'GitHub' },
-            { url: `mailto://${atob('c2l0ZS1jb250YWN0QHNoYXVuYnVyZGljay5jb20=')}`, text: 'Email' },
-            { url: 'https://zcal.co/shaunburdick', text: 'Calendar' }
-        ]
-    });
 
     interface Command {
         description: string;
@@ -222,26 +185,7 @@ function ShellPrompt() {
         run: (username: string) => {
             const user = USERS.get(username);
             if (user) {
-                const response: ConsoleLine[] = [];
-
-                if (user.image) {
-                    response.push([<img src={user.image} alt={user.name} width={'50%'}/>]);
-                }
-                response.push(['Name: ', user.name]);
-                if (user.occupation) {
-                    response.push(['Occupation: ', JSON.stringify(user.occupation)]);
-                }
-                if (user.location) {
-                    response.push(['Location: ', user.location]);
-                }
-                if (user.expertise) {
-                    response.push(['Expertise: ', JSON.stringify(user.expertise, null, 2)]);
-                }
-                if (user.links) {
-                    response.push(['Links: ', ...user.links.map(link => <a href={link.url}>{link.text}</a>)]);
-                }
-
-                return response;
+                return displayUser(user);
             } else if(/miki|mikey|faktrl/.test(username)) {
                 window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
                 return [[`Hello, ${username}`]];
