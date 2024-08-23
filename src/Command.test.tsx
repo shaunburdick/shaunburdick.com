@@ -14,6 +14,20 @@ describe('Command', () => {
         };
     }
 
+    let oldOpen: typeof window.open;
+
+    beforeEach(() => {
+        // Stash the window.open fn and set a mock fn
+        // jsDom doesn't implement the function and throws an error
+        oldOpen = window.open;
+        window.open = jest.fn();
+    });
+
+    afterEach(() => {
+        // return the window.open fn
+        window.open = oldOpen;
+    });
+
     test('Get a command map', () => {
         expect(commandsWithContext(buildContext())).toBeDefined();
     });
@@ -107,6 +121,8 @@ describe('Command', () => {
         expect(open?.run('http://foo.com')).toEqual([
             ['Opening http://foo.com...']
         ]);
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.open).toHaveBeenCalledWith('http://foo.com');
 
         expect(open?.run('ftp://foo.com')).toEqual([
             ['Unknown protocol: ftp:']
@@ -134,6 +150,9 @@ describe('Command', () => {
         const commands = commandsWithContext(ctx);
 
         const response = commands.get('rm')?.run();
+
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.open).toHaveBeenCalledWith('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
         expect(response).toEqual([
             ['rm never gonna give you up!']
@@ -168,6 +187,9 @@ describe('Command', () => {
         const commands = commandsWithContext(ctx);
 
         const response = commands.get('view-source')?.run();
+
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.open).toHaveBeenCalledWith('https://github.com/shaunburdick/shaunburdick.com');
 
         expect(response).toEqual([
             ['Opening GH Page...']
