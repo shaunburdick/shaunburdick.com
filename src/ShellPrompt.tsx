@@ -228,7 +228,7 @@ function ShellPrompt() {
                         <>
                             {'command' in lastCommand &&
                             <span title={lastCommand.timestamp.toISOString()} aria-label='The command that was run'>
-                                {<span aria-hidden>$</span>} {lastCommand?.command}
+                                {<span aria-hidden>$</span>} {lastCommand.command}
                             </span>}
                             {lastCommand.response.map((commandLine, lineIndex) => (
                                 <span key={lineIndex}>
