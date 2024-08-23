@@ -9,6 +9,13 @@ describe('ShellPrompt', () => {
         expect(document.body.querySelector('.shell')).toBeInTheDocument();
     });
 
+    test('Rest command history if invalid', () => {
+        localStorage.setItem(LS_KEY_COMMAND_HISTORY, '"');
+
+        act(() => render(<ShellPrompt />));
+        expect(localStorage.getItem(LS_KEY_COMMAND_HISTORY)).toBe('[]');
+    });
+
     describe('Commands', () => {
         describe('history', () => {
             test('should save your history', async () => {
@@ -84,6 +91,54 @@ describe('ShellPrompt', () => {
             const input = document.body.querySelector('#console-input') as HTMLInputElement;
             expect(input).toBeInTheDocument();
             expect(input?.value).toEqual('whois shaun');
+        });
+    });
+
+    describe('Keyboard', () => {
+        describe('tab completions', () => {
+            test('should prevent loss of focus on the input if there is content', async () => {
+                userEvent.setup();
+                act(() => render(<ShellPrompt />));
+
+                const cmdInput = document.querySelector('#console-input');
+                expect(cmdInput).not.toBeNull();
+
+                // Should be focused on input
+                expect(document.activeElement).toEqual(cmdInput);
+
+                // type a command and try to tab out
+                await userEvent.keyboard('command1{Tab}');
+
+                // Should be focused on input
+                expect(document.activeElement).toEqual(cmdInput);
+
+                // clear input
+                (cmdInput as HTMLInputElement).value = '';
+
+                await userEvent.keyboard('{Tab}');
+
+                // Should not be focused on input
+                expect(document.activeElement).not.toEqual(cmdInput);
+            });
+        });
+
+        describe('escape', () => {
+            test('should clear the input', async () => {
+                userEvent.setup();
+                act(() => render(<ShellPrompt />));
+
+                const cmdInput = document.querySelector('#console-input');
+                expect(cmdInput).not.toBeNull();
+
+                // type a command
+                await userEvent.keyboard('command1');
+                expect((cmdInput as HTMLInputElement).value).toEqual('command1');
+
+                await userEvent.keyboard('{Escape}');
+
+                // Should be empty
+                expect((cmdInput as HTMLInputElement).value).toEqual('');
+            });
         });
     });
 });
