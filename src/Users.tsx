@@ -42,7 +42,7 @@ export const displayUser = (user: User) => {
 
 USERS.set('shaun', {
     name: 'Shaun Burdick',
-    image: 'shaun.png',
+    image: 'img/shaun.png',
     occupation: [ 'Father', 'Husband', 'Leader', 'Engineer' ],
     location: 'Syracuse, NY',
     expertise: [
