@@ -69,7 +69,7 @@ export const commandsWithContext = ({
                 return [[`${key}=`]];
             } else {
                 environment.set(key, value);
-                return [[`${key}=${value || ''}`]];
+                return [[`${key}=${value}`]];
             }
         }
     });
