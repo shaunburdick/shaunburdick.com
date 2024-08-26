@@ -50,7 +50,7 @@ function ShellPrompt() {
     const [commandHistory, setCommandHistory] = useState<string[]>(defaultCommandHistory);
     const [commandPointer, setCommandPointer] = useState<number>(DEFAULT_COMMAND_POINTER);
     const [lastCommand, setLastCommand] = useState<CommandResult | undefined>(WELCOME_MESSAGE);
-    const [environment, setEnvironment] = useState<Map<string,string>>(DEFAULT_ENVIRONMENT);
+    const [environment/* , setEnvironment*/] = useState<Map<string,string>>(DEFAULT_ENVIRONMENT);
     const [workingDir/* , setWorkingDir*/] = useState<string>('/');
     const inputRef = useRef<HTMLInputElement | null>(null);
     const preBottomRef = useRef<HTMLSpanElement | null>(null);
@@ -59,7 +59,6 @@ function ShellPrompt() {
         commandHistory,
         environment,
         setConsoleLines,
-        setEnvironment,
         setLastCommand,
         workingDir,
         users: USERS

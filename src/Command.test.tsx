@@ -7,7 +7,6 @@ describe('Command', () => {
             commandHistory: [],
             environment: new Map(),
             setConsoleLines: jest.fn(),
-            setEnvironment: jest.fn(),
             setLastCommand: jest.fn(),
             users: new Map([['test', { name: 'test' }]]),
             workingDir: '',
@@ -69,11 +68,32 @@ describe('Command', () => {
         ctx.environment.set('fizz', 'buzz');
         const commands = commandsWithContext(ctx);
 
-        const response = commands.get('export')?.run('key', 'value');
+        const exp = commands.get('export');
 
-        expect(response).toEqual([
+        expect(exp?.run('key', 'value')).toEqual([
             ['key=value']
         ]);
+        expect([...ctx.environment]).toEqual([
+            ['foo', 'bar'],
+            ['fizz', 'buzz'],
+            ['key', 'value']
+        ]);
+
+        // test with equals sign
+        expect(exp?.run('has=equals')).toEqual([
+            ['has=equals']
+        ]);
+
+        expect(exp?.run('has=multiple=equals')).toEqual([
+            ['has=multiple=equals']
+        ]);
+
+        // clearing
+        expect(ctx.environment.has('key')).toEqual(true);
+        expect(exp?.run('key')).toEqual([
+            ['key=']
+        ]);
+        expect(ctx.environment.has('key')).toEqual(false);
     });
 
     test('help (no args)', () => {

@@ -11,7 +11,6 @@ export interface CommandContext {
     commandHistory: string[];
     environment: Map<string, string>;
     setConsoleLines: React.Dispatch<React.SetStateAction<CommandResult[]>>;
-    setEnvironment: React.Dispatch<React.SetStateAction<Map<string, string>>>;
     setLastCommand: React.Dispatch<React.SetStateAction<CommandResult | undefined>>;
     users: Map<string, User>;
     workingDir: string;
@@ -21,7 +20,6 @@ export const commandsWithContext = ({
     commandHistory,
     environment,
     setConsoleLines,
-    setEnvironment,
     setLastCommand,
     users,
     workingDir,
@@ -60,8 +58,19 @@ export const commandsWithContext = ({
     COMMANDS.set('export', {
         description: 'Set an environment variable',
         run: (key, value) => {
-            setEnvironment({ ...environment, [key]: value });
-            return [[`${key}=${value}`]];
+            if (key.includes('=')) {
+                const split = key.indexOf('=');
+                value = key.slice(split+1);
+                key = key.slice(0, split);
+            }
+
+            if (typeof value === 'undefined') {
+                environment.delete(key);
+                return [[`${key}=`]];
+            } else {
+                environment.set(key, value);
+                return [[`${key}=${value || ''}`]];
+            }
         }
     });
 
