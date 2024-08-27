@@ -241,6 +241,8 @@ describe('Command', () => {
         expect(whois?.run('miki')).toEqual([
             ['Hello, miki']
         ]);
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.open).toHaveBeenCalledWith('https://www.youtube.com/watch?v=YjyUIwKPAxA');
 
         const gfResponse = whois?.run('gamefront');
         expect(Array.isArray(gfResponse)).toBe(true);
