@@ -1,0 +1,22 @@
+@keyframes move-it {
+    0% {
+        background-position: initial;
+    }
+    100% {
+        background-position: 0px -200%;
+    }
+}
+
+pre.prompt {
+    max-height: 80vh;
+    min-height: 20vh;
+    background: repeating-linear-gradient(
+        1deg,
+        var(--nc-bg-3),
+        var(--nc-bg-3) 0%,
+        var(--nc-bg-2) 10%,
+        var(--nc-bg-2) 100%
+    );
+    background-size: 100% 200%;
+    animation: move-it 15s linear infinite;
+}

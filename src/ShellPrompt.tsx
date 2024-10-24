@@ -4,6 +4,7 @@ import Hints from './Hints';
 import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
 import { USERS } from './Users';
 import { commandsWithContext } from './Command';
+import './ShellPrompt.css';
 
 export const LS_KEY_LAST_LOGIN = 'lastLogin';
 export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
@@ -208,7 +209,7 @@ function ShellPrompt() {
 
     return (
         <div className="shell">
-            <pre style={{ maxHeight: '80vh', minHeight: '20vh' }}
+            <pre className='prompt'
                 aria-label='A text-based console.'
                 // *eslint-disable-next-line jsx-a11y/aria-props
                 aria-description='This area is meant to depict an older styled computer console
