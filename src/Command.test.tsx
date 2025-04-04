@@ -231,7 +231,9 @@ describe('Command', () => {
         const response = commands.get('whoami')?.run();
 
         expect(response).toEqual([
-            ['You\'re you, silly']
+            ['You\'re you, silly'],
+            ['Achievements:'],
+            ['- Who Am I?: Use the whoami command.']
         ]);
     });
 

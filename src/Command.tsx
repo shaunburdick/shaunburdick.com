@@ -1,5 +1,6 @@
 import { CommandResult, ConsoleLine } from './ConsoleOutput';
 import { displayUser, User } from './Users';
+import { getAchievements, addAchievement } from './Achievements';
 
 export interface Command {
     description: string;
@@ -150,9 +151,17 @@ export const commandsWithContext = ({
 
     COMMANDS.set('whoami', {
         description: 'Tell you a little about yourself',
-        run: () => [
-            ['You\'re you, silly']
-        ]
+        run: () => {
+            // Add the "whoami_used" achievement
+            addAchievement('whoami_used');
+
+            const achievements = getAchievements();
+            return [
+                ['You\'re you, silly'],
+                ['Achievements:'],
+                ...achievements.map(a => [`- ${a.title}: ${a.description}`]),
+            ];
+        }
     });
 
     COMMANDS.set('whois', {

@@ -4,6 +4,7 @@ import Hints from './Hints';
 import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
 import { USERS } from './Users';
 import { commandsWithContext } from './Command';
+import { addAchievement } from './Achievements';
 import './ShellPrompt.css';
 
 export const LS_KEY_LAST_LOGIN = 'lastLogin';
@@ -70,7 +71,11 @@ function ShellPrompt() {
     };
 
     const execCommand = (commandName: string, ...args: string[]): ConsoleLine[] => {
-        // record command
+        // Add the "first_command" achievement
+        if (commandHistory.length === 0) {
+            addAchievement('first_command');
+        }
+
         tracker.trackEvent(TRACKER_EVENTS.ExecCommand, { props: { commandName, args: args.join(' ') } });
 
         const command = COMMANDS.get(commandName.toLowerCase());
