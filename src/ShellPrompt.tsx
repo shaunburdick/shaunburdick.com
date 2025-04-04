@@ -250,6 +250,7 @@ function ShellPrompt() {
                         onKeyDown={handleKeyDown}
                         autoCorrect='off'
                         autoCapitalize='none'
+                        spellCheck={false}
                         aria-label='An input to enter commands.'
                         // *eslint-disable-next-line jsx-a11y/aria-props
                         aria-description='When a command is entered, it will be run by the console interpreter
