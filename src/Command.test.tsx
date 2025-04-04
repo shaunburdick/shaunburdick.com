@@ -192,12 +192,20 @@ describe('Command', () => {
 
     test('users', () => {
         const ctx = buildContext();
+        // add users not in alphabetical order
         ctx.users.set('test', { name: 'test' });
+        ctx.users.set('spot', { name: 'spot' });
+        ctx.users.set('alfred', { name: 'alfred' });
+        ctx.users.set('fred', { name: 'fred' });
         const commands = commandsWithContext(ctx);
 
         const response = commands.get('users')?.run();
 
+        // expect them to be in alphabetical order
         expect(response).toEqual([
+            ['alfred'],
+            ['fred'],
+            ['spot'],
             ['test']
         ]);
     });

@@ -137,7 +137,7 @@ export const commandsWithContext = ({
 
     COMMANDS.set('users', {
         description: 'List users',
-        run: () => [...users.keys()].map(userName => [userName])
+        run: () => [...users.keys()].sort().map(userName => [userName])
     });
 
     COMMANDS.set('view-source', {
