@@ -68,7 +68,10 @@ describe('CookieNotice', () => {
         // notice should stay on the screen
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
 
-        window.location = location;
+        Object.defineProperty(window, 'location', {
+            value: location,
+            writable: true,
+        });
     });
 });
 
