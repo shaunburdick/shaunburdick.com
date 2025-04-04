@@ -60,3 +60,33 @@ USERS.set('shaun', {
         { url: 'https://zcal.co/shaunburdick', text: 'Calendar' }
     ]
 });
+
+USERS.set('mario', {
+    name: 'Mario Mario',
+    occupation: [ 'Plumber', 'Brother', 'Emergency Contact' ],
+    location: 'Level 1, Mushroom Kingdom',
+    expertise: [
+        'Plumbing',
+        'Jumping',
+        'Fireball Throwing',
+        'Princess Saving',
+        'Mushroom Eating',
+    ],
+    links: [
+        { url: 'https://www.youtube.com/watch?v=6Ajhzlq42f0', text: 'Theme Song' },
+    ]
+});
+
+USERS.set('badger', {
+    name: 'Badger Badger Badger',
+    occupation: [ 'Badger', 'Mushroom', 'Snake' ],
+    location: 'The bushes of the internet',
+    expertise: [
+        'Badgering',
+        'Mushrooming',
+        'Snaking',
+    ],
+    links: [
+        { url: 'https://www.youtube.com/watch?v=EIyixC9NsLI', text: 'Badger Badger Badger' },
+    ]
+});
