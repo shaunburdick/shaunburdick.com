@@ -4,8 +4,6 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-// Plugin has an odd export structure
-// eslint-disable-next-line import/default
 import CopyPlugin from 'copy-webpack-plugin';
 
 const isEnvProduction = process.env.NODE_ENV === 'production';
