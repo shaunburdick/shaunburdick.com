@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import ShellPrompt from './ShellPrompt';
 import CookieNotice from './CookieNotice';
 import { TrackerContext } from './Tracker';
+import { Notifications } from './Notification';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
             <div aria-describedby='page-desc'>
                 <ShellPrompt />
                 <CookieNotice />
+                <Notifications />
             </div>
         </>
     );

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { addAchievement } from './Achievements';
 import { TRACKER_EVENTS, TrackerContext } from './Tracker';
 import Hints from './Hints';
 import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
 import { USERS } from './Users';
 import { commandsWithContext } from './Command';
-import { addAchievement } from './Achievements';
 import './ShellPrompt.css';
+import { useNotification } from './Notification';
 
 export const LS_KEY_LAST_LOGIN = 'lastLogin';
 export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
@@ -19,7 +20,7 @@ export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
  */
 function ShellPrompt() {
     const tracker = useContext(TrackerContext);
-
+    const notifications = useNotification();
     const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
 
     const WELCOME_MESSAGE: CommandResult = {
@@ -63,7 +64,8 @@ function ShellPrompt() {
         setConsoleLines,
         setLastCommand,
         workingDir,
-        users: USERS
+        users: USERS,
+        notifications
     });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -73,7 +75,9 @@ function ShellPrompt() {
     const execCommand = (commandName: string, ...args: string[]): ConsoleLine[] => {
         // Add the "first_command" achievement
         if (commandHistory.length === 0) {
-            addAchievement('first_command');
+            addAchievement('first_command', (message) => {
+                notifications.add(message, 3000);
+            });
         }
 
         tracker.trackEvent(TRACKER_EVENTS.ExecCommand, { props: { commandName, args: args.join(' ') } });

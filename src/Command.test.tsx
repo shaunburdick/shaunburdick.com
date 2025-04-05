@@ -10,6 +10,12 @@ describe('Command', () => {
             setLastCommand: jest.fn(),
             users: new Map([['test', { name: 'test' }]]),
             workingDir: '',
+            notifications: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                clear: jest.fn(),
+                notifications: []
+            }
         };
     }
 

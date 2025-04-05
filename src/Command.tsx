@@ -1,6 +1,7 @@
 import { CommandResult, ConsoleLine } from './ConsoleOutput';
 import { displayUser, User } from './Users';
 import { getAchievements, addAchievement } from './Achievements';
+import { NotificationContextType } from './Notification';
 
 export interface Command {
     description: string;
@@ -15,6 +16,7 @@ export interface CommandContext {
     setLastCommand: React.Dispatch<React.SetStateAction<CommandResult | undefined>>;
     users: Map<string, User>;
     workingDir: string;
+    notifications: NotificationContextType
 }
 
 export const commandsWithContext = ({
@@ -24,6 +26,7 @@ export const commandsWithContext = ({
     setLastCommand,
     users,
     workingDir,
+    notifications
 }: CommandContext): Map<string, Command> => {
     /**
      * A map of commands available to run
@@ -153,7 +156,9 @@ export const commandsWithContext = ({
         description: 'Tell you a little about yourself',
         run: () => {
             // Add the "whoami_used" achievement
-            addAchievement('whoami_used');
+            addAchievement('whoami_used', (message) => {
+                notifications.add(message);
+            });
 
             const achievements = getAchievements();
             return [
