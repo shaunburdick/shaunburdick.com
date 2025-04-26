@@ -1,3 +1,5 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
 export const LS_KEY_ACHIEVEMENTS = 'achievements';
 
 export interface AchievementUnlocked {
@@ -7,7 +9,6 @@ export interface AchievementUnlocked {
     unlockedAt: string;
 }
 
-// Use `as const` to make `defaultAchievements` a readonly array with literal types
 export const coreAchievements = {
     accept_cookies: { title: 'Accept Cookies', description: 'Accept the cookies.' },
     first_command: { title: 'First Command', description: 'Run your first command in the console.' },
@@ -16,15 +17,100 @@ export const coreAchievements = {
     whoami_used: { title: 'Who Am I?', description: 'Use the whoami command.' },
 } as const;
 
-// Create a union type for valid achievement IDs
 export type AchievementId = keyof typeof coreAchievements;
 
-export const getAchievements = (): AchievementUnlocked[] => {
-    const stored = localStorage.getItem(LS_KEY_ACHIEVEMENTS);
-    return stored ? JSON.parse(stored) : [];
+interface AchievementContextType {
+    achievements: AchievementUnlocked[];
+    unlockAchievement: (achievementId: AchievementId) => void;
+    hasAchievement: (achievementId: AchievementId) => boolean;
+    resetAchievements: () => void;
+}
+
+const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
+
+// Custom hook to safely access localStorage
+const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => void] => {
+    // Get from localStorage on initial render
+    const getStoredValue = (): T => {
+        try {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : initialValue;
+        } catch {
+            return initialValue;
+        }
+    };
+
+    const [storedValue, setStoredValue] = useState<T>(getStoredValue);
+
+    // Return a wrapped version that persists the new value to localStorage
+    const setValue = (value: T): void => {
+        try {
+            setStoredValue(value);
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch {
+            // Silent fail on localStorage errors
+        }
+    };
+
+    return [storedValue, setValue];
 };
 
-export const addAchievement = (achievementId: AchievementId, onUnlock?: (message: string) => void) => {
+export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [achievements, setAchievements] = useLocalStorage<AchievementUnlocked[]>(LS_KEY_ACHIEVEMENTS, []);
+
+    const hasAchievement = (achievementId: AchievementId): boolean => {
+        return achievements.some(a => a.id === achievementId);
+    };
+
+    const unlockAchievement = (achievementId: AchievementId): void => {
+        if (!hasAchievement(achievementId) && achievementId in coreAchievements) {
+            const achievement = coreAchievements[achievementId];
+            setAchievements([
+                ...achievements,
+                {
+                    id: achievementId,
+                    unlockedAt: new Date().toISOString(),
+                    ...achievement
+                }
+            ]);
+        }
+    };
+
+    const resetAchievements = (): void => {
+        setAchievements([]);
+    };
+
+    return (
+        <AchievementContext.Provider value={{
+            achievements,
+            unlockAchievement,
+            hasAchievement,
+            resetAchievements
+        }}>
+            {children}
+        </AchievementContext.Provider>
+    );
+};
+
+export const useAchievements = (): AchievementContextType => {
+    const context = useContext(AchievementContext);
+    if (context === undefined) {
+        throw new Error('useAchievements must be used within an AchievementProvider');
+    }
+    return context;
+};
+
+// For backward compatibility
+export const getAchievements = (): AchievementUnlocked[] => {
+    try {
+        const stored = localStorage.getItem(LS_KEY_ACHIEVEMENTS);
+        return stored ? JSON.parse(stored) : [];
+    } catch {
+        return [];
+    }
+};
+
+export const addAchievement = (achievementId: AchievementId, onUnlock?: (message: string) => void): void => {
     const achievements = getAchievements();
     if (!achievements.find(a => a.id === achievementId)) {
         if (achievementId in coreAchievements) {
@@ -33,11 +119,15 @@ export const addAchievement = (achievementId: AchievementId, onUnlock?: (message
                 ...achievements,
                 { id: achievementId, unlockedAt: new Date().toISOString(), ...achievement }
             ];
-            localStorage.setItem(LS_KEY_ACHIEVEMENTS, JSON.stringify(updated));
+            try {
+                localStorage.setItem(LS_KEY_ACHIEVEMENTS, JSON.stringify(updated));
 
-            // Trigger the callback with the achievement message
-            if (onUnlock) {
-                onUnlock(`Achievement Unlocked: ${achievement.title}`);
+                // Trigger the callback with the achievement message
+                if (onUnlock) {
+                    onUnlock(`Achievement Unlocked: ${achievement.title}`);
+                }
+            } catch {
+                // Silent fail on localStorage errors
             }
         }
     }
