@@ -77,7 +77,7 @@ export function Notifications() {
     const { notifications } = useNotification();
 
     return (
-        <>
+        <div className="notification-container">
             {notifications.map((notification, index) => (
                 <Notification
                     key={index}
@@ -85,6 +85,6 @@ export function Notifications() {
                     duration={notification.duration}
                 />
             ))}
-        </>
+        </div>
     );
 }
