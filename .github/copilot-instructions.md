@@ -1,19 +1,59 @@
-This is a personal website for Shaun Burdick.
-The website is meant to look and behave like an old computer console, similar to a VT terminal.
-There is humor and easter eggs through out the application.
+# Copilot Instructions for shaunburdick.com
 
-The website is written in React using Typescript.
-It uses ESLint and Jest for linting and testing.
+## Project Overview
+- Personal website for Shaun Burdick
+- Retro terminal-style interface (VT terminal emulator)
+- Built with React + TypeScript
+- Contains intentional humor and easter eggs
 
-Keep the code modern, using the latest tools and libraries but as simple as possible.
-Avoid including new libraries when possible.
+## Technical Requirements
+- React 18+ with TypeScript
+- Webpack for bundling
+- ESLint for linting
+- Jest for testing
+- Docker for containerization
+- GitHub Pages for deployment
 
-The deployment is done using Docker and Github Pages via a deploy workflow.
+## Code Style Guidelines
+1. **Imports**
+   - Sort all imports alphabetically
+   - Group imports: React, third-party, local
 
-The website must be WCAG 2 compliant for accessibility and is tested for use by screen readers.
-Try not to use classes or complex CSS, the idea is to style the elements directly.
+2. **Documentation**
+   - Add TSDoc comments for all functions and components
+   - Include @param and @returns tags when applicable
 
-Do not output anything to the console unless directed.
-All imports and lists should be sorted alphabetically unless functionality requires it.
-Do not leave any trailing spaces, but add a new line to the end of a file.
-Add TSDoc comments to every method and function.
+3. **Accessibility**
+   - Ensure WCAG 2.1 AA compliance
+   - Support screen readers
+   - Use semantic HTML elements
+   - Include proper ARIA attributes
+
+4. **Styling**
+   - Prefer direct element styling over CSS classes
+   - Keep styles minimal and terminal-like
+   - Use monospace fonts and terminal colors
+   - Avoid complex CSS selectors
+
+5. **Best Practices**
+   - No console.log statements in production code
+   - Add newline at end of files
+   - No trailing spaces
+   - Keep dependencies minimal
+   - Use modern React patterns (hooks, functional components)
+
+## Example Component Structure
+```typescript
+/**
+ * Terminal-style component description
+ * @param props - Component props description
+ * @returns Terminal-styled React component
+ */
+const TerminalComponent: React.FC<Props> = ({ props }) => {
+  // Component logic
+  return (
+    <div style={{ fontFamily: 'monospace' }}>
+      {/* Component content */}
+    </div>
+  );
+};
