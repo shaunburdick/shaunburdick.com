@@ -36,7 +36,7 @@
    - Avoid complex CSS selectors
 
 5. **Best Practices**
-   - No console.log statements in production code
+   - No console statements in production code
    - Add newline at end of files
    - No trailing spaces
    - Keep dependencies minimal
