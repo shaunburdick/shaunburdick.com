@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { NotificationProvider } from './components/Notification/Notification';
+import { AchievementProvider } from './components/Achievements/Achievements';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -10,7 +11,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <NotificationProvider>
-            <App />
+            <AchievementProvider>
+                <App />
+            </AchievementProvider>
         </NotificationProvider>
     </React.StrictMode>
 );

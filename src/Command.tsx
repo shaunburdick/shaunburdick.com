@@ -1,7 +1,7 @@
 import { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 import { displayUser, User } from './Users';
-import { getAchievements, addAchievement } from './components/Achievements/Achievements';
 import { NotificationContextType } from './components/Notification/Notification';
+import { AchievementContextType } from './components/Achievements/Achievements';
 
 export interface Command {
     description: string;
@@ -16,7 +16,8 @@ export interface CommandContext {
     setLastCommand: React.Dispatch<React.SetStateAction<CommandResult | undefined>>;
     users: Map<string, User>;
     workingDir: string;
-    notifications: NotificationContextType
+    notifications: NotificationContextType,
+    achievements: AchievementContextType
 }
 
 export const commandsWithContext = ({
@@ -26,7 +27,7 @@ export const commandsWithContext = ({
     setLastCommand,
     users,
     workingDir,
-    notifications
+    achievements
 }: CommandContext): Map<string, Command> => {
     /**
      * A map of commands available to run
@@ -156,15 +157,12 @@ export const commandsWithContext = ({
         description: 'Tell you a little about yourself',
         run: () => {
             // Add the "whoami_used" achievement
-            addAchievement('whoami_used', (message) => {
-                notifications.add(message);
-            });
+            achievements.unlockAchievement('whoami_used');
 
-            const achievements = getAchievements();
             return [
                 ['You\'re you, silly'],
                 ['Achievements:'],
-                ...achievements.map(a => [`- ${a.title}: ${a.description}`]),
+                ...achievements.achievements.map(a => [`- ${a.title}: ${a.description}`]),
             ];
         }
     });
