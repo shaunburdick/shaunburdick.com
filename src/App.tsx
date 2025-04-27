@@ -1,10 +1,10 @@
 import './App.css';
 
 import { useContext } from 'react';
-import ShellPrompt from './ShellPrompt';
-import CookieNotice from './CookieNotice';
+import ShellPrompt from './components/ShellPrompt/ShellPrompt';
+import CookieNotice from './components/CookieNotice/CookieNotice';
 import { TrackerContext } from './Tracker';
-import { Notifications } from './Notification';
+import { Notifications } from './components/Notification/Notification';
 
 function App() {
 

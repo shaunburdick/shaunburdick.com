@@ -1,7 +1,7 @@
-import { CommandResult, ConsoleLine } from './ConsoleOutput';
+import { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 import { displayUser, User } from './Users';
-import { getAchievements, addAchievement } from './Achievements';
-import { NotificationContextType } from './Notification';
+import { getAchievements, addAchievement } from './components/Achievements/Achievements';
+import { NotificationContextType } from './components/Notification/Notification';
 
 export interface Command {
     description: string;

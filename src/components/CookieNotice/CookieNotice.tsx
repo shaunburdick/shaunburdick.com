@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { TRACKER_EVENTS, TrackerContext } from './Tracker';
+import { TRACKER_EVENTS, TrackerContext } from '../../Tracker';
 
 export const LS_COOKIE_ACKNOWLEDGE = 'cookieAcknowledge';
 

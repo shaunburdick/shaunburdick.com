@@ -1,4 +1,4 @@
-import { ConsoleLine } from './ConsoleOutput';
+import { ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 
 export interface User {
     name: string;

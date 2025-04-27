@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { addAchievement } from './Achievements';
-import { TRACKER_EVENTS, TrackerContext } from './Tracker';
-import Hints from './Hints';
-import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
-import { USERS } from './Users';
-import { commandsWithContext } from './Command';
+import { addAchievement } from '../Achievements/Achievements';
+import Hints from '../Hints/Hints';
+import ConsoleOutput, { CommandResult, ConsoleLine } from '../ConsoleOutput/ConsoleOutput';
+import { TRACKER_EVENTS, TrackerContext } from '../../Tracker';
+import { USERS } from '../../Users';
+import { commandsWithContext } from '../../Command';
 import './ShellPrompt.css';
-import { useNotification } from './Notification';
+import { useNotification } from '../Notification/Notification';
 
 export const LS_KEY_LAST_LOGIN = 'lastLogin';
 export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
