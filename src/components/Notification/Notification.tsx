@@ -27,6 +27,8 @@ export function Notification({ message, duration = 3000, onClose }: Notification
 
     return (
         <div
+            role="alert"
+            aria-live="polite"
             className="notification"
             style={{
                 animation: `fade-in-out ${duration}ms ease-in-out`
@@ -82,10 +84,14 @@ export function Notifications() {
     const { notifications } = useNotification();
 
     return (
-        <div className="notification-container">
+        <div
+            className="notification-container"
+            aria-label="Notifications"
+            role="region"
+        >
             {notifications.map((notification, index) => (
                 <Notification
-                    key={index}
+                    key={`notification-${index}`}
                     message={notification.message}
                     duration={notification.duration}
                 />
