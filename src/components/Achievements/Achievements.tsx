@@ -13,7 +13,7 @@ export interface AchievementUnlocked {
 export const coreAchievements = {
     accept_cookies: { title: 'Accept Cookies', description: 'Accept the cookies.' },
     first_command: { title: 'First Command', description: 'Run your first command in the console.' },
-    give_you_up: { title: 'Never Gonna Give You Up', description: 'Never gonna let you down.' },
+    rick_rolled: { title: 'Never Gonna Give You Up', description: 'Never gonna let you down.' },
     old_spice_mario: { title: 'Old Spice Mario', description: 'You know what to do.' },
     whoami_used: { title: 'Who Am I?', description: 'Use the whoami command.' },
 } as const;

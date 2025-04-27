@@ -130,6 +130,7 @@ export const commandsWithContext = ({
         description: 'Remove directory entries',
         run: () => {
             window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+            achievements.unlockAchievement('rick_rolled');
             return [['rm never gonna give you up!']];
         }
     });
