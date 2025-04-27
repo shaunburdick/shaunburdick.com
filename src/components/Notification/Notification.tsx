@@ -26,7 +26,12 @@ export function Notification({ message, duration = 3000, onClose }: Notification
     }
 
     return (
-        <div className="notification">
+        <div
+            className="notification"
+            style={{
+                animation: `fade-in-out ${duration}ms ease-in-out`
+            }}
+        >
             {message}
         </div>
     );
