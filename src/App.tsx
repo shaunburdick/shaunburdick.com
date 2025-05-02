@@ -11,7 +11,7 @@ function App() {
     const tracker = useTracker();
     const notifications = useNotification();
     useEvent('onAchievement', (achievement) => {
-        notifications.add(`Achievement Unlocked: ${achievement.title}`, 5000);
+        notifications.add({ title: `Achievement Unlocked: ${achievement.title}`, body: achievement.description }, 5000);
         tracker.trackEvent(TRACKER_EVENTS.AchievementUnlocked, {
             props: {
                 achievement: achievement.id

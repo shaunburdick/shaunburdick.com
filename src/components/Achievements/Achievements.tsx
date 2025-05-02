@@ -13,9 +13,10 @@ export interface AchievementUnlocked {
 export const coreAchievements = {
     accept_cookies: { title: 'Accept Cookies', description: 'Accept the cookies.' },
     first_command: { title: 'First Command', description: 'Run your first command in the console.' },
-    rick_rolled: { title: 'Never Gonna Give You Up', description: 'Never gonna let you down.' },
     old_spice_mario: { title: 'Old Spice Mario', description: 'You know what to do.' },
-    whoami_used: { title: 'Who Am I?', description: 'Use the whoami command.' },
+    rick_rolled: { title: 'Never Gonna Give You Up', description: 'Never gonna let you down.' },
+    secret_command: { title: 'Secret Command', description: 'You found the secret command!' },
+    who_are_you: { title: 'Who Am I?', description: 'Use the whoami command.' },
 } as const;
 
 export type AchievementId = keyof typeof coreAchievements;

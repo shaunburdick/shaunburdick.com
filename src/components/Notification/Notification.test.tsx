@@ -7,7 +7,7 @@ describe('Notification', () => {
         jest.useFakeTimers();
 
         const onClose = jest.fn();
-        render(<Notification message="Test Notification" duration={2000} onClose={onClose} />);
+        render(<Notification message={{ body: 'Test Notification' }} duration={2000} onClose={onClose} />);
 
         expect(screen.getByText('Test Notification')).toBeInTheDocument();
 
@@ -24,7 +24,7 @@ describe('Notification', () => {
     test('does not render if visible is false', () => {
         jest.useFakeTimers();
 
-        render(<Notification message="Hidden Notification" duration={0} />);
+        render(<Notification message={{ body: 'Hidden Notification' }} duration={0} />);
         act(() => {
             jest.advanceTimersByTime(0);
         });
@@ -33,16 +33,26 @@ describe('Notification', () => {
 
         jest.useRealTimers();
     });
+
+    test('renders notification with title when provided', () => {
+        jest.useFakeTimers();
+
+        render(<Notification message={{ title: 'Test Title', body: 'Test Body' }} duration={2000} />);
+
+        expect(screen.getByText('Test Title')).toBeInTheDocument();
+        expect(screen.getByText('Test Body')).toBeInTheDocument();
+
+        jest.useRealTimers();
+    });
 });
 
 describe('NotificationProvider', () => {
     const TestComponent = () => {
-        const { add, remove, clear, notifications } = useNotification();
+        const { add, clear, notifications } = useNotification();
 
         return (
             <div>
-                <button onClick={() => add('Test Message', 3000)}>Add Notification</button>
-                <button onClick={() => remove('Test Message')}>Remove Notification</button>
+                <button onClick={() => add({ body: 'Test Notification' }, 3000)}>Add Notification</button>
                 <button onClick={clear}>Clear Notifications</button>
                 <Notifications />
                 <div data-testid="notification-count">{notifications.length}</div>
@@ -62,32 +72,8 @@ describe('NotificationProvider', () => {
             addButton.click();
         });
 
-        expect(screen.getByText('Test Message')).toBeInTheDocument();
+        expect(screen.getByText('Test Notification')).toBeInTheDocument();
         expect(screen.getByTestId('notification-count').textContent).toBe('1');
-    });
-
-    test('removes a notification', () => {
-        render(
-            <NotificationProvider>
-                <TestComponent />
-            </NotificationProvider>
-        );
-
-        const addButton = screen.getByText('Add Notification');
-        const removeButton = screen.getByText('Remove Notification');
-
-        act(() => {
-            addButton.click();
-        });
-
-        expect(screen.getByText('Test Message')).toBeInTheDocument();
-
-        act(() => {
-            removeButton.click();
-        });
-
-        expect(screen.queryByText('Test Message')).not.toBeInTheDocument();
-        expect(screen.getByTestId('notification-count').textContent).toBe('0');
     });
 
     test('clears all notifications', () => {
@@ -105,13 +91,13 @@ describe('NotificationProvider', () => {
             addButton.click();
         });
 
-        expect(screen.getAllByText('Test Message').length).toBe(2);
+        expect(screen.getAllByText('Test Notification').length).toBe(2);
 
         act(() => {
             clearButton.click();
         });
 
-        expect(screen.queryByText('Test Message')).not.toBeInTheDocument();
+        expect(screen.queryByText('Test Notification')).not.toBeInTheDocument();
         expect(screen.getByTestId('notification-count').textContent).toBe('0');
     });
 });

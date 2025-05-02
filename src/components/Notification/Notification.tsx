@@ -2,7 +2,10 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import './Notification.css';
 
 interface NotificationProps {
-    message: string;
+    message: {
+        body: string;
+        title?: string;
+    };
     duration?: number; // Duration in milliseconds
     onClose?: () => void;
 }
@@ -34,37 +37,36 @@ export function Notification({ message, duration = 3000, onClose }: Notification
                 animation: `fade-in-out ${duration}ms ease-in-out`
             }}
         >
-            {message}
+            {message.title && <strong>{message.title}</strong>}
+            <br />
+            {message.body}
         </div>
     );
 }
 
 export interface NotificationContextType {
-    add: (message: string, duration?: number) => void;
-    remove: (message: string) => void;
+    add: (message: NotificationProps['message'], duration?: number) => void;
     clear: () => void;
-    notifications: { message: string; duration?: number }[];
+    notifications: { message: NotificationProps['message']; duration?: number }[];
 }
 
 const NotificationContext = createContext<NotificationContextType>({
     add: () => void 0,
-    remove: () => void 0,
     clear: () => void 0,
     notifications: [],
 });
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-    const [notifications, setNotifications] = useState<{ message: string; duration?: number }[]>([]);
+    const [notifications, setNotifications] = useState<{
+        message: NotificationProps['message'];
+        duration?: number
+    }[]>([]);
 
-    const add = (message: string, duration?: number) => {
+    const add = (message: NotificationProps['message'], duration?: number) => {
         setNotifications((prev) => [...prev, { message, duration }]);
         setTimeout(() => {
             setNotifications((prev) => prev.filter((n) => n.message !== message));
         }, duration || 3000);
-    };
-
-    const remove = (message: string) => {
-        setNotifications((prev) => prev.filter((n) => n.message !== message));
     };
 
     const clear = () => {
@@ -72,7 +74,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <NotificationContext.Provider value={{ add, remove, clear, notifications }}>
+        <NotificationContext.Provider value={{ add, clear, notifications }}>
             {children}
         </NotificationContext.Provider>
     );

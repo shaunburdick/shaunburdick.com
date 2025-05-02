@@ -14,7 +14,6 @@ describe('Command', () => {
             workingDir: '',
             notifications: {
                 add: jest.fn(),
-                remove: jest.fn(),
                 clear: jest.fn(),
                 notifications: []
             },

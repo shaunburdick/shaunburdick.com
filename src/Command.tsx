@@ -138,7 +138,10 @@ export const commandsWithContext = ({
     COMMANDS.set('secret', {
         description: 'A secret command',
         secret: true,
-        run: () => [['You found it!']]
+        run: () => {
+            achievements.unlockAchievement('secret_command');
+            return [['You found it!']];
+        }
     });
 
     COMMANDS.set('users', {
@@ -158,7 +161,7 @@ export const commandsWithContext = ({
         description: 'Tell you a little about yourself',
         run: () => {
             // Add the "whoami_used" achievement
-            achievements.unlockAchievement('whoami_used');
+            achievements.unlockAchievement('who_are_you');
 
             return [
                 ['You\'re you, silly'],
@@ -173,6 +176,9 @@ export const commandsWithContext = ({
         run: (username: string) => {
             const user = users.get(username);
             if (user) {
+                if (username === 'mario') {
+                    achievements.unlockAchievement('old_spice_mario');
+                }
                 return displayUser(user);
             } else if(/miki|mikey|faktrl/.test(username)) {
                 window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');

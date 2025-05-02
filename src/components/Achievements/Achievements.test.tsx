@@ -67,13 +67,13 @@ describe('Achievements React Hooks', () => {
         });
 
         act(() => {
-            result.current.unlockAchievement('whoami_used');
+            result.current.unlockAchievement('who_are_you');
         });
 
         // Verify we have both achievements
         expect(result.current.achievements.length).toBe(2);
         expect(result.current.hasAchievement('first_command')).toBe(true);
-        expect(result.current.hasAchievement('whoami_used')).toBe(true);
+        expect(result.current.hasAchievement('who_are_you')).toBe(true);
 
         // Reset achievements
         act(() => {
@@ -83,7 +83,7 @@ describe('Achievements React Hooks', () => {
         // Verify all achievements are removed
         expect(result.current.achievements.length).toBe(0);
         expect(result.current.hasAchievement('first_command')).toBe(false);
-        expect(result.current.hasAchievement('whoami_used')).toBe(false);
+        expect(result.current.hasAchievement('who_are_you')).toBe(false);
     });
 
     test('AchievementProvider persists achievements to localStorage', () => {
