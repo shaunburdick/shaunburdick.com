@@ -1,20 +1,30 @@
 import React, { act } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { AchievementProvider } from '../Achievements/Achievements';
 import CookieNotice, { LS_COOKIE_ACKNOWLEDGE } from './CookieNotice';
 
 describe('CookieNotice', () => {
+    // Helper function to wrap component with providers
+    const renderWithProviders = (component: React.ReactElement) => {
+        return render(
+            <AchievementProvider>
+                {component}
+            </AchievementProvider>
+        );
+    };
+
     beforeEach(() => {
         localStorage.clear();
     });
 
     test('Display the cookie notice', () => {
-        act(() => render(<CookieNotice />));
+        act(() => renderWithProviders(<CookieNotice />));
 
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
     });
 
     test('Hide cookie notice once clicked', () => {
-        act(() => render(<CookieNotice />));
+        act(() => renderWithProviders(<CookieNotice />));
 
         const button = screen.getByText('Yes');
 
@@ -30,7 +40,7 @@ describe('CookieNotice', () => {
     test('Hide cookie notice if they have already accepted', () => {
         localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'true');
 
-        act(() => render(<CookieNotice />));
+        act(() => renderWithProviders(<CookieNotice />));
 
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).not.toBeInTheDocument();
     });
@@ -50,7 +60,7 @@ describe('CookieNotice', () => {
             set: setHrefSpy,
         });
 
-        act(() => render(<CookieNotice />));
+        act(() => renderWithProviders(<CookieNotice />));
 
         const button = screen.getByText('No');
 

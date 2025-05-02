@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Hints from '../Hints/Hints';
 import ConsoleOutput, { CommandResult, ConsoleLine } from '../ConsoleOutput/ConsoleOutput';
-import { TRACKER_EVENTS, TrackerContext } from '../../Tracker';
+import { TRACKER_EVENTS, useTracker } from '../../hooks/useTracker';
 import { USERS } from '../../Users';
 import { commandsWithContext } from '../../Command';
 import './ShellPrompt.css';
@@ -20,7 +20,7 @@ export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
  * @return JSX representing a Shell Prompt
  */
 function ShellPrompt() {
-    const tracker = useContext(TrackerContext);
+    const tracker = useTracker();
     const notifications = useNotification();
     const achievements = useAchievements();
     const commandUpdateEvent = useEvent('onCommand');

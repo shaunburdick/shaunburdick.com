@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react';
-import { TRACKER_EVENTS, TrackerContext } from '../../Tracker';
+import { useState } from 'react';
+import { TRACKER_EVENTS, useTracker } from '../../hooks/useTracker';
 
 interface HintsProps {
     hintClick?: (hint: string) => void
@@ -7,7 +7,7 @@ interface HintsProps {
 
 function Hints({ hintClick }: HintsProps) {
 
-    const tracker = useContext(TrackerContext);
+    const tracker = useTracker();
 
     const [showHints, setShowHints] = useState<boolean>(false);
 

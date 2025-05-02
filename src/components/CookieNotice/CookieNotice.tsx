@@ -1,12 +1,12 @@
-import { useContext, useState } from 'react';
-import { TRACKER_EVENTS, TrackerContext } from '../../Tracker';
+import { useState } from 'react';
+import { TRACKER_EVENTS, useTracker } from '../../hooks/useTracker';
 import { useAchievements } from '../Achievements/Achievements';
 
 export const LS_COOKIE_ACKNOWLEDGE = 'cookieAcknowledge';
 
 function CookieNotice() {
 
-    const tracker = useContext(TrackerContext);
+    const tracker = useTracker();
     const { unlockAchievement } = useAchievements();
 
     const initialShowCookie = (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'false') !== 'true';
