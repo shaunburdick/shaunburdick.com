@@ -45,11 +45,13 @@ export function Notification({ message, duration = 3000, onClose }: Notification
 }
 
 export interface NotificationContextType {
-    add: (message: NotificationProps['message'], duration?: number) => void;
+    add: (message: NotificationProps['message'], duration?: NotificationProps['duration']) => void;
     clear: () => void;
-    notifications: { message: NotificationProps['message']; duration?: number }[];
+    notifications: { message: NotificationProps['message']; duration?: NotificationProps['duration'] }[];
 }
 
+// Ignore the context for testing purposes
+/* istanbul ignore next */
 const NotificationContext = createContext<NotificationContextType>({
     add: () => void 0,
     clear: () => void 0,
@@ -59,7 +61,7 @@ const NotificationContext = createContext<NotificationContextType>({
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const [notifications, setNotifications] = useState<{
         message: NotificationProps['message'];
-        duration?: number
+        duration?: NotificationProps['duration']
     }[]>([]);
 
     const add = (message: NotificationProps['message'], duration?: number) => {

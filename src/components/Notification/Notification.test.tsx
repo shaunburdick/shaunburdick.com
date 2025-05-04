@@ -53,6 +53,7 @@ describe('NotificationProvider', () => {
         return (
             <div>
                 <button onClick={() => add({ body: 'Test Notification' }, 3000)}>Add Notification</button>
+                <button onClick={() => add({ body: 'Quick Notification' }, 1000)}>Add Quick Notification</button>
                 <button onClick={clear}>Clear Notifications</button>
                 <Notifications />
                 <div data-testid="notification-count">{notifications.length}</div>
@@ -99,5 +100,43 @@ describe('NotificationProvider', () => {
 
         expect(screen.queryByText('Test Notification')).not.toBeInTheDocument();
         expect(screen.getByTestId('notification-count').textContent).toBe('0');
+    });
+
+    test('removes notification after duration expires', () => {
+        jest.useFakeTimers();
+
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+
+        const quickButton = screen.getByText('Add Quick Notification');
+        act(() => {
+            quickButton.click();
+        });
+
+        expect(screen.getByText('Quick Notification')).toBeInTheDocument();
+        expect(screen.getByTestId('notification-count').textContent).toBe('1');
+
+        // Advance timers by just less than the duration
+        act(() => {
+            jest.advanceTimersByTime(900);
+        });
+
+        // Notification should still be visible
+        expect(screen.getByText('Quick Notification')).toBeInTheDocument();
+        expect(screen.getByTestId('notification-count').textContent).toBe('1');
+
+        // Advance timers to complete the duration
+        act(() => {
+            jest.advanceTimersByTime(200);
+        });
+
+        // Notification should now be removed
+        expect(screen.queryByText('Quick Notification')).not.toBeInTheDocument();
+        expect(screen.getByTestId('notification-count').textContent).toBe('0');
+
+        jest.useRealTimers();
     });
 });

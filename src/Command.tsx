@@ -160,7 +160,7 @@ export const commandsWithContext = ({
     COMMANDS.set('whoami', {
         description: 'Tell you a little about yourself',
         run: () => {
-            // Add the "whoami_used" achievement
+            // Add the "who_are_you" achievement
             achievements.unlockAchievement('who_are_you');
 
             return [

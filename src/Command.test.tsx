@@ -1,5 +1,5 @@
 import { CommandContext, commandsWithContext } from './Command';
-import { AchievementUnlocked } from './components/Achievements/Achievements';
+import { AchievementId, AchievementUnlocked, coreAchievements } from './components/Achievements/Achievements';
 import { displayUser, User } from './Users';
 
 describe('Command', () => {
@@ -18,8 +18,14 @@ describe('Command', () => {
                 notifications: []
             },
             achievements: {
-                unlockAchievement: jest.fn().mockImplementation((id) => achievements.push(id)),
-                hasAchievement: jest.fn().mockImplementation((id) => achievements.includes(id)),
+                unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => achievements.push({
+                    id,
+                    title: coreAchievements[id].title,
+                    description: coreAchievements[id].description,
+                    unlockedAt: new Date().toISOString()
+                })),
+                hasAchievement: jest.fn().mockImplementation((id: AchievementId) =>
+                    achievements.some(achievement => achievement.id === id)),
                 resetAchievements: jest.fn().mockImplementation(() => achievements.splice(0)),
                 achievements
             }
@@ -237,7 +243,7 @@ describe('Command', () => {
         ]);
     });
 
-    test.skip('whoami', () => {
+    test('whoami', () => {
         const ctx = buildContext();
         const commands = commandsWithContext(ctx);
 
@@ -277,5 +283,10 @@ describe('Command', () => {
         expect(whois?.run()).toEqual([
             ['Unknown user: ']
         ]);
+
+        // Test for mario achievement
+        ctx.users.set('mario', { name: 'mario' });
+        whois?.run('mario');
+        expect(ctx.achievements.unlockAchievement).toHaveBeenCalledWith('old_spice_mario');
     });
 });
