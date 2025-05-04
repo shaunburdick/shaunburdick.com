@@ -7,7 +7,10 @@ describe('Notification', () => {
         jest.useFakeTimers();
 
         const onClose = jest.fn();
-        render(<Notification message={{ body: 'Test Notification' }} duration={2000} onClose={onClose} />);
+        render(
+            <Notification id="test-notification-1" message={{ body: 'Test Notification' }}
+                duration={2000} onClose={onClose} />
+        );
 
         expect(screen.getByText('Test Notification')).toBeInTheDocument();
 
@@ -24,7 +27,7 @@ describe('Notification', () => {
     test('does not render if visible is false', () => {
         jest.useFakeTimers();
 
-        render(<Notification message={{ body: 'Hidden Notification' }} duration={0} />);
+        render(<Notification id="test-notification-2" message={{ body: 'Hidden Notification' }} duration={0} />);
         act(() => {
             jest.advanceTimersByTime(0);
         });
@@ -37,7 +40,10 @@ describe('Notification', () => {
     test('renders notification with title when provided', () => {
         jest.useFakeTimers();
 
-        render(<Notification message={{ title: 'Test Title', body: 'Test Body' }} duration={2000} />);
+        render(
+            <Notification id="test-notification-3" message={{ title: 'Test Title', body: 'Test Body' }}
+                duration={2000} />
+        );
 
         expect(screen.getByText('Test Title')).toBeInTheDocument();
         expect(screen.getByText('Test Body')).toBeInTheDocument();
@@ -48,13 +54,18 @@ describe('Notification', () => {
 
 describe('NotificationProvider', () => {
     const TestComponent = () => {
-        const { add, clear, notifications } = useNotification();
+        const { add, remove, clear, notifications } = useNotification();
 
         return (
             <div>
                 <button onClick={() => add({ body: 'Test Notification' }, 3000)}>Add Notification</button>
                 <button onClick={() => add({ body: 'Quick Notification' }, 1000)}>Add Quick Notification</button>
                 <button onClick={clear}>Clear Notifications</button>
+                <button data-testid="remove-by-id" onClick={() => {
+                    if (notifications.length > 0) {
+                        remove(notifications[0].id);
+                    }
+                }}>Remove First Notification</button>
                 <Notifications />
                 <div data-testid="notification-count">{notifications.length}</div>
             </div>

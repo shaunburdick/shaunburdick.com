@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import './Notification.css';
 
 interface NotificationProps {
+    id: string;
     message: {
         body: string;
         title?: string;
@@ -10,7 +11,13 @@ interface NotificationProps {
     onClose?: () => void;
 }
 
-export function Notification({ message, duration = 3000, onClose }: NotificationProps) {
+/**
+ * Terminal-style notification component
+ *
+ * @param props - Component props
+ * @returns Notification component that automatically disappears after specified duration
+ */
+export function Notification({ id, message, duration = 3000, onClose }: NotificationProps) {
     const [visible, setVisible] = useState(true);
 
     useEffect(() => {
@@ -30,6 +37,7 @@ export function Notification({ message, duration = 3000, onClose }: Notification
 
     return (
         <div
+            data-id={id}
             role="alert"
             aria-live="polite"
             className="notification"
@@ -45,30 +53,41 @@ export function Notification({ message, duration = 3000, onClose }: Notification
 }
 
 export interface NotificationContextType {
-    add: (message: NotificationProps['message'], duration?: NotificationProps['duration']) => void;
+    add: (message: NotificationProps['message'], duration?: NotificationProps['duration']) => string;
+    remove: (id: string) => void;
     clear: () => void;
-    notifications: { message: NotificationProps['message']; duration?: NotificationProps['duration'] }[];
+    notifications: { id: string; message: NotificationProps['message']; duration?: NotificationProps['duration'] }[];
 }
 
 // Ignore the context for testing purposes
 /* istanbul ignore next */
 const NotificationContext = createContext<NotificationContextType>({
-    add: () => void 0,
+    add: () => '',
+    remove: () => void 0,
     clear: () => void 0,
     notifications: [],
 });
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const [notifications, setNotifications] = useState<{
+        id: string;
         message: NotificationProps['message'];
         duration?: NotificationProps['duration']
     }[]>([]);
 
+    const generateId = () => `notification-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
+    const remove = (id: string) => {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+    };
+
     const add = (message: NotificationProps['message'], duration?: number) => {
-        setNotifications((prev) => [...prev, { message, duration }]);
+        const id = generateId();
+        setNotifications((prev) => [...prev, { id, message, duration }]);
         setTimeout(() => {
-            setNotifications((prev) => prev.filter((n) => n.message !== message));
+            remove(id);
         }, duration || 3000);
+        return id;
     };
 
     const clear = () => {
@@ -76,7 +95,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <NotificationContext.Provider value={{ add, clear, notifications }}>
+        <NotificationContext.Provider value={{ add, remove, clear, notifications }}>
             {children}
         </NotificationContext.Provider>
     );
@@ -93,9 +112,10 @@ export function Notifications() {
             aria-label="Notifications"
             role="region"
         >
-            {notifications.map((notification, index) => (
+            {notifications.map((notification) => (
                 <Notification
-                    key={`notification-${index}`}
+                    key={notification.id}
+                    id={notification.id}
                     message={notification.message}
                     duration={notification.duration}
                 />
