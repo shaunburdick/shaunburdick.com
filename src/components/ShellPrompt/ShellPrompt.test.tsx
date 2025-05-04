@@ -1,18 +1,28 @@
 import React, { act } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { AchievementProvider } from '../Achievements/Achievements';
 import ShellPrompt, { LS_KEY_COMMAND_HISTORY } from './ShellPrompt';
+
+// Helper function to wrap component with providers
+const renderWithProviders = (component: React.ReactElement) => {
+    return render(
+        <AchievementProvider>
+            {component}
+        </AchievementProvider>
+    );
+};
 
 describe('ShellPrompt', () => {
     test('Shows the console', () => {
-        act(() => render(<ShellPrompt />));
+        act(() => renderWithProviders(<ShellPrompt />));
         expect(document.body.querySelector('.shell')).toBeInTheDocument();
     });
 
     test('Rest command history if invalid', () => {
         localStorage.setItem(LS_KEY_COMMAND_HISTORY, '"');
 
-        act(() => render(<ShellPrompt />));
+        act(() => renderWithProviders(<ShellPrompt />));
         expect(localStorage.getItem(LS_KEY_COMMAND_HISTORY)).toBe('[]');
     });
 
@@ -20,7 +30,7 @@ describe('ShellPrompt', () => {
         describe('history', () => {
             test('should save your history', async () => {
                 userEvent.setup();
-                act(() => render(<ShellPrompt />));
+                act(() => renderWithProviders(<ShellPrompt />));
 
                 await userEvent.keyboard('command1{Enter}');
                 await userEvent.keyboard('command2{Enter}');
@@ -55,7 +65,7 @@ describe('ShellPrompt', () => {
         describe('clear', () => {
             test('should clear the screen', async () => {
                 userEvent.setup();
-                act(() => render(<ShellPrompt />));
+                act(() => renderWithProviders(<ShellPrompt />));
 
                 await userEvent.keyboard('clear{Enter}');
 
@@ -67,7 +77,7 @@ describe('ShellPrompt', () => {
 
         test('Empty command should show an empty result', async () => {
             userEvent.setup();
-            act(() => render(<ShellPrompt />));
+            act(() => renderWithProviders(<ShellPrompt />));
 
             await userEvent.keyboard('{Enter}');
 
@@ -80,7 +90,7 @@ describe('ShellPrompt', () => {
 
     describe('Hints', () => {
         test('Clicking hint should update input with value', () => {
-            act(() => render(<ShellPrompt />));
+            act(() => renderWithProviders(<ShellPrompt />));
 
             const button = screen.getByText('Show Hints');
             fireEvent.click(button);
@@ -98,7 +108,7 @@ describe('ShellPrompt', () => {
         describe('tab completions', () => {
             test('should prevent loss of focus on the input if there is content', async () => {
                 userEvent.setup();
-                act(() => render(<ShellPrompt />));
+                act(() => renderWithProviders(<ShellPrompt />));
 
                 const cmdInput = document.querySelector('#console-input');
                 expect(cmdInput).not.toBeNull();
@@ -125,7 +135,7 @@ describe('ShellPrompt', () => {
         describe('escape', () => {
             test('should clear the input', async () => {
                 userEvent.setup();
-                act(() => render(<ShellPrompt />));
+                act(() => renderWithProviders(<ShellPrompt />));
 
                 const cmdInput = document.querySelector('#console-input');
                 expect(cmdInput).not.toBeNull();

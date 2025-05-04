@@ -1,8 +1,10 @@
 import { CommandContext, commandsWithContext } from './Command';
+import { AchievementId, AchievementUnlocked, coreAchievements } from './components/Achievements/Achievements';
 import { displayUser, User } from './Users';
 
 describe('Command', () => {
     function buildContext(): CommandContext {
+        const achievements: AchievementUnlocked[] = [];
         return {
             commandHistory: [],
             environment: new Map(),
@@ -10,6 +12,24 @@ describe('Command', () => {
             setLastCommand: jest.fn(),
             users: new Map([['test', { name: 'test' }]]),
             workingDir: '',
+            notifications: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                clear: jest.fn(),
+                notifications: []
+            },
+            achievements: {
+                unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => achievements.push({
+                    id,
+                    title: coreAchievements[id].title,
+                    description: coreAchievements[id].description,
+                    unlockedAt: new Date().toISOString()
+                })),
+                hasAchievement: jest.fn().mockImplementation((id: AchievementId) =>
+                    achievements.some(achievement => achievement.id === id)),
+                resetAchievements: jest.fn().mockImplementation(() => achievements.splice(0)),
+                achievements
+            }
         };
     }
 
@@ -231,7 +251,9 @@ describe('Command', () => {
         const response = commands.get('whoami')?.run();
 
         expect(response).toEqual([
-            ['You\'re you, silly']
+            ['You\'re you, silly'],
+            ['Achievements:'],
+            ['- Who Am I?: Use the whoami command.']
         ]);
     });
 
@@ -262,5 +284,10 @@ describe('Command', () => {
         expect(whois?.run()).toEqual([
             ['Unknown user: ']
         ]);
+
+        // Test for mario achievement
+        ctx.users.set('mario', { name: 'mario' });
+        whois?.run('mario');
+        expect(ctx.achievements.unlockAchievement).toHaveBeenCalledWith('old_spice_mario');
     });
 });

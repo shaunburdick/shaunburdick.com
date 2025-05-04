@@ -1,13 +1,29 @@
 import './App.css';
 
-import { useContext } from 'react';
-import ShellPrompt from './ShellPrompt';
-import CookieNotice from './CookieNotice';
-import { TrackerContext } from './Tracker';
+import ShellPrompt from './components/ShellPrompt/ShellPrompt';
+import CookieNotice from './components/CookieNotice/CookieNotice';
+import { TRACKER_EVENTS, useTracker } from './hooks/useTracker';
+import { Notifications, useNotification } from './components/Notification/Notification';
+import { useEvent } from './hooks';
 
 function App() {
 
-    const tracker = useContext(TrackerContext);
+    const tracker = useTracker();
+    const notifications = useNotification();
+    useEvent('onAchievement', (achievement) => {
+        notifications.add({ title: `Achievement Unlocked: ${achievement.title}`, body: achievement.description }, 5000);
+        tracker.trackEvent(TRACKER_EVENTS.AchievementUnlocked, {
+            props: {
+                achievement: achievement.id
+            }
+        });
+    });
+
+    useEvent('onCommand', ({ command }) => {
+        tracker.trackEvent(TRACKER_EVENTS.ExecCommand,
+            { props: { commandName: command.name, args: command.args.join(' ') } });
+    });
+
 
     tracker.trackPageview();
     tracker.enableAutoOutboundTracking();
@@ -18,6 +34,7 @@ function App() {
             <div aria-describedby='page-desc'>
                 <ShellPrompt />
                 <CookieNotice />
+                <Notifications />
             </div>
         </>
     );

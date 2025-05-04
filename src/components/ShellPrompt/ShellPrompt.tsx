@@ -1,10 +1,13 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { TRACKER_EVENTS, TrackerContext } from './Tracker';
-import Hints from './Hints';
-import ConsoleOutput, { CommandResult, ConsoleLine } from './ConsoleOutput';
-import { USERS } from './Users';
-import { commandsWithContext } from './Command';
+import React, { useState, useRef, useEffect } from 'react';
+import Hints from '../Hints/Hints';
+import ConsoleOutput, { CommandResult, ConsoleLine } from '../ConsoleOutput/ConsoleOutput';
+import { TRACKER_EVENTS, useTracker } from '../../hooks/useTracker';
+import { USERS } from '../../Users';
+import { commandsWithContext } from '../../Command';
 import './ShellPrompt.css';
+import { useNotification } from '../Notification/Notification';
+import { useEvent } from '../../hooks';
+import { useAchievements } from '../Achievements/Achievements';
 
 export const LS_KEY_LAST_LOGIN = 'lastLogin';
 export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
@@ -17,8 +20,10 @@ export const LS_KEY_COMMAND_HISTORY = 'commandHistory';
  * @return JSX representing a Shell Prompt
  */
 function ShellPrompt() {
-    const tracker = useContext(TrackerContext);
-
+    const tracker = useTracker();
+    const notifications = useNotification();
+    const achievements = useAchievements();
+    const commandUpdateEvent = useEvent('onCommand');
     const LAST_LOGIN = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
 
     const WELCOME_MESSAGE: CommandResult = {
@@ -62,7 +67,9 @@ function ShellPrompt() {
         setConsoleLines,
         setLastCommand,
         workingDir,
-        users: USERS
+        users: USERS,
+        notifications,
+        achievements
     });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -70,18 +77,28 @@ function ShellPrompt() {
     };
 
     const execCommand = (commandName: string, ...args: string[]): ConsoleLine[] => {
-        // record command
-        tracker.trackEvent(TRACKER_EVENTS.ExecCommand, { props: { commandName, args: args.join(' ') } });
+        // Add the "first_command" achievement
+        if (commandHistory.length === 0) {
+            achievements.unlockAchievement('first_command');
+        }
 
         const command = COMMANDS.get(commandName.toLowerCase());
+        let result = [];
         if (command) {
-            return command.run(...args);
+            result = command.run(...args);
         } else {
-            return [
+            result = [
                 ['Unknown Command: ', commandName],
                 ['Type `help` for assistance']
             ];
         }
+
+        commandUpdateEvent.dispatch({
+            command: { name: commandName.toLowerCase(), args },
+            result
+        });
+
+        return result;
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

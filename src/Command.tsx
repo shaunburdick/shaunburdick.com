@@ -1,5 +1,7 @@
-import { CommandResult, ConsoleLine } from './ConsoleOutput';
+import { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 import { displayUser, User } from './Users';
+import { NotificationContextType } from './components/Notification/Notification';
+import { AchievementContextType } from './components/Achievements/Achievements';
 
 export interface Command {
     description: string;
@@ -14,6 +16,8 @@ export interface CommandContext {
     setLastCommand: React.Dispatch<React.SetStateAction<CommandResult | undefined>>;
     users: Map<string, User>;
     workingDir: string;
+    notifications: NotificationContextType,
+    achievements: AchievementContextType
 }
 
 export const commandsWithContext = ({
@@ -23,6 +27,7 @@ export const commandsWithContext = ({
     setLastCommand,
     users,
     workingDir,
+    achievements
 }: CommandContext): Map<string, Command> => {
     /**
      * A map of commands available to run
@@ -125,6 +130,7 @@ export const commandsWithContext = ({
         description: 'Remove directory entries',
         run: () => {
             window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+            achievements.unlockAchievement('rick_rolled');
             return [['rm never gonna give you up!']];
         }
     });
@@ -132,7 +138,10 @@ export const commandsWithContext = ({
     COMMANDS.set('secret', {
         description: 'A secret command',
         secret: true,
-        run: () => [['You found it!']]
+        run: () => {
+            achievements.unlockAchievement('secret_command');
+            return [['You found it!']];
+        }
     });
 
     COMMANDS.set('users', {
@@ -150,9 +159,16 @@ export const commandsWithContext = ({
 
     COMMANDS.set('whoami', {
         description: 'Tell you a little about yourself',
-        run: () => [
-            ['You\'re you, silly']
-        ]
+        run: () => {
+            // Add the "who_are_you" achievement
+            achievements.unlockAchievement('who_are_you');
+
+            return [
+                ['You\'re you, silly'],
+                ['Achievements:'],
+                ...achievements.achievements.map(a => [`- ${a.title}: ${a.description}`]),
+            ];
+        }
     });
 
     COMMANDS.set('whois', {
@@ -160,6 +176,9 @@ export const commandsWithContext = ({
         run: (username: string) => {
             const user = users.get(username);
             if (user) {
+                if (username === 'mario') {
+                    achievements.unlockAchievement('old_spice_mario');
+                }
                 return displayUser(user);
             } else if(/miki|mikey|faktrl/.test(username)) {
                 window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
