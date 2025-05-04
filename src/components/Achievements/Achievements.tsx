@@ -31,7 +31,7 @@ export interface AchievementContextType {
 const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
 
 // Custom hook to safely access localStorage
-const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => void] => {
+const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] => {
     // Get from localStorage on initial render
     const getStoredValue = (): T => {
         try {
@@ -45,10 +45,12 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
     const [storedValue, setStoredValue] = useState<T>(getStoredValue);
 
     // Return a wrapped version that persists the new value to localStorage
-    const setValue = (value: T): void => {
+    const setValue = (value: T | ((prev: T) => T)): void => {
         try {
-            setStoredValue(value);
-            localStorage.setItem(key, JSON.stringify(value));
+            // Handle both direct values and functional updates
+            const valueToStore = value instanceof Function ? value(getStoredValue()) : value;
+            setStoredValue(valueToStore);
+            localStorage.setItem(key, JSON.stringify(valueToStore));
         } catch {
             // Silent fail on localStorage errors
         }
@@ -66,18 +68,26 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
     };
 
     const unlockAchievement = (achievementId: AchievementId): void => {
-        if (!hasAchievement(achievementId) && achievementId in coreAchievements) {
-            const achievement = {
-                id: achievementId,
-                unlockedAt: new Date().toISOString(),
-                ...coreAchievements[achievementId]
-            };
-            setAchievements([
-                ...achievements,
-                achievement
-            ]);
+        if (achievementId in coreAchievements) {
+            // Use functional update pattern to avoid race conditions
+            setAchievements((currentAchievements) => {
+                // Check again if achievement exists in the latest state
+                if (currentAchievements.some(a => a.id === achievementId)) {
+                    return currentAchievements; // Achievement already exists
+                }
 
-            achievementEvent.dispatch(achievement);
+                const achievement = {
+                    id: achievementId,
+                    unlockedAt: new Date().toISOString(),
+                    ...coreAchievements[achievementId]
+                };
+
+                // Dispatch event for the new achievement
+                achievementEvent.dispatch(achievement);
+
+                // Return new array with the added achievement
+                return [...currentAchievements, achievement];
+            });
         }
     };
 

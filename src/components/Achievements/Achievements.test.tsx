@@ -98,4 +98,44 @@ describe('Achievements React Hooks', () => {
         expect(storedAchievements.length).toBe(1);
         expect(storedAchievements[0].id).toBe('first_command');
     });
+
+    test('handles concurrent achievement unlocks atomically', async () => {
+        const { result } = renderHook(() => useAchievements(), { wrapper: TestWrapper });
+
+        // Simulate multiple concurrent achievement unlocks
+        await act(async () => {
+            // Create an array of achievement unlock promises
+            const unlockPromises = [
+                'first_command',
+                'who_are_you',
+                'accept_cookies',
+                'secret_command'
+            ].map(id => Promise.resolve().then(() => {
+                result.current.unlockAchievement(id as keyof typeof coreAchievements);
+            }));
+
+            // Execute all promises concurrently
+            await Promise.all(unlockPromises);
+        });
+
+        // All achievements should have been correctly added
+        expect(result.current.achievements.length).toBe(4);
+        expect(result.current.hasAchievement('first_command')).toBe(true);
+        expect(result.current.hasAchievement('who_are_you')).toBe(true);
+        expect(result.current.hasAchievement('accept_cookies')).toBe(true);
+        expect(result.current.hasAchievement('secret_command')).toBe(true);
+
+        // Verify localStorage was updated correctly with all achievements
+        const storedAchievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+        expect(storedAchievements.length).toBe(4);
+
+        // Try unlocking the same achievements again
+        await act(async () => {
+            result.current.unlockAchievement('first_command');
+            result.current.unlockAchievement('who_are_you');
+        });
+
+        // No duplicates should be added
+        expect(result.current.achievements.length).toBe(4);
+    });
 });
