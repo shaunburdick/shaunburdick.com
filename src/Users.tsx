@@ -1,13 +1,30 @@
 import { ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 
+/**
+ * User interface representing a user in the system
+ */
 export interface User {
+    /** User's display name */
     name: string;
+
+    /** Optional path to user avatar image */
     image?: string;
+
+    /** List of user occupations */
     occupation?: string[],
+
+    /** User's geographic location */
     location?: string,
+
+    /** List of user skills/expertise */
     expertise?: string[],
+
+    /** List of relevant links for the user */
     links?: {
+        /** URL to link destination */
         url: string;
+
+        /** Text to display for the link */
         text: string;
     }[]
 }
@@ -17,6 +34,12 @@ export interface User {
  */
 export const USERS = new Map<string, User>();
 
+/**
+ * Format a user object into console-friendly output lines
+ *
+ * @param user - User object to display
+ * @returns Array of console lines representing the user's information
+ */
 export const displayUser = (user: User) => {
     const response: ConsoleLine[] = [];
 
@@ -40,6 +63,7 @@ export const displayUser = (user: User) => {
     return response;
 };
 
+// User data below
 USERS.set('shaun', {
     name: 'Shaun Burdick',
     image: 'img/shaun.png',

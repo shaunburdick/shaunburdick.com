@@ -6,10 +6,20 @@ import { TRACKER_EVENTS, useTracker } from './hooks/useTracker';
 import { Notifications, useNotification } from './components/Notification/Notification';
 import { useEvent } from './hooks';
 
+/**
+ * Main application component
+ * Sets up event tracking, event listeners, and renders the main terminal interface
+ *
+ * @returns The main application component with terminal-style UI
+ */
 function App() {
 
     const tracker = useTracker();
     const notifications = useNotification();
+
+    /**
+     * Listen for achievement events and display notifications
+     */
     useEvent('onAchievement', (achievement) => {
         notifications.add({ title: `Achievement Unlocked: ${achievement.title}`, body: achievement.description }, 5000);
         tracker.trackEvent(TRACKER_EVENTS.AchievementUnlocked, {
@@ -19,6 +29,9 @@ function App() {
         });
     });
 
+    /**
+     * Track command execution events
+     */
     useEvent('onCommand', ({ command }) => {
         tracker.trackEvent(TRACKER_EVENTS.ExecCommand,
             { props: { commandName: command.name, args: command.args.join(' ') } });

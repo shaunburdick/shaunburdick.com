@@ -3,23 +3,55 @@ import { displayUser, User } from './Users';
 import { NotificationContextType } from './components/Notification/Notification';
 import { AchievementContextType } from './components/Achievements/Achievements';
 
+/**
+ * Interface for a terminal command
+ */
 export interface Command {
+    /** Help text description of the command */
     description: string;
+
+    /** Whether the command should be hidden from help listings */
     secret?: boolean;
+
+    /** Function that executes the command with any arguments */
     run: (...args: string[]) => ConsoleLine[];
 }
 
+/**
+ * Context required for commands to access system state
+ */
 export interface CommandContext {
+    /** List of previously executed commands */
     commandHistory: string[];
+
+    /** Map of environment variables */
     environment: Map<string, string>;
+
+    /** Function to update the displayed console lines */
     setConsoleLines: React.Dispatch<React.SetStateAction<CommandResult[]>>;
+
+    /** Function to update the last executed command */
     setLastCommand: React.Dispatch<React.SetStateAction<CommandResult | undefined>>;
+
+    /** Map of registered users in the system */
     users: Map<string, User>;
+
+    /** Current working directory */
     workingDir: string;
-    notifications: NotificationContextType,
+
+    /** Interface for displaying notifications */
+    notifications: NotificationContextType;
+
+    /** Interface for handling achievements */
     achievements: AchievementContextType
 }
 
+/**
+ * Creates a map of available commands with access to system context
+ *
+ * @param context - The command context containing system state
+ * @returns Map of command names to command implementations
+ */
 export const commandsWithContext = ({
     commandHistory,
     environment,
