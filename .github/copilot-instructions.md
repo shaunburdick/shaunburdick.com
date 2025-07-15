@@ -24,7 +24,7 @@
    - Include @param and @returns tags when applicable
 
 3. **Accessibility**
-   - Ensure WCAG 2.1 AA compliance
+   - Ensure WCAG 2.2 AA compliance
    - Support screen readers
    - Use semantic HTML elements
    - Include proper ARIA attributes
@@ -57,3 +57,4 @@ const TerminalComponent: React.FC<Props> = ({ props }) => {
     </div>
   );
 };
+```
