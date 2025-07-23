@@ -1,13 +1,31 @@
 import { resolve } from 'path';
+import { readFileSync } from 'fs';
+import { execSync } from 'child_process';
 import process from 'node:process';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
+import webpack from 'webpack';
 
 const isEnvProduction = process.env.NODE_ENV === 'production';
 const isEnvDevelopment = !isEnvProduction;
+
+// Get version from package.json
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
+const version = packageJson.version;
+
+// Get commit hash
+let commitHash = 'unknown';
+try {
+    commitHash = execSync('git rev-parse --short HEAD').toString().trim();
+} catch {
+    // Silently fail if git is not available or not a git repository
+}
+
+// Get build date (when webpack runs)
+const buildDate = new Date().toISOString();
 
 export default {
     target: ['browserslist'],
@@ -19,6 +37,12 @@ export default {
     devtool: isEnvDevelopment && 'cheap-module-source-map',
     entry: './src/index.tsx',
     plugins: [
+        // Inject build-time environment variables
+        new webpack.DefinePlugin({
+            'process.env.REACT_APP_VERSION': JSON.stringify(version),
+            'process.env.REACT_APP_COMMIT_HASH': JSON.stringify(commitHash),
+            'process.env.REACT_APP_BUILD_DATE': JSON.stringify(buildDate),
+        }),
         // Generates an `index.html` file with the <script> injected.
         new HtmlWebpackPlugin({
             inject: true,

@@ -69,6 +69,12 @@ function Hints({ hintClick }: HintsProps) {
                         </tr>
                         <tr>
                             <td>
+                                <a onClick={onHintClick} href='#' title='Click to copy command to input'>version</a>
+                            </td>
+                            <td>Show app version and build info</td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <a onClick={onHintClick} href='#' title='Click to copy command to input'>rm -rf /</a>
                             </td>
                             <td>Delete all files</td>

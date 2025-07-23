@@ -181,6 +181,25 @@ export const commandsWithContext = ({
         run: () => [...users.keys()].sort().map(userName => [userName])
     });
 
+    COMMANDS.set('version', {
+        description: 'Show application version and build information',
+        run: () => {
+            const version = process.env.REACT_APP_VERSION || 'unknown';
+            const commitHash = process.env.REACT_APP_COMMIT_HASH || 'unknown';
+            const buildDate = process.env.REACT_APP_BUILD_DATE || 'unknown';
+
+            return [
+                ['Application Version Information:'],
+                [''],
+                [`Version: ${version}`],
+                [`Commit: ${commitHash}`],
+                [`Build Date: ${buildDate}`],
+                [''],
+                ['Source: ', <a href="https://github.com/shaunburdick/shaunburdick.com">GitHub Repository</a>]
+            ];
+        }
+    });
+
     COMMANDS.set('view-source', {
         description: 'View the source of this app',
         run: () => {

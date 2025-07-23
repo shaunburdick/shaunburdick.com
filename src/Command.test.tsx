@@ -290,4 +290,16 @@ describe('Command', () => {
         whois?.run('mario');
         expect(ctx.achievements.unlockAchievement).toHaveBeenCalledWith('old_spice_mario');
     });
+
+    test('version', () => {
+        const ctx = buildContext();
+        const commands = commandsWithContext(ctx);
+
+        const response = commands.get('version')?.run();
+
+        expect(Array.isArray(response)).toBe(true);
+        expect(response?.some(line => line[0] && line[0].toString().includes('Version:'))).toBe(true);
+        expect(response?.some(line => line[0] && line[0].toString().includes('Commit:'))).toBe(true);
+        expect(response?.some(line => line[0] && line[0].toString().includes('Build Date:'))).toBe(true);
+    });
 });
