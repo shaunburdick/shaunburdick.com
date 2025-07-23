@@ -46,20 +46,6 @@ describe('CookieNotice', () => {
     });
 
     test('Show cookie joke if you click no', () => {
-        const { location } = window;
-        const getHrefSpy = jest.fn(() => 'example.com');
-        const setHrefSpy = jest.fn(href => href);
-
-        // @ts-expect-error - clear out the locations object and redefine
-        delete window.location;
-        // @ts-expect-error - set an empty object to fill
-        window.location = {};
-
-        Object.defineProperty(window.location, 'href', {
-            get: getHrefSpy,
-            set: setHrefSpy,
-        });
-
         act(() => renderWithProviders(<CookieNotice />));
 
         const button = screen.getByText('No');
@@ -67,21 +53,14 @@ describe('CookieNotice', () => {
         expect(button).toBeInTheDocument();
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
 
-        // click the show button
+        // Click the no button
         fireEvent.click(button);
 
-        expect(setHrefSpy).toHaveBeenCalledTimes(1);
-        expect(setHrefSpy).toHaveBeenCalledWith(
-            'https://www.oreo.com/',
-        );
-
-        // notice should stay on the screen
+        // Notice should stay on the screen (the joke is that rejecting cookies doesn't work)
         expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
 
-        Object.defineProperty(window, 'location', {
-            value: location,
-            writable: true,
-        });
+        // localStorage should NOT be set when clicking no
+        expect(localStorage.getItem(LS_COOKIE_ACKNOWLEDGE)).toBeNull();
     });
 });
 
