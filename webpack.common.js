@@ -1,6 +1,6 @@
-import { resolve } from 'path';
-import { readFileSync } from 'fs';
-import { execSync } from 'child_process';
+import { resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import process from 'node:process';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
@@ -14,7 +14,7 @@ const isEnvDevelopment = !isEnvProduction;
 
 // Get version from package.json
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
-const version = packageJson.version;
+const { version } = packageJson;
 
 // Get commit hash
 let commitHash = 'unknown';

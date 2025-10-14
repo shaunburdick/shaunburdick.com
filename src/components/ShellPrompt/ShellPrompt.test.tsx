@@ -13,6 +13,8 @@ const renderWithProviders = (component: React.ReactElement) => {
     );
 };
 
+const CONSOLE_INPUT_SELECTOR = '#console-input';
+
 describe('ShellPrompt', () => {
     test('Shows the console', () => {
         act(() => renderWithProviders(<ShellPrompt />));
@@ -98,7 +100,7 @@ describe('ShellPrompt', () => {
             const link = screen.getByText('whois shaun');
             fireEvent.click(link);
 
-            const input = document.body.querySelector('#console-input') as HTMLInputElement;
+            const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
             expect(input).toBeInTheDocument();
             expect(input?.value).toEqual('whois shaun');
         });
@@ -110,7 +112,7 @@ describe('ShellPrompt', () => {
                 userEvent.setup();
                 act(() => renderWithProviders(<ShellPrompt />));
 
-                const cmdInput = document.querySelector('#console-input');
+                const cmdInput = document.querySelector(CONSOLE_INPUT_SELECTOR);
                 expect(cmdInput).not.toBeNull();
 
                 // Should be focused on input
@@ -137,7 +139,7 @@ describe('ShellPrompt', () => {
                 userEvent.setup();
                 act(() => renderWithProviders(<ShellPrompt />));
 
-                const cmdInput = document.querySelector('#console-input');
+                const cmdInput = document.querySelector(CONSOLE_INPUT_SELECTOR);
                 expect(cmdInput).not.toBeNull();
 
                 // type a command

@@ -40,6 +40,7 @@ function CookieNotice() {
     };
 
     return (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
             {showCookieMessage &&
                 <div style={{ position: 'fixed', bottom: 0, maxWidth: '750px', paddingRight: '2em' }}>

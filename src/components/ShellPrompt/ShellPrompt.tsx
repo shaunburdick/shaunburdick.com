@@ -32,7 +32,7 @@ function ShellPrompt() {
             ['****************************************'],
             ['Welcome to Shaun Burdick\'s Console!'],
             ['****************************************'],
-            ['Your last login was:', <span aria-label='Last Login Timestamp'>{LAST_LOGIN}</span>],
+            ['Your last login was:', <span key={LAST_LOGIN} aria-label='Last Login Timestamp'>{LAST_LOGIN}</span>],
             ['Type `help` for assistance.'],
             [''],
         ]
@@ -101,67 +101,85 @@ function ShellPrompt() {
         return result;
     };
 
+    const handleEnterKey = () => {
+        if (inputRef.current) {
+            const input = inputRef.current.value.trimEnd();
+            const newCommandResult: CommandResult = {
+                timestamp: new Date(),
+                command: input,
+                response: [['']]
+            };
+
+            // add to history
+            setCommandHistory([...commandHistory, input]);            if (newCommandResult.command) {
+                // execute command
+                const [command, ...args] = newCommandResult.command.split(' ');
+                newCommandResult.response = typeof command === 'string' && command.length > 0 ?
+                    execCommand(command, ...args as string[]) : [['']];
+            }
+
+            // clear input
+            inputRef.current.value = '';
+            // set last command
+            setLastCommand(newCommandResult);
+            // write lines
+            setConsoleLines([...consoleLines, newCommandResult]);
+            // reset command pointer
+            setCommandPointer(0);
+        }
+    };
+
+    const handleTabKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        // if input is empty, allow them to tab out
+        if (inputRef.current?.value) {
+            // add tab completion?
+            event.preventDefault();
+        }
+    };
+
+    const handleArrowUpKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        event.preventDefault();
+        tracker.trackEvent(TRACKER_EVENTS.HistoryUpArrow);
+        if (commandPointer < commandHistory.length) {
+            setCommandPointer(commandPointer + 1);
+        }
+    };
+
+    const handleArrowDownKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        event.preventDefault();
+        if (commandPointer > DEFAULT_COMMAND_POINTER) {
+            setCommandPointer(commandPointer - 1);
+        } else {
+            if (inputRef.current !== null) {
+                inputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleEscapeKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        event.preventDefault();
+        setCommandPointer(DEFAULT_COMMAND_POINTER);
+        if (inputRef.current !== null) {
+            inputRef.current.value = '';
+        }
+    };
+
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         switch (event.key) {
             case 'Enter':
-                if (inputRef.current) {
-                    const input = inputRef.current.value.trimEnd();
-                    const newCommandResult: CommandResult = {
-                        timestamp: new Date(),
-                        command: input,
-                        response: [['']]
-                    };
-
-                    // add to history
-                    setCommandHistory([...commandHistory, input]);
-
-                    if (newCommandResult.command) {
-                        // execute command
-                        const [command, ...args] = newCommandResult.command.split(' ');
-                        newCommandResult.response = typeof command === 'string' && command.length > 0 ?
-                            execCommand(command, ...args as string[]) : [['']];
-                    }
-
-                    // clear input
-                    inputRef.current.value = '';
-                    // set last command
-                    setLastCommand(newCommandResult);
-                    // write lines
-                    setConsoleLines([...consoleLines, newCommandResult]);
-                    // reset command pointer
-                    setCommandPointer(0);
-                }
+                handleEnterKey();
                 break;
             case 'Tab':
-                // if input is empty, allow them to tab out
-                if (inputRef.current?.value) {
-                    // add tab completion?
-                    event.preventDefault();
-                }
+                handleTabKey(event);
                 break;
             case 'ArrowUp':
-                event.preventDefault();
-                tracker.trackEvent(TRACKER_EVENTS.HistoryUpArrow);
-                if (commandPointer < commandHistory.length) {
-                    setCommandPointer(commandPointer + 1);
-                }
+                handleArrowUpKey(event);
                 break;
             case 'ArrowDown':
-                event.preventDefault();
-                if (commandPointer > DEFAULT_COMMAND_POINTER) {
-                    setCommandPointer(commandPointer - 1);
-                } else {
-                    if (inputRef.current !== null) {
-                        inputRef.current.value = '';
-                    }
-                }
+                handleArrowDownKey(event);
                 break;
             case 'Escape':
-                event.preventDefault();
-                setCommandPointer(DEFAULT_COMMAND_POINTER);
-                if (inputRef.current !== null) {
-                    inputRef.current.value = '';
-                }
+                handleEscapeKey(event);
                 break;
             default:
             // do nothing
@@ -200,8 +218,8 @@ function ShellPrompt() {
         ) {
             inputRef.current.value = commandHistory[commandHistory.length - commandPointer];
         }
-
         // update history with max last 20 commands
+        // eslint-disable-next-line react-you-might-not-need-an-effect/no-chain-state-updates
         localStorage.setItem(LS_KEY_COMMAND_HISTORY, JSON.stringify(commandHistory.slice(-20)));
     }, [commandPointer, commandHistory]);
 
@@ -232,6 +250,7 @@ function ShellPrompt() {
                 aria-description='This area is meant to depict an older styled computer console
                 where commands can be typed and responses will be shown.'>
                 {consoleLines.slice(0, -1).map((commandResult, commandIndex) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <ConsoleOutput key={commandIndex} commandResult={commandResult}/>
                 ))}
                 {/*
@@ -248,6 +267,7 @@ function ShellPrompt() {
                                 {<span aria-hidden>$</span>} {lastCommand.command}
                             </span>}
                             {lastCommand.response.map((commandLine, lineIndex) => (
+                                // eslint-disable-next-line react/no-array-index-key
                                 <span key={lineIndex}>
                                     {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
                                 </span>
@@ -269,9 +289,6 @@ function ShellPrompt() {
                         autoCapitalize='none'
                         spellCheck={false}
                         aria-label='An input to enter commands.'
-                        // *eslint-disable-next-line jsx-a11y/aria-props
-                        aria-description='When a command is entered, it will be run by the console interpreter
-                        and the above output will be updated with the result'
                     />
                 </div>
             </form>

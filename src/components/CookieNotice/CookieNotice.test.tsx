@@ -13,6 +13,8 @@ describe('CookieNotice', () => {
         );
     };
 
+    const COOKIE_NOTICE_SELECTOR = '[aria-label="Cookie Notice"]';
+
     beforeEach(() => {
         localStorage.clear();
     });
@@ -20,7 +22,7 @@ describe('CookieNotice', () => {
     test('Display the cookie notice', () => {
         act(() => renderWithProviders(<CookieNotice />));
 
-        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
+        expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).toBeInTheDocument();
     });
 
     test('Hide cookie notice once clicked', () => {
@@ -29,11 +31,11 @@ describe('CookieNotice', () => {
         const button = screen.getByText('Yes');
 
         expect(button).toBeInTheDocument();
-        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
+        expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).toBeInTheDocument();
 
         // click the show button
         fireEvent.click(button);
-        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).not.toBeInTheDocument();
+        expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).not.toBeInTheDocument();
         expect(localStorage.getItem(LS_COOKIE_ACKNOWLEDGE)).toEqual('true');
     });
 
@@ -42,7 +44,7 @@ describe('CookieNotice', () => {
 
         act(() => renderWithProviders(<CookieNotice />));
 
-        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).not.toBeInTheDocument();
+        expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).not.toBeInTheDocument();
     });
 
     test('Show cookie joke if you click no', () => {
@@ -51,13 +53,13 @@ describe('CookieNotice', () => {
         const button = screen.getByText('No');
 
         expect(button).toBeInTheDocument();
-        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
+        expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).toBeInTheDocument();
 
         // Click the no button
         fireEvent.click(button);
 
         // Notice should stay on the screen (the joke is that rejecting cookies doesn't work)
-        expect(document.body.querySelector('[aria-label="Cookie Notice"]')).toBeInTheDocument();
+        expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).toBeInTheDocument();
 
         // localStorage should NOT be set when clicking no
         expect(localStorage.getItem(LS_COOKIE_ACKNOWLEDGE)).toBeNull();

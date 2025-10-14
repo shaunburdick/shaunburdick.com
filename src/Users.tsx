@@ -44,7 +44,7 @@ export const displayUser = (user: User) => {
     const response: ConsoleLine[] = [];
 
     if (user.image) {
-        response.push([<img src={user.image} alt={user.name} width={'50%'}/>]);
+        response.push([<img src={user.image} alt={user.name} key={user.name} width={'50%'}/>]);
     }
     response.push(['Name: ', user.name]);
     if (user.occupation) {
@@ -57,7 +57,7 @@ export const displayUser = (user: User) => {
         response.push(['Expertise: ', JSON.stringify(user.expertise, null, 2)]);
     }
     if (user.links) {
-        response.push(['Links: ', ...user.links.map(link => <a href={link.url}>{link.text}</a>)]);
+        response.push(['Links: ', ...user.links.map(link => <a key={link.url} href={link.url}>{link.text}</a>)]);
     }
 
     return response;

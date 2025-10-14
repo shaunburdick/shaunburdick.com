@@ -111,7 +111,7 @@ describe('Achievements React Hooks', () => {
                 'accept_cookies',
                 'secret_command'
             ].map(id => Promise.resolve().then(() => {
-                result.current.unlockAchievement(id as keyof typeof coreAchievements);
+                return result.current.unlockAchievement(id as keyof typeof coreAchievements);
             }));
 
             // Execute all promises concurrently

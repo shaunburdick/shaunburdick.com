@@ -84,9 +84,9 @@ export const commandsWithContext = ({
         run: () => {
             const response: ConsoleLine[] = [];
 
-            environment.forEach((v, k) => {
+            for (const [k, v] of environment.entries()) {
                 response.push([`${k}=${v}`]);
-            });
+            }
 
             return response;
         }
@@ -195,7 +195,7 @@ export const commandsWithContext = ({
                 [`Commit: ${commitHash}`],
                 [`Build Date: ${buildDate}`],
                 [''],
-                ['Source: ', <a href="https://github.com/shaunburdick/shaunburdick.com">GitHub Repository</a>]
+                ['Source: ', <a key='gh-repo' href="https://github.com/shaunburdick/shaunburdick.com">GitHub Repository</a>]
             ];
         }
     });
@@ -235,7 +235,7 @@ export const commandsWithContext = ({
                 window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
                 return [[`Hello, ${username}`]];
             } else if (username === 'gamefront') {
-                return [[<a href='https://gamefront.com'>Gamefront</a>, 'is just FilesNetwork with a better skin']];
+                return [[<a key='gf-link' href='https://gamefront.com'>Gamefront</a>, 'is just FilesNetwork with a better skin']];
             } else {
                 return [[`Unknown user: ${username || ''}`]];
             }

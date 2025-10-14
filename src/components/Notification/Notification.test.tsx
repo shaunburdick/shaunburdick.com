@@ -2,23 +2,27 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { Notification, NotificationProvider, useNotification, Notifications } from './Notification';
 
+const TEST_NOTIFICATION_TEXT = 'Test Notification';
+const QUICK_NOTIFICATION_TEXT = 'Quick Notification';
+const TESTID_NOTIFICATION_COUNT = 'notification-count';
+
 describe('Notification', () => {
     test('renders a notification and hides it after the duration', () => {
         jest.useFakeTimers();
 
         const onClose = jest.fn();
         render(
-            <Notification id="test-notification-1" message={{ body: 'Test Notification' }}
+            <Notification id="test-notification-1" message={{ body: TEST_NOTIFICATION_TEXT }}
                 duration={2000} onClose={onClose} />
         );
 
-        expect(screen.getByText('Test Notification')).toBeInTheDocument();
+        expect(screen.getByText(TEST_NOTIFICATION_TEXT)).toBeInTheDocument();
 
         act(() => {
             jest.advanceTimersByTime(2000);
         });
 
-        expect(screen.queryByText('Test Notification')).not.toBeInTheDocument();
+        expect(screen.queryByText(TEST_NOTIFICATION_TEXT)).not.toBeInTheDocument();
         expect(onClose).toHaveBeenCalled();
 
         jest.useRealTimers();
@@ -58,8 +62,8 @@ describe('NotificationProvider', () => {
 
         return (
             <div>
-                <button onClick={() => add({ body: 'Test Notification' }, 3000)}>Add Notification</button>
-                <button onClick={() => add({ body: 'Quick Notification' }, 1000)}>Add Quick Notification</button>
+                <button onClick={() => add({ body: TEST_NOTIFICATION_TEXT }, 3000)}>Add Notification</button>
+                <button onClick={() => add({ body: QUICK_NOTIFICATION_TEXT }, 1000)}>Add Quick Notification</button>
                 <button onClick={clear}>Clear Notifications</button>
                 <button data-testid="remove-by-id" onClick={() => {
                     if (notifications.length > 0) {
@@ -84,7 +88,7 @@ describe('NotificationProvider', () => {
             addButton.click();
         });
 
-        expect(screen.getByText('Test Notification')).toBeInTheDocument();
+        expect(screen.getByText(TEST_NOTIFICATION_TEXT)).toBeInTheDocument();
         expect(screen.getByTestId('notification-count').textContent).toBe('1');
     });
 
@@ -103,14 +107,14 @@ describe('NotificationProvider', () => {
             addButton.click();
         });
 
-        expect(screen.getAllByText('Test Notification').length).toBe(2);
+        expect(screen.getAllByText(TEST_NOTIFICATION_TEXT).length).toBe(2);
 
         act(() => {
             clearButton.click();
         });
 
-        expect(screen.queryByText('Test Notification')).not.toBeInTheDocument();
-        expect(screen.getByTestId('notification-count').textContent).toBe('0');
+        expect(screen.queryByText(TEST_NOTIFICATION_TEXT)).not.toBeInTheDocument();
+        expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('0');
     });
 
     test('removes notification after duration expires', () => {
@@ -127,8 +131,8 @@ describe('NotificationProvider', () => {
             quickButton.click();
         });
 
-        expect(screen.getByText('Quick Notification')).toBeInTheDocument();
-        expect(screen.getByTestId('notification-count').textContent).toBe('1');
+        expect(screen.getByText(QUICK_NOTIFICATION_TEXT)).toBeInTheDocument();
+        expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('1');
 
         // Advance timers by just less than the duration
         act(() => {
@@ -136,8 +140,8 @@ describe('NotificationProvider', () => {
         });
 
         // Notification should still be visible
-        expect(screen.getByText('Quick Notification')).toBeInTheDocument();
-        expect(screen.getByTestId('notification-count').textContent).toBe('1');
+        expect(screen.getByText(QUICK_NOTIFICATION_TEXT)).toBeInTheDocument();
+        expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('1');
 
         // Advance timers to complete the duration
         act(() => {
@@ -145,8 +149,8 @@ describe('NotificationProvider', () => {
         });
 
         // Notification should now be removed
-        expect(screen.queryByText('Quick Notification')).not.toBeInTheDocument();
-        expect(screen.getByTestId('notification-count').textContent).toBe('0');
+        expect(screen.queryByText(QUICK_NOTIFICATION_TEXT)).not.toBeInTheDocument();
+        expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('0');
 
         jest.useRealTimers();
     });

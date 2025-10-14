@@ -43,7 +43,7 @@ function App() {
 
     return (
         <>
-            <h1 id='page-desc'>Shaun Burdick's Console</h1>
+            <h1 id='page-desc'>Shaun Burdick&apos;s Console</h1>
             <div aria-describedby='page-desc'>
                 <ShellPrompt />
                 <CookieNotice />

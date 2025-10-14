@@ -1,4 +1,5 @@
-import { useCallback, useEffect, type Dispatch } from 'react';
+import { useCallback, useEffect  } from 'react';
+import type { Dispatch } from 'react';
 import type { AchievementUnlocked } from '../components/Achievements/Achievements';
 import type { ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
 
@@ -35,7 +36,7 @@ export const useEvent = <T extends keyof CustomWindowEventMap>(
     callback?: Dispatch<EventPayload<T>> | VoidFunction
 ) => {
     useEffect(() => {
-        if (!callback) {
+        if (callback === undefined) {
             return;
         }
 

@@ -38,13 +38,13 @@ function Hints({ hintClick }: HintsProps) {
     };
 
     /**
-     * Handle click on a hint link
+     * Handle click on a hint button
      *
      * @param event - The click event
      */
-    const onHintClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    const onHintClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if (hintClick) {
-            hintClick(event.currentTarget.text);
+            hintClick(event.currentTarget.textContent || '');
         }
     };
 
@@ -63,19 +63,61 @@ function Hints({ hintClick }: HintsProps) {
                     <tbody>
                         <tr>
                             <td>
-                                <a onClick={onHintClick} href='#' title='Click to copy command to input'>whois shaun</a>
+                                <button
+                                    onClick={onHintClick}
+                                    title='Click to copy command to input'
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'inherit',
+                                        textDecoration: 'underline',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        font: 'inherit'
+                                    }}
+                                >
+                                    whois shaun
+                                </button>
                             </td>
                             <td>Show information on Shaun</td>
                         </tr>
                         <tr>
                             <td>
-                                <a onClick={onHintClick} href='#' title='Click to copy command to input'>version</a>
+                                <button
+                                    onClick={onHintClick}
+                                    title='Click to copy command to input'
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'inherit',
+                                        textDecoration: 'underline',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        font: 'inherit'
+                                    }}
+                                >
+                                    version
+                                </button>
                             </td>
                             <td>Show app version and build info</td>
                         </tr>
                         <tr>
                             <td>
-                                <a onClick={onHintClick} href='#' title='Click to copy command to input'>rm -rf /</a>
+                                <button
+                                    onClick={onHintClick}
+                                    title='Click to copy command to input'
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'inherit',
+                                        textDecoration: 'underline',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        font: 'inherit'
+                                    }}
+                                >
+                                    rm -rf /
+                                </button>
                             </td>
                             <td>Delete all files</td>
                         </tr>

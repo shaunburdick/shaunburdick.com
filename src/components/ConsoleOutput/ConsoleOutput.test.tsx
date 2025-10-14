@@ -69,9 +69,9 @@ describe('ConsoleOutput', () => {
 
         expect(screen.getByText(`${testCommands.multiLine.command}`)).toBeInTheDocument();
 
-        testCommands.multiLine.response.forEach(line => {
+        for (const line of testCommands.multiLine.response) {
             expect(screen.getByText(`${line[0]}`)).toBeInTheDocument();
-        });
+        }
     });
 });
 
