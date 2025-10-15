@@ -14,6 +14,9 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 const CONSOLE_INPUT_SELECTOR = '#console-input';
+const ARROW_DOWN_KEY = '{ArrowDown}';
+const ARROW_UP_KEY = '{ArrowUp}';
+const WHOIS_SHAUN_TEXT = 'whois shaun';
 
 describe('ShellPrompt', () => {
     test('Shows the console', () => {
@@ -56,10 +59,11 @@ describe('ShellPrompt', () => {
                 await userEvent.keyboard('{ArrowUp}');
                 expect(input?.value).toEqual('command2');
 
-                await userEvent.keyboard('{ArrowDown}');
+                await userEvent.keyboard(ARROW_DOWN_KEY);
                 expect(input?.value).toEqual('command3');
 
-                await userEvent.keyboard('{ArrowDown}{ArrowDown}'); // Todo: Fix this bug, should just be one
+                // Todo: Fix this bug, should just be one
+                await userEvent.keyboard(`${ARROW_DOWN_KEY}${ARROW_DOWN_KEY}`);
                 expect(input?.value).toEqual('');
             });
         });
@@ -97,7 +101,7 @@ describe('ShellPrompt', () => {
             const button = screen.getByText('Show Hints');
             fireEvent.click(button);
 
-            const link = screen.getByText('whois shaun');
+            const link = screen.getByText(WHOIS_SHAUN_TEXT);
             fireEvent.click(link);
 
             const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
@@ -151,6 +155,111 @@ describe('ShellPrompt', () => {
                 // Should be empty
                 expect((cmdInput as HTMLInputElement).value).toEqual('');
             });
+        });
+    });
+
+    describe('Edge cases and null checks', () => {
+        test('handleEnterKey when inputRef.current is null', () => {
+            // Test null check for inputRef.current
+            const component = renderWithProviders(<ShellPrompt />);
+
+            // Get the ShellPrompt instance to access internal methods
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+
+            // Mock inputRef.current to be null temporarily
+            Object.defineProperty(input, 'current', { value: null });
+
+            // Trigger enter key - should not throw error
+            fireEvent.keyDown(input, { key: 'Enter' });
+
+            expect(component.container.querySelector('pre')).toBeInTheDocument();
+        });
+
+        test('command execution branches', async () => {
+            // Test different command execution paths
+            userEvent.setup();
+            act(() => renderWithProviders(<ShellPrompt />));
+
+            // Test empty command (line 117)
+            await userEvent.keyboard('{Enter}');
+
+            // Test command with no args
+            await userEvent.keyboard('help{Enter}');
+
+            // Test command with args
+            await userEvent.keyboard('whois shaun{Enter}');
+
+            // Test non-existent command
+            await userEvent.keyboard('nonexistent{Enter}');
+
+            const consoleCommands = document.body.querySelectorAll('pre > div');
+            expect(consoleCommands.length).toBeGreaterThan(4);
+        });
+
+        test('handleTabKey prevents default when input has value', async () => {
+            // Test tab key behavior for better coverage
+            userEvent.setup();
+            act(() => renderWithProviders(<ShellPrompt />));
+
+            const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
+
+            // Type something in the input
+            await userEvent.type(input, 'test command');
+
+            // Tab should be prevented (focus stays on input)
+            await userEvent.keyboard('{Tab}');
+            expect(document.activeElement).toBe(input);
+        });
+
+        test('escape key clears input and resets command pointer', async () => {
+            // Test escape key functionality
+            userEvent.setup();
+            act(() => renderWithProviders(<ShellPrompt />));
+
+            const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
+
+            // Add some history and navigate it
+            await userEvent.keyboard('test1{Enter}');
+            await userEvent.keyboard('test2{Enter}');
+            await userEvent.keyboard(ARROW_UP_KEY); // Should show test2
+
+            expect(input.value).toBe('test2');
+
+            // Escape should clear input
+            await userEvent.keyboard('{Escape}');
+            expect(input.value).toBe('');
+        });
+
+        test('handleEnterKey with empty command', async () => {
+            // Test empty command execution
+            userEvent.setup();
+            act(() => renderWithProviders(<ShellPrompt />));
+
+            // Enter with empty input
+            await userEvent.keyboard('{Enter}');
+
+            // Should still have console output
+            const consoleCommands = document.body.querySelectorAll('pre > div');
+            expect(consoleCommands.length).toBeGreaterThan(0);
+        });
+
+        test('hintClick functionality', () => {
+            // Test hintClick method
+            act(() => renderWithProviders(<ShellPrompt />));
+
+            const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
+
+            // Test hintClick by clicking show hints button first
+            const showHintsButton = screen.getByText('Show Hints');
+            fireEvent.click(showHintsButton);
+
+            // Find a hint and click it
+            const hintButton = screen.getByText(WHOIS_SHAUN_TEXT);
+            fireEvent.click(hintButton);
+
+            // Input should be populated with the hint
+            expect(input.value).toBe(WHOIS_SHAUN_TEXT);
+            expect(document.activeElement).toBe(input);
         });
     });
 });

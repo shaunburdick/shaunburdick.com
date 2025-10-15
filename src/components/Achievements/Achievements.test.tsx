@@ -138,4 +138,49 @@ describe('Achievements React Hooks', () => {
         // No duplicates should be added
         expect(result.current.achievements.length).toBe(4);
     });
+
+    test('useAchievements throws error when used outside provider', () => {
+        // Test the error boundary at line 113
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { /* no-op */ });
+
+        expect(() => {
+            renderHook(() => useAchievements());
+        }).toThrow('useAchievements must be used within an AchievementProvider');
+
+        consoleSpy.mockRestore();
+    });
+
+    test('localStorage error handling in getStoredValue', () => {
+        // Test localStorage error handling
+        const originalGetItem = Storage.prototype.getItem;
+        Storage.prototype.getItem = jest.fn(() => {
+            throw new Error('localStorage error');
+        });
+
+        const { result } = renderHook(() => useAchievements(), { wrapper: TestWrapper });
+
+        // Should return empty array as initial value when localStorage fails
+        expect(result.current.achievements).toEqual([]);
+
+        Storage.prototype.getItem = originalGetItem;
+    });
+
+    test('localStorage error handling in setValue', () => {
+        // Test localStorage.setItem error handling
+        const originalSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = jest.fn(() => {
+            throw new Error('localStorage setItem error');
+        });
+
+        const { result } = renderHook(() => useAchievements(), { wrapper: TestWrapper });
+
+        // Should not throw error when localStorage.setItem fails
+        expect(() => {
+            act(() => {
+                result.current.unlockAchievement('first_command');
+            });
+        }).not.toThrow();
+
+        Storage.prototype.setItem = originalSetItem;
+    });
 });

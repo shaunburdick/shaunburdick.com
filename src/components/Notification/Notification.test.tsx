@@ -4,6 +4,7 @@ import { Notification, NotificationProvider, useNotification, Notifications } fr
 
 const TEST_NOTIFICATION_TEXT = 'Test Notification';
 const QUICK_NOTIFICATION_TEXT = 'Quick Notification';
+const NO_CALLBACK_TEXT = 'No callback';
 const TESTID_NOTIFICATION_COUNT = 'notification-count';
 
 describe('Notification', () => {
@@ -51,6 +52,25 @@ describe('Notification', () => {
 
         expect(screen.getByText('Test Title')).toBeInTheDocument();
         expect(screen.getByText('Test Body')).toBeInTheDocument();
+
+        jest.useRealTimers();
+    });
+
+    test('handles notification without onClose callback', () => {
+        // Test onClose is optional
+        jest.useFakeTimers();
+
+        render(
+            <Notification id="test-notification-no-callback" message={{ body: NO_CALLBACK_TEXT }} duration={1000} />
+        );
+
+        expect(screen.getByText(NO_CALLBACK_TEXT)).toBeInTheDocument();
+
+        act(() => {
+            jest.advanceTimersByTime(1000);
+        });
+
+        expect(screen.queryByText(NO_CALLBACK_TEXT)).not.toBeInTheDocument();
 
         jest.useRealTimers();
     });
@@ -150,6 +170,46 @@ describe('NotificationProvider', () => {
 
         // Notification should now be removed
         expect(screen.queryByText(QUICK_NOTIFICATION_TEXT)).not.toBeInTheDocument();
+        expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('0');
+
+        jest.useRealTimers();
+    });
+
+    test('useNotification add function handles undefined duration', () => {
+        // Test duration fallback to 3000
+        jest.useFakeTimers();
+
+        const TestComponentWithUndefinedDuration: React.FC = () => {
+            const { add, notifications } = useNotification();
+
+            return (
+                <div>
+                    <button onClick={() => add({ body: 'Undefined Duration' })}>
+                        Add Undefined Duration
+                    </button>
+                    <div data-testid={TESTID_NOTIFICATION_COUNT}>{notifications.length}</div>
+                </div>
+            );
+        };
+
+        render(
+            <NotificationProvider>
+                <TestComponentWithUndefinedDuration />
+            </NotificationProvider>
+        );
+
+        const addButton = screen.getByText('Add Undefined Duration');
+        act(() => {
+            addButton.click();
+        });
+
+        expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('1');
+
+        // Should use default 3000ms duration
+        act(() => {
+            jest.advanceTimersByTime(3000);
+        });
+
         expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('0');
 
         jest.useRealTimers();
