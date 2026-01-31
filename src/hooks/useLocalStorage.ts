@@ -30,14 +30,20 @@ export const useLocalStorage = <T,>(
 
     // Return a wrapped version that persists the new value to localStorage
     const setValue = (value: T | ((prev: T) => T)): void => {
-        try {
+        // Use React's functional update to access current state reliably
+        setStoredValue((currentState) => {
             // Handle both direct values and functional updates
-            const valueToStore = value instanceof Function ? value(getStoredValue()) : value;
-            setStoredValue(valueToStore);
-            localStorage.setItem(key, JSON.stringify(valueToStore));
-        } catch {
-            // Silent fail on localStorage errors
-        }
+            const valueToStore = value instanceof Function ? value(currentState) : value;
+
+            // Persist to localStorage with error handling
+            try {
+                localStorage.setItem(key, JSON.stringify(valueToStore));
+            } catch {
+                // Silent fail on localStorage errors (e.g., quota exceeded)
+            }
+
+            return valueToStore;
+        });
     };
 
     return [storedValue, setValue];

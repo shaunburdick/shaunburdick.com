@@ -49,9 +49,12 @@ function ShellPrompt() {
     const [commandHistory, setCommandHistory] = useLocalStorage<string[]>(LS_KEY_COMMAND_HISTORY, []);
     const [commandPointer, setCommandPointer] = useState<number>(DEFAULT_COMMAND_POINTER);
     const [lastCommand, setLastCommand] = useState<CommandResult | undefined>(WELCOME_MESSAGE);
-    const [environment/* , setEnvironment*/] = useState<Map<string,string>>(DEFAULT_ENVIRONMENT);
-    const [workingDir/* , setWorkingDir*/] = useState<string>('/');
     const [inputValue, setInputValue] = useState<string | undefined>(undefined);
+
+    // Environment and working directory are currently read-only
+    // TODO: Implement setters if cd and export commands need to modify state
+    const environment = DEFAULT_ENVIRONMENT;
+    const workingDir = '/';
 
     const COMMANDS = commandsWithContext({
         commandHistory,
