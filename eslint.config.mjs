@@ -7,6 +7,17 @@ export default [
     ...shaunburdick.config.ts,
     ...shaunburdick.config.react,
     {
+        rules: {
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: 'CallExpression[callee.name="useState"]',
+                    message: 'View components should not manage state. Use controlled props.',
+                },
+            ]
+        }
+    },
+    {
         ignores: [
             'build/**/*'
         ]
