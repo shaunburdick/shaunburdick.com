@@ -1,6 +1,6 @@
 import React, { act } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import Hints from './Hints';
+import Hints from '../../containers/Hints';
 
 const SHOW_HINTS_TEXT = 'Show Hints';
 const WHOIS_SHAUN_TEXT = 'whois shaun';

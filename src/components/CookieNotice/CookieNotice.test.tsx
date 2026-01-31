@@ -1,7 +1,7 @@
 import React, { act } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { AchievementProvider } from '../Achievements/Achievements';
-import CookieNotice, { LS_COOKIE_ACKNOWLEDGE } from './CookieNotice';
+import { AchievementProvider } from '../../containers/AchievementProvider';
+import CookieNotice, { LS_COOKIE_ACKNOWLEDGE } from '../../containers/CookieNotice';
 
 describe('CookieNotice', () => {
     // Helper function to wrap component with providers

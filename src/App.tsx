@@ -1,9 +1,9 @@
 import './App.css';
 
-import ShellPrompt from './components/ShellPrompt/ShellPrompt';
-import CookieNotice from './components/CookieNotice/CookieNotice';
+import ShellPrompt from './containers/ShellPrompt';
+import CookieNotice from './containers/CookieNotice';
 import { TRACKER_EVENTS, useTracker } from './hooks/useTracker';
-import { Notifications, useNotification } from './components/Notification/Notification';
+import { Notifications, useNotification } from './containers/NotificationProvider';
 import { useEvent } from './hooks';
 
 /**

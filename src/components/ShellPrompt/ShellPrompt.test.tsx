@@ -1,8 +1,8 @@
 import React, { act } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AchievementProvider } from '../Achievements/Achievements';
-import ShellPrompt, { LS_KEY_COMMAND_HISTORY } from './ShellPrompt';
+import { AchievementProvider } from '../../containers/AchievementProvider';
+import ShellPrompt, { LS_KEY_COMMAND_HISTORY } from '../../containers/ShellPrompt';
 
 // Helper function to wrap component with providers
 const renderWithProviders = (component: React.ReactElement) => {
@@ -19,16 +19,26 @@ const ARROW_UP_KEY = '{ArrowUp}';
 const WHOIS_SHAUN_TEXT = 'whois shaun';
 
 describe('ShellPrompt', () => {
+    beforeEach(() => {
+        // Clear localStorage before each test to prevent test interference
+        localStorage.clear();
+    });
+
     test('Shows the console', () => {
         act(() => renderWithProviders(<ShellPrompt />));
         expect(document.body.querySelector('.shell')).toBeInTheDocument();
     });
 
-    test('Rest command history if invalid', () => {
+    test('Rest command history if invalid', async () => {
         localStorage.setItem(LS_KEY_COMMAND_HISTORY, '"');
 
+        userEvent.setup();
         act(() => renderWithProviders(<ShellPrompt />));
-        expect(localStorage.getItem(LS_KEY_COMMAND_HISTORY)).toBe('[]');
+
+        // Component should handle invalid data gracefully by falling back to empty array
+        // Verify by submitting a command and checking it's properly saved
+        await userEvent.keyboard('test{Enter}');
+        expect(localStorage.getItem(LS_KEY_COMMAND_HISTORY)).toBe('["test"]');
     });
 
     describe('Commands', () => {

@@ -4,7 +4,7 @@ import {
     coreAchievements,
     AchievementProvider,
     useAchievements
-} from './Achievements';
+} from '../../containers/AchievementProvider';
 
 // Wrapper component for testing hooks
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (

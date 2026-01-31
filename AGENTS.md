@@ -5,6 +5,13 @@ This is a **terminal-style React personal website** that simulates a retro VT te
 
 ## Architecture & Key Patterns
 
+### Container/Presentational Pattern (Enforced by ESLint)
+- **Separation of Concerns**: Logic and presentation are strictly separated
+- **Containers** (`src/containers/`): Manage state, side effects, and business logic
+- **Views** (`src/components/*/View.tsx`): Pure presentational components that receive props
+- **Enforcement**: ESLint rule prevents `useState` in `src/components/` files
+- **Benefits**: Improved testability, maintainability, and code reusability
+
 ### Terminal Command System
 - **Central Hub**: `src/Command.tsx` exports `commandsWithContext()` that creates a `Map<string, Command>`
 - **Command Interface**: Each command has `description`, optional `secret` flag, and `run(...args)` function
@@ -13,20 +20,35 @@ This is a **terminal-style React personal website** that simulates a retro VT te
 
 ### Event-Driven Architecture
 - **Custom Events**: `src/hooks/useEvent.ts` provides typed custom events (`onAchievement`, `onCommand`)
-- **Achievement System**: `src/components/Achievements/Achievements.tsx` manages unlockable easter eggs
+- **Achievement System**: `src/containers/AchievementProvider.tsx` manages unlockable easter eggs
 - **Analytics Integration**: Plausible tracker automatically captures command usage and achievements
 
 ### Component Organization
 ```
 src/
-├── App.tsx                    # Main app with event listeners
-├── Command.tsx               # Command registry and implementations
-├── Users.tsx                 # User profiles displayed by whois
-└── components/
-    ├── ShellPrompt/          # Core terminal interface
-    ├── ConsoleOutput/        # Command result display
-    ├── Achievements/         # Easter egg system
-    └── Notification/         # Toast notifications
+├── App.tsx                        # Main app with event listeners
+├── Command.tsx                    # Command registry and implementations
+├── Users.tsx                      # User profiles displayed by whois
+├── containers/                    # Business logic layer
+│   ├── AchievementProvider.tsx   # Achievement management with Context
+│   ├── NotificationProvider.tsx  # Notification management with Context
+│   ├── ShellPrompt.tsx           # Shell state and command execution
+│   ├── CookieNotice.tsx          # Cookie acknowledgment logic
+│   └── Hints.tsx                 # Command hints logic
+└── components/                    # Presentation layer
+    ├── ShellPrompt/
+    │   ├── ShellPromptView.tsx   # Terminal UI (presentational)
+    │   └── ShellPrompt.test.tsx
+    ├── ConsoleOutput/             # Command result display
+    ├── CookieNotice/
+    │   ├── CookieNoticeView.tsx  # Cookie notice UI (presentational)
+    │   └── CookieNotice.test.tsx
+    ├── Hints/
+    │   ├── HintsView.tsx         # Hints UI (presentational)
+    │   └── Hints.test.tsx
+    └── Notification/
+        ├── NotificationView.tsx   # Notification UI (presentational)
+        └── Notification.test.tsx
 ```
 
 ## Development Workflows
@@ -69,6 +91,7 @@ src/
 - **TSDoc Required**: All functions/components documented with `@param`/`@returns`
 - **Import Organization**: React, third-party, local imports (alphabetical within groups)
 - **ESLint Config**: Uses `eslint-config-shaunburdick` with React + TypeScript rules
+- **Container/View Pattern**: ESLint enforces separation - no `useState` in `src/components/` files
 
 ## Integration Points
 
@@ -79,8 +102,8 @@ src/
 
 ### Data Flow Patterns
 - **LocalStorage**: Command history, achievements, last login stored persistently
-- **React Context**: Achievements and Notifications use provider patterns
-- **Custom Hooks**: `useEvent` for DOM event abstraction, `useTracker` for analytics
+- **React Context**: Achievements and Notifications use provider patterns (see `src/containers/`)
+- **Custom Hooks**: `useEvent` for DOM event abstraction, `useTracker` for analytics, `useLocalStorage` for persistent state
 
 ### Deployment
 - **GitHub Pages**: Automated via `.github/workflows/deploy.yml`
@@ -90,9 +113,54 @@ src/
 ## Key Files for New Features
 
 - **New Commands**: Modify `commandsWithContext()` in `src/Command.tsx`
-- **New Achievements**: Update `coreAchievements` in `src/components/Achievements/Achievements.tsx`
+- **New Achievements**: Update `coreAchievements` in `src/containers/AchievementProvider.tsx`
 - **New Users**: Add entries to `USERS` Map in `src/Users.tsx`
-- **UI Components**: Follow existing pattern in `src/components/` with co-located tests
+- **New UI Components**: 
+  - Create container in `src/containers/YourFeature.tsx` for logic/state
+  - Create view in `src/components/YourFeature/YourFeatureView.tsx` for presentation
+  - Add co-located test file: `src/components/YourFeature/YourFeature.test.tsx`
 - **Styling**: Add terminal-themed inline styles or minimal CSS files
+
+### Adding New Features (Container/View Pattern)
+
+When creating a new feature, follow this structure:
+
+1. **Create Container** (`src/containers/YourFeature.tsx`):
+   ```typescript
+   import { useState } from 'react';
+   import YourFeatureView from '../components/YourFeature/YourFeatureView';
+   
+   export default function YourFeature() {
+       const [state, setState] = useState(initialState);
+       
+       const handleAction = () => {
+           // Business logic here
+       };
+       
+       return (
+           <YourFeatureView
+               data={state}
+               onAction={handleAction}
+           />
+       );
+   }
+   ```
+
+2. **Create View** (`src/components/YourFeature/YourFeatureView.tsx`):
+   ```typescript
+   interface YourFeatureViewProps {
+       data: DataType;
+       onAction: () => void;
+   }
+   
+   export default function YourFeatureView({ data, onAction }: YourFeatureViewProps) {
+       // Pure presentational component - no useState!
+       return <div onClick={onAction}>{data}</div>;
+   }
+   ```
+
+3. **Add Tests** (`src/components/YourFeature/YourFeature.test.tsx`):
+   - Test container logic and view rendering together
+   - Use providers as needed (AchievementProvider, NotificationProvider)
 
 This codebase prioritizes accessibility, maintainability, and whimsical user experience over complex architectures.

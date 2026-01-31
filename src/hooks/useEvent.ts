@@ -1,6 +1,6 @@
 import { useCallback, useEffect  } from 'react';
 import type { Dispatch } from 'react';
-import type { AchievementUnlocked } from '../components/Achievements/Achievements';
+import type { AchievementUnlocked } from '../containers/AchievementProvider';
 import type { ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
 
 /**

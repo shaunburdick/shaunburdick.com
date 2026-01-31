@@ -1,7 +1,7 @@
 import React, { act } from 'react';
 import { render, screen } from '@testing-library/react';
-import { AchievementProvider } from './components/Achievements/Achievements';
-import { NotificationProvider } from './components/Notification/Notification';
+import { AchievementProvider } from './containers/AchievementProvider';
+import { NotificationProvider } from './containers/NotificationProvider';
 import App from './App';
 import { TRACKER_EVENTS } from './hooks/useTracker';
 
@@ -25,8 +25,8 @@ jest.mock('./hooks/useTracker', () => ({
 }));
 
 // Mock the notification hook
-jest.mock('./components/Notification/Notification', () => {
-    const original = jest.requireActual('./components/Notification/Notification');
+jest.mock('./containers/NotificationProvider', () => {
+    const original = jest.requireActual('./containers/NotificationProvider');
     return {
         ...original,
         useNotification: () => ({

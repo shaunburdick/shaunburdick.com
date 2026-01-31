@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { useEvent } from '../../hooks';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useEvent } from '../hooks/useEvent';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export const LS_KEY_ACHIEVEMENTS = 'achievements';
 
@@ -29,35 +30,6 @@ export interface AchievementContextType {
 }
 
 const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
-
-// Custom hook to safely access localStorage
-const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] => {
-    // Get from localStorage on initial render
-    const getStoredValue = (): T => {
-        try {
-            const item = localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
-        } catch {
-            return initialValue;
-        }
-    };
-
-    const [storedValue, setStoredValue] = useState<T>(getStoredValue);
-
-    // Return a wrapped version that persists the new value to localStorage
-    const setValue = (value: T | ((prev: T) => T)): void => {
-        try {
-            // Handle both direct values and functional updates
-            const valueToStore = value instanceof Function ? value(getStoredValue()) : value;
-            setStoredValue(valueToStore);
-            localStorage.setItem(key, JSON.stringify(valueToStore));
-        } catch {
-            // Silent fail on localStorage errors
-        }
-    };
-
-    return [storedValue, setValue];
-};
 
 export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [achievements, setAchievements] = useLocalStorage<AchievementUnlocked[]>(LS_KEY_ACHIEVEMENTS, []);
