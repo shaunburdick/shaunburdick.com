@@ -3,12 +3,19 @@ export default {
     preset: 'ts-jest',
     testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+    testPathIgnorePatterns: [
+        '/node_modules/',
+        '/e2e/',
+        '/build/'
+    ],
     collectCoverageFrom: [
         '**/*.{ts,tsx}',
         '!**/*.d.ts',
         '!**/node_modules/**',
         '!**/vendor/**',
-        '!**/index.tsx'
+        '!**/index.tsx',
+        '!**/e2e/**',
+        '!playwright.config.ts'
     ],
     transform: {
         '^.+\\.css$': '<rootDir>/scripts/jest/cssTransform.js'

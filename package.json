@@ -15,8 +15,13 @@
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint .",
     "start": "webpack serve --config webpack.development.js",
-    "test:ci": "npm run lint && npm run test:coverage",
+    "start:no-open": "webpack serve --config webpack.development.js --no-open",
+    "test:ci": "npm run lint && npm run test:coverage && npm run test:e2e",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
     "test:unit": "jest",
     "test:watch": "jest --watch",
     "test": "npm run lint && npm run test:unit"
@@ -34,6 +39,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
