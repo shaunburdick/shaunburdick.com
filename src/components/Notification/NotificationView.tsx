@@ -26,6 +26,7 @@ export function NotificationView({ id, message, duration, visible }: Notificatio
     return (
         <div
             data-id={id}
+            data-testid="notification"
             role="alert"
             aria-live="polite"
             className="notification"

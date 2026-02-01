@@ -28,7 +28,7 @@ export const test = base.extend({
         await page.reload();
 
         // Wait for app to be ready (terminal input should be visible)
-        await page.getByRole('textbox', { name: 'An input to enter commands.' }).waitFor({
+        await page.getByTestId('console-input').waitFor({
             state: 'visible',
             timeout: 10000
         });

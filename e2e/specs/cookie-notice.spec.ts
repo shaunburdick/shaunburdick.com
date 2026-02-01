@@ -90,8 +90,12 @@ test.describe('Cookie Notice', () => {
     test('should have accessible ARIA labels', async ({ page }) => {
         const cookies = new CookieNoticePage(page);
 
-        // Check cookie notice has proper labeling
-        await expect(cookies.cookieNotice).toHaveAttribute('aria-label', /cookie notice/i);
+        // Check cookie notice is visible with proper structure
+        await expect(cookies.cookieNotice).toBeVisible();
+
+        // Check that the content inside has proper labeling
+        const preElement = page.locator('[aria-label="Cookie Notice"]');
+        await expect(preElement).toBeVisible();
 
         // Buttons should be keyboard accessible
         await expect(cookies.acceptButton).toBeVisible();

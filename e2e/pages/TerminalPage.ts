@@ -10,11 +10,11 @@ import { BasePage } from './BasePage';
  * - Checking command history
  * - Interacting with hints
  *
- * Best Practice: Use semantic locators (roles, labels) over CSS selectors
- * for better accessibility and test resilience
+ * Best Practice: Use data-testid for reliable, maintainable selectors
+ * that won't break when UI text or ARIA labels change
  */
 export class TerminalPage extends BasePage {
-    // Locators using accessible selectors
+    // Locators using data-testid for reliability
     public readonly commandInput: Locator;
     public readonly consoleOutput: Locator;
     public readonly hintsButton: Locator;
@@ -23,11 +23,11 @@ export class TerminalPage extends BasePage {
     public constructor(page: Page) {
         super(page);
 
-        // Use accessible locators (role, aria-label, placeholder)
-        this.commandInput = page.getByRole('textbox', { name: /enter commands/i });
-        this.consoleOutput = page.getByLabel(/text-based console/i);
-        this.hintsButton = page.getByRole('button', { name: /hints/i });
-        this.hintsTable = page.getByRole('table');
+        // Use data-testid for stable, fast selectors
+        this.commandInput = page.getByTestId('console-input');
+        this.consoleOutput = page.getByTestId('console-output');
+        this.hintsButton = page.getByTestId('hints-toggle');
+        this.hintsTable = page.getByTestId('hints-table');
     }
 
     /**
@@ -148,11 +148,24 @@ export class TerminalPage extends BasePage {
     /**
      * Click a specific hint in the hints table
      *
-     * @param hintText - Text of the hint to click
+     * @param hintText - Text of the hint to click (for finding the right button)
      * @returns Promise that resolves when hint is clicked
      */
     public async clickHint(hintText: string): Promise<void> {
-        await this.hintsTable.getByText(hintText, { exact: false }).click();
+        // Get all hint buttons and find the one with matching text
+        const hintButtons = this.page.getByTestId('hint-button');
+        const count = await hintButtons.count();
+
+        for (let i = 0; i < count; i++) {
+            const button = hintButtons.nth(i);
+            const text = await button.textContent();
+            if ((text !== null) && (text.length > 0) && text.includes(hintText)) {
+                await button.click();
+                return;
+            }
+        }
+
+        throw new Error(`Hint with text "${hintText}" not found`);
     }
 
     /**

@@ -4,7 +4,8 @@ import { BasePage } from './BasePage';
 /**
  * Page Object for the Cookie Notice component
  *
- * Handles interactions with the cookie acknowledgment notice
+ * Handles all cookie notice interactions for E2E tests
+ * Best Practice: Use data-testid for reliable, maintainable selectors
  */
 export class CookieNoticePage extends BasePage {
     public readonly cookieNotice: Locator;
@@ -14,9 +15,10 @@ export class CookieNoticePage extends BasePage {
     public constructor(page: Page) {
         super(page);
 
-        this.cookieNotice = page.getByLabel(/cookie notice/i);
-        this.acceptButton = page.getByRole('button', { name: /yes/i });
-        this.rejectButton = page.getByRole('button', { name: /no/i });
+        // Use data-testid for stable selectors
+        this.cookieNotice = page.getByTestId('cookie-notice');
+        this.acceptButton = page.getByTestId('cookie-accept');
+        this.rejectButton = page.getByTestId('cookie-reject');
     }
 
     /**

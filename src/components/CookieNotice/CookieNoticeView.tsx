@@ -31,7 +31,10 @@ function CookieNoticeView({ show, onAccept, onReject }: CookieNoticeViewProps) {
     }
 
     return (
-        <div style={{ position: 'fixed', bottom: 0, maxWidth: '750px', paddingRight: '2em' }}>
+        <div
+            style={{ position: 'fixed', bottom: 0, maxWidth: '750px', paddingRight: '2em' }}
+            data-testid="cookie-notice"
+        >
             <pre aria-label="Cookie Notice">
                 This site uses cookies to feed its developer in an effort to get them to write code.
                 So far it seems to be working.
@@ -39,9 +42,9 @@ function CookieNoticeView({ show, onAccept, onReject }: CookieNoticeViewProps) {
                 <br />
                 Do you acknowledge that this site uses cookies?
                 <div style={{ textAlign: 'right' }}>
-                    <button onClick={onAccept}>Yes</button>
+                    <button onClick={onAccept} data-testid="cookie-accept">Yes</button>
                     &nbsp;
-                    <button onClick={onReject}>No</button>
+                    <button onClick={onReject} data-testid="cookie-reject">No</button>
                 </div>
             </pre>
         </div>

@@ -17,7 +17,7 @@ export class NotificationPage extends BasePage {
      * @returns Locator for all visible notifications
      */
     public getNotifications(): Locator {
-        return this.page.locator('[role="alert"].notification');
+        return this.page.getByTestId('notification');
     }
 
     /**
