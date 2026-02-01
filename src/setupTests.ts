@@ -3,7 +3,7 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 // Weird import resolver issue, just ignore it
-// eslint-disable-next-line import/no-unresolved
+// eslint-disable-next-line import/no-unresolved -- it's there, not sure why eslint can't find it
 import '@testing-library/jest-dom';
 
 global.console = {

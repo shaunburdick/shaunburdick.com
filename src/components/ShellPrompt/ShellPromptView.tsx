@@ -109,7 +109,7 @@ function ShellPromptView({
                 aria-description='This area is meant to depict an older styled computer console
                 where commands can be typed and responses will be shown.'>
                 {consoleLines.slice(0, -1).map((commandResult, commandIndex) => (
-                    // eslint-disable-next-line react/no-array-index-key
+                    // eslint-disable-next-line react/no-array-index-key -- It's a command number at this point
                     <ConsoleOutput key={commandIndex} commandResult={commandResult}/>
                 ))}
                 {/*
@@ -126,7 +126,7 @@ function ShellPromptView({
                                 {<span aria-hidden>$</span>} {lastCommand.command}
                             </span>}
                             {lastCommand.response.map((commandLine, lineIndex) => (
-                                // eslint-disable-next-line react/no-array-index-key
+                                // eslint-disable-next-line react/no-array-index-key -- It's a line number at this point
                                 <span key={lineIndex}>
                                     {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
                                 </span>

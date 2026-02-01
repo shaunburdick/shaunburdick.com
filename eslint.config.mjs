@@ -23,7 +23,8 @@ export default [
     },
     {
         ignores: [
-            'build/**/*'
+            'build/**/*',
+            'coverage/**/*'
         ]
     },
     {

@@ -61,8 +61,7 @@ function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
                         {<span aria-hidden>$</span>} {commandResult.command}
                     </span>}
                     {commandResult.response.map((commandLine, lineIndex) => (
-                        // It's a line number at this point, not a unique ID
-                        // eslint-disable-next-line react/no-array-index-key
+                        // eslint-disable-next-line react/no-array-index-key -- It's a line number at this point
                         <span key={lineIndex}>
                             {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
                         </span>
