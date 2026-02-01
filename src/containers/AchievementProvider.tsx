@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useRef, useEffect } from 'react';
 import { useEvent } from '../hooks/useEvent';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -35,6 +35,20 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [achievements, setAchievements] = useLocalStorage<AchievementUnlocked[]>(LS_KEY_ACHIEVEMENTS, []);
     const achievementEvent = useEvent('onAchievement');
 
+    // Track which achievement IDs we've already dispatched events for
+    // Initialize with existing achievements to prevent re-dispatching on mount
+    const dispatchedIdsRef = useRef<Set<string>>(new Set(achievements.map(a => a.id)));
+
+    // When achievements change, dispatch events for new ones
+    useEffect(() => {
+        for (const achievement of achievements) {
+            if (!dispatchedIdsRef.current.has(achievement.id)) {
+                dispatchedIdsRef.current.add(achievement.id);
+                achievementEvent.dispatch(achievement);
+            }
+        }
+    }, [achievements, achievementEvent]);
+
     const hasAchievement = (achievementId: AchievementId): boolean => {
         return achievements.some(a => a.id === achievementId);
     };
@@ -43,9 +57,9 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
         if (achievementId in coreAchievements) {
             // Use functional update pattern to avoid race conditions
             setAchievements((currentAchievements) => {
-                // Check again if achievement exists in the latest state
+                // Check if achievement already exists
                 if (currentAchievements.some(a => a.id === achievementId)) {
-                    return currentAchievements; // Achievement already exists
+                    return currentAchievements;
                 }
 
                 const achievement = {
@@ -54,10 +68,7 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
                     ...coreAchievements[achievementId]
                 };
 
-                // Dispatch event for the new achievement
-                achievementEvent.dispatch(achievement);
-
-                // Return new array with the added achievement
+                // Just return the new array - useEffect will handle dispatching
                 return [...currentAchievements, achievement];
             });
         }
