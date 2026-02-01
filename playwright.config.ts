@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const TEST_ID_ATTRIBUTE = 'data-testid';
+
 /**
  * Playwright configuration for end-to-end testing
  *
@@ -28,25 +30,27 @@ export default defineConfig({
     fullyParallel: true,
 
     // Fail the build on CI if you accidentally left test.only in the source code
-    forbidOnly: (typeof process.env.CI === 'string' && process.env.CI.length > 0),
+    forbidOnly: typeof process.env.CI === 'string' && process.env.CI.length > 0,
 
     // Retry on CI only (flaky test mitigation)
-    retries: (typeof process.env.CI === 'string' && process.env.CI.length > 0) ? 2 : 0,
+    retries:
+        typeof process.env.CI === 'string' && process.env.CI.length > 0 ? 2 : 0,
 
     // Opt out of parallel tests on CI (to avoid resource contention)
-    workers: (typeof process.env.CI === 'string' && process.env.CI.length > 0) ? 1 : undefined,
+    workers:
+        typeof process.env.CI === 'string' && process.env.CI.length > 0
+            ? 1
+            : undefined,
 
     // Reporter to use - HTML for local development, GitHub for CI
-    reporter: (typeof process.env.CI === 'string' && process.env.CI.length > 0)
-        ? 'github'
-        : [
-            ['html', { outputFolder: 'playwright-report' }],
-            ['list']
-        ],
+    reporter:
+        typeof process.env.CI === 'string' && process.env.CI.length > 0
+            ? 'github'
+            : [['html', { outputFolder: 'playwright-report' }], ['list']],
 
     // Shared settings for all the projects below
     use: {
-    // Base URL to use in actions like `await page.goto('/')`
+        // Base URL to use in actions like `await page.goto('/')`
         baseURL: 'http://127.0.0.1:8080',
 
         // Collect trace when retrying the failed test (debugging aid)
@@ -69,29 +73,26 @@ export default defineConfig({
             use: {
                 ...devices['Desktop Chrome'],
                 // Use data-testid attributes as primary locator strategy
-                testIdAttribute: 'data-testid',
+                testIdAttribute: TEST_ID_ATTRIBUTE,
             },
         },
-
-        // Uncomment to test on other browsers:
-        // {
-        //   name: 'firefox',
-        //   use: { ...devices['Desktop Firefox'] },
-        // },
-        // {
-        //   name: 'webkit',
-        //   use: { ...devices['Desktop Safari'] },
-        // },
-
-    // Test on mobile viewports
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+        // Test on mobile viewports
+        {
+            name: 'Mobile Chrome',
+            use: {
+                ...devices['Pixel 5'],
+                // Use data-testid attributes as primary locator strategy
+                testIdAttribute: TEST_ID_ATTRIBUTE,
+            },
+        },
+        {
+            name: 'Mobile Safari',
+            use: {
+                ...devices['iPhone 12'],
+                // Use data-testid attributes as primary locator strategy
+                testIdAttribute: TEST_ID_ATTRIBUTE,
+            },
+        },
     ],
 
     // Run your local dev server before starting the tests
@@ -103,20 +104,23 @@ export default defineConfig({
             url: 'http://127.0.0.1:8080',
             name: 'Dev Server',
             timeout: 120 * 1000,
-            reuseExistingServer: !(typeof process.env.CI === 'string' && process.env.CI.length > 0),
+            reuseExistingServer: !(
+                typeof process.env.CI === 'string' && process.env.CI.length > 0
+            ),
             stdout: 'pipe',
             stderr: 'pipe',
         },
-    // Uncomment to also test against production build:
-    // {
-    //   // Production build server
-    //   command: 'npm run build && npx serve -s build -l 3000',
-    //   url: 'http://localhost:3000',
-    //   name: 'Production Server',
-    //   timeout: 120 * 1000,
-    //   reuseExistingServer: !process.env.CI,
-    //   stdout: 'ignore',
-    //   stderr: 'pipe',
-    // },
+        // {
+        //     // Production build server
+        //     command: 'npm run build && npx serve -s build -l 3000',
+        //     url: 'http://127.0.0.1:3000',
+        //     name: 'Production Server',
+        //     timeout: 120 * 1000,
+        //     reuseExistingServer: !(
+        //         typeof process.env.CI === 'string' && process.env.CI.length > 0
+        //     ),
+        //     stdout: 'ignore',
+        //     stderr: 'pipe',
+        // },
     ],
 });

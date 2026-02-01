@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/base';
-import { TerminalPage } from '../pages';
+import { TerminalPage, CookieNoticePage } from '../pages';
 
 /**
  * Basic E2E tests for terminal page load and rendering
@@ -41,6 +41,13 @@ test.describe('Terminal Page Load', () => {
 
     test('should toggle hints table', async ({ page }) => {
         const terminal = new TerminalPage(page);
+        const cookieNotice = new CookieNoticePage(page);
+
+        // Accept cookies first to ensure cookie notice doesn't overlap hints button on mobile
+        if (await cookieNotice.isVisible()) {
+            await cookieNotice.accept();
+            await cookieNotice.waitForHidden();
+        }
 
         // Initially hidden
         await expect(terminal.hintsTable).toBeHidden();
