@@ -101,8 +101,9 @@ function ShellPromptView({
     }, [consoleLines]);
 
     return (
-        <div className="shell">
+        <div className="shell" data-testid="shell-prompt">
             <pre className='prompt'
+                data-testid="console-output"
                 aria-label='A text-based console.'
                 // *eslint-disable-next-line jsx-a11y/aria-props
                 aria-description='This area is meant to depict an older styled computer console
@@ -134,11 +135,12 @@ function ShellPromptView({
                 </div>
                 <span ref={preBottomRef} />
             </pre>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} data-testid="command-form">
                 <div style={{ display: 'flex', alignItems: 'stretch' }}>
                     <span aria-hidden>$ </span>
                     <input
                         id='console-input'
+                        data-testid="console-input"
                         placeholder='Type `help` for assistance.'
                         style={{ width: '100%', marginLeft: '1em' }}
                         ref={inputRef}

@@ -56,14 +56,52 @@ src/
 ### Essential Commands
 - **Development**: `npm start` (webpack dev server)
 - **Testing**: `npm test` (lint + unit tests), `npm run test:watch`
+- **E2E Testing**: `npm run test:e2e` (Playwright), `npm run test:e2e:ui` (interactive mode)
 - **Production Build**: `npm run build`
 - **Linting**: `npm run lint` or `npm run lint:fix`
+- **CI Testing**: `npm run test:ci` (runs lint, unit tests, coverage, and E2E tests)
 
 ### Testing Strategy
 - **Jest + React Testing Library**: All components have `.test.tsx` files
+- **Playwright E2E Tests**: End-to-end browser tests in `e2e/` directory
 - **High Coverage Requirements**: 90% threshold enforced (see `jest.config.js`)
 - **Mock Patterns**: Window APIs mocked (see `Command.test.tsx` for `window.open`)
 - **Provider Testing**: Achievement/Notification contexts wrapped in test utilities
+- **Test Isolation**: Each E2E test runs with clean localStorage/sessionStorage
+
+### E2E Testing with Playwright
+- **Directory Structure**:
+  ```
+  e2e/
+  ├── fixtures/base.ts        # Extended test fixture with setup/teardown
+  ├── pages/                  # Page Object Model
+  │   ├── BasePage.ts        # Base class with common functionality
+  │   ├── TerminalPage.ts    # Terminal/console interactions
+  │   ├── CookieNoticePage.ts
+  │   ├── NotificationPage.ts
+  │   └── index.ts           # Central exports
+  └── specs/                  # Test specifications
+      ├── page-load.spec.ts
+      ├── commands.spec.ts
+      ├── achievements.spec.ts
+      └── cookie-notice.spec.ts
+  ```
+- **Configuration**: `playwright.config.ts` - auto-starts dev server, manages browser contexts
+- **Page Object Pattern**: Encapsulates element selectors and actions for maintainability
+- **Accessible Locators**: Uses semantic selectors (roles, ARIA labels) over CSS classes
+- **Best Practices**:
+  - Test user-visible behavior, not implementation details
+  - Each test is isolated with fresh storage
+  - Auto-wait for elements (no manual timeouts needed)
+  - Screenshot/video capture on failure for debugging
+  - Parallel execution for speed (configurable)
+- **Running Tests**:
+  - `npm run test:e2e` - Headless mode (CI-friendly)
+  - `npm run test:e2e:headed` - Watch tests run in browser
+  - `npm run test:e2e:ui` - Interactive UI mode with time travel debugging
+  - `npm run test:e2e:debug` - Step-through debugging
+  - **WSL2 Compatible**: Dev server auto-starts using 127.0.0.1 for reliable networking
+- **CI Integration**: GitHub Actions automatically runs E2E tests, uploads reports on failure
 
 ### Build System
 - **Webpack Configuration**: Split configs (`webpack.common.js`, `webpack.development.js`, `webpack.production.js`)

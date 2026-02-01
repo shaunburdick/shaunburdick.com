@@ -39,8 +39,17 @@ jobs:
                   cache: ${{ steps.detect-package-manager.outputs.manager }}
             - name: Install dependencies
               run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps chromium
             - name: Run tests
               run: ${{ steps.detect-package-manager.outputs.manager }} run test:ci
+            - name: Upload Playwright Report
+              uses: actions/upload-artifact@v4
+              if: failure()
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 30
             - name: Build project
               run: ${{ steps.detect-package-manager.outputs.manager }} run build
             - name: Upload artifact

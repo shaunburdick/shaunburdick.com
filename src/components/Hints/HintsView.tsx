@@ -51,9 +51,9 @@ function HintsView({ showHints, onToggle, onHintClick }: HintsViewProps) {
 
     return (
         <>
-            <button onClick={onToggle}>{showHints ? 'Hide' : 'Show'} Hints</button>
+            <button onClick={onToggle} data-testid="hints-toggle">{showHints ? 'Hide' : 'Show'} Hints</button>
             {showHints &&
-                <table>
+                <table data-testid="hints-table">
                     <caption>Hints</caption>
                     <thead>
                         <tr>
@@ -68,6 +68,7 @@ function HintsView({ showHints, onToggle, onHintClick }: HintsViewProps) {
                                     onClick={handleHintClick}
                                     title='Click to copy command to input'
                                     style={hintButtonStyle}
+                                    data-testid="hint-button"
                                 >
                                     whois shaun
                                 </button>
@@ -80,6 +81,7 @@ function HintsView({ showHints, onToggle, onHintClick }: HintsViewProps) {
                                     onClick={handleHintClick}
                                     title='Click to copy command to input'
                                     style={hintButtonStyle}
+                                    data-testid="hint-button"
                                 >
                                     version
                                 </button>
@@ -92,6 +94,7 @@ function HintsView({ showHints, onToggle, onHintClick }: HintsViewProps) {
                                     onClick={handleHintClick}
                                     title='Click to copy command to input'
                                     style={hintButtonStyle}
+                                    data-testid="hint-button"
                                 >
                                     rm -rf /
                                 </button>
