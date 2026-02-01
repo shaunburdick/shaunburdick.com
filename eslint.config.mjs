@@ -7,6 +7,21 @@ export default [
     ...shaunburdick.config.ts,
     ...shaunburdick.config.react,
     {
+        // Enforce presentational component pattern
+        // View components in src/components/ should not use useState
+        // Containers in src/containers/ are allowed to use state
+        files: ['src/components/**/*.tsx', 'src/components/**/*.ts'],
+        rules: {
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: 'CallExpression[callee.name="useState"]',
+                    message: 'View components should not manage state. Use controlled props.',
+                },
+            ]
+        }
+    },
+    {
         ignores: [
             'build/**/*'
         ]

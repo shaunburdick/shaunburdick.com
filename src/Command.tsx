@@ -1,7 +1,7 @@
 import { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 import { displayUser, User } from './Users';
-import { NotificationContextType } from './components/Notification/Notification';
-import { AchievementContextType } from './components/Achievements/Achievements';
+import { NotificationContextType } from './containers/NotificationProvider';
+import { AchievementContextType } from './containers/AchievementProvider';
 
 /**
  * Interface for a terminal command

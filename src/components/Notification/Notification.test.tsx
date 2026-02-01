@@ -1,6 +1,11 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
-import { Notification, NotificationProvider, useNotification, Notifications } from './Notification';
+import { act, render, screen } from '@testing-library/react';
+import {
+    Notification,
+    Notifications,
+    NotificationProvider,
+    useNotification
+} from '../../containers/NotificationProvider';
 
 const TEST_NOTIFICATION_TEXT = 'Test Notification';
 const QUICK_NOTIFICATION_TEXT = 'Quick Notification';
@@ -187,6 +192,7 @@ describe('NotificationProvider', () => {
                     <button onClick={() => add({ body: 'Undefined Duration' })}>
                         Add Undefined Duration
                     </button>
+                    <Notifications />
                     <div data-testid={TESTID_NOTIFICATION_COUNT}>{notifications.length}</div>
                 </div>
             );

@@ -1,5 +1,5 @@
 import { CommandContext, commandsWithContext } from './Command';
-import { AchievementId, AchievementUnlocked, coreAchievements } from './components/Achievements/Achievements';
+import { AchievementId, AchievementUnlocked, coreAchievements } from './containers/AchievementProvider';
 import { displayUser, User } from './Users';
 
 describe('Command', () => {
