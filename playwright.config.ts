@@ -11,12 +11,9 @@ import { defineConfig, devices } from '@playwright/test';
  * - HTML reporter with trace on failure for debugging
  * - Base URL for relative navigation
  *
- * WSL2 Note: The webServer auto-start may hang in WSL2 environments.
- * If tests timeout waiting for the server, manually start it first:
- *   Terminal 1: npm run start:no-open
- *   Terminal 2: npx playwright test
- *
- * The config will detect and reuse the existing server automatically.
+ * WSL2 Compatibility: Uses 127.0.0.1 instead of localhost for reliable
+ * network connectivity in WSL2 environments. The webpack dev server is
+ * configured with explicit host binding to 127.0.0.1:8080.
  *
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -50,7 +47,7 @@ export default defineConfig({
     // Shared settings for all the projects below
     use: {
     // Base URL to use in actions like `await page.goto('/')`
-        baseURL: 'http://localhost:8080',
+        baseURL: 'http://127.0.0.1:8080',
 
         // Collect trace when retrying the failed test (debugging aid)
         trace: 'on-first-retry',
@@ -103,7 +100,7 @@ export default defineConfig({
             // Development server (for tests against dev build)
             // Uses --no-open flag to prevent auto-opening browser tabs
             command: 'npm run start:no-open',
-            url: 'http://localhost:8080',
+            url: 'http://127.0.0.1:8080',
             name: 'Dev Server',
             timeout: 120 * 1000,
             reuseExistingServer: !(typeof process.env.CI === 'string' && process.env.CI.length > 0),

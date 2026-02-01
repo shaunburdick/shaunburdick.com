@@ -100,9 +100,7 @@ src/
   - `npm run test:e2e:headed` - Watch tests run in browser
   - `npm run test:e2e:ui` - Interactive UI mode with time travel debugging
   - `npm run test:e2e:debug` - Step-through debugging
-  - **WSL2 Workaround**: If auto-start hangs, manually start server first:
-    - Terminal 1: `npm run start:no-open`
-    - Terminal 2: `npx playwright test`
+  - **WSL2 Compatible**: Dev server auto-starts using 127.0.0.1 for reliable networking
 - **CI Integration**: GitHub Actions automatically runs E2E tests, uploads reports on failure
 
 ### Build System
