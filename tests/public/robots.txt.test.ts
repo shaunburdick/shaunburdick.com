@@ -59,8 +59,10 @@ describe('public/robots.txt', () => {
         }
     });
 
-    test('references llms.txt in a comment for AI crawlers', () => {
-        expect(content).toContain('llms.txt');
-        expect(content).toContain('llmstxt.org');
+    test('does not reference llms.txt (the file was intentionally removed)', () => {
+        // Guard against accidentally re-adding a reference if llms.txt is
+        // ever reintroduced — the meta tags in index.html are the canonical
+        // AI-discoverability surface for this site.
+        expect(content).not.toMatch(/llms\.txt/);
     });
 });

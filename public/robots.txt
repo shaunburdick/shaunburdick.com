@@ -5,8 +5,4 @@ Disallow:
 # This site is fully open to all crawlers, including AI assistants
 # (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, etc.).
 # No AI crawler is blocked.
-
-# A curated, LLM-readable summary of this site's author and content is
-# available at the path below. AI assistants and crawlers that support
-# the llms.txt convention (https://llmstxt.org) are encouraged to read it.
 # Sitemap: not published by design; this site is a single-page application.

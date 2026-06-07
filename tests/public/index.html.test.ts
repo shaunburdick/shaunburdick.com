@@ -78,12 +78,6 @@ describe('public/index.html', () => {
         });
     });
 
-    describe('LLM-friendly link', () => {
-        test('declares an alternate link to llms.txt', () => {
-            expect(content).toMatch(/<link\s+[^>]*rel="alternate"[^>]*href="[^"]*llms\.txt"/);
-        });
-    });
-
     describe('noscript fallback', () => {
         test('is present and human-readable for no-JS clients', () => {
             const noscript = content.match(/<noscript>([\s\S]*?)<\/noscript>/);
@@ -93,7 +87,13 @@ describe('public/index.html', () => {
             expect(inner).toContain('Syracuse, NY');
             expect(inner).toContain('linkedin.com/in/shaunburdick');
             expect(inner).toContain('github.com/shaunburdick');
-            expect(inner).toContain('llms.txt');
+        });
+
+        test('does not link to a removed llms.txt (no dead 404s for no-JS clients)', () => {
+            const noscript = content.match(/<noscript>([\s\S]*?)<\/noscript>/);
+            expect(noscript).not.toBeNull();
+            const inner = noscript?.[1] ?? '';
+            expect(inner).not.toMatch(/href=["'][^"']*llms\.txt/);
         });
     });
 });
