@@ -45,7 +45,12 @@ function HintsView({ showHints, onToggle, onHintClick }: HintsViewProps) {
         color: 'inherit',
         textDecoration: 'underline',
         cursor: 'pointer',
-        padding: 0,
+        // 4px vertical padding over a 16px line-height yields a ~24px tall
+        // click target. minWidth/minHeight are a belt-and-suspenders guarantee
+        // that the touch target meets WCAG 2.5.8 (Target Size, AA = 24x24 CSS px).
+        padding: '4px 8px',
+        minHeight: '24px',
+        minWidth: '24px',
         font: 'inherit'
     };
 
@@ -57,8 +62,8 @@ function HintsView({ showHints, onToggle, onHintClick }: HintsViewProps) {
                     <caption>Hints</caption>
                     <thead>
                         <tr>
-                            <th>Command</th>
-                            <th>Use</th>
+                            <th scope="col">Command</th>
+                            <th scope="col">Use</th>
                         </tr>
                     </thead>
                     <tbody>
