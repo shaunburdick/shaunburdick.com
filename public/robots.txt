@@ -1,3 +1,8 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow:
+
+# This site is fully open to all crawlers, including AI assistants
+# (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, etc.).
+# No AI crawler is blocked.
+# Sitemap: not published by design; this site is a single-page application.
