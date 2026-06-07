@@ -20,3 +20,12 @@ pre.prompt {
     background-size: 100% 200%;
     animation: move-it 15s linear infinite;
 }
+
+/* Honor the user's motion preference: stop the looping background scroll
+   for visitors who have requested reduced motion. The gradient itself
+   stays put, only the animation halts. WCAG 2.3.3 (Animation from Interactions). */
+@media (prefers-reduced-motion: reduce) {
+    pre.prompt {
+        animation: none;
+    }
+}
