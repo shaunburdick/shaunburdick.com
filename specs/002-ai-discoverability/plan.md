@@ -36,131 +36,69 @@ important identity data Shaun wants known:
 
 ## Approach
 
-Three coordinated changes:
+Two coordinated changes:
 
-### 1. `public/llms.txt` (primary deliverable)
+### 1. `public/robots.txt` update
 
-A curated, human-and-LLM-readable markdown file at the site root following the
-[llms.txt spec](https://llmstxt.org/). This is the authoritative, machine-friendly
-identity document. Modern AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended)
-check `/llms.txt` and consume it directly. It bypasses the JS-rendered DOM entirely.
+Add a comment welcoming AI crawlers and confirming full access. No `Disallow` rules
+change — stays fully open to all crawlers including AI bots. Add a note that no
+sitemap is published by design.
 
-Content: H1 with name, blockquote summary, structured sections (About, Expertise, Links,
-Contact, About this site) with `[label](url): description` links per the spec.
+### 2. `public/index.html` improvements (meta tags + `<noscript>`)
 
-### 2. `public/robots.txt` update
-
-Add a comment pointing crawlers at the `llms.txt` file. No Disallow rules change —
-stays fully open to all crawlers including AI bots.
-
-### 3. `public/index.html` improvements (minor meta-tag cleanups)
+Static HTML changes that any client can read without executing the React bundle:
 
 - Fix `og:url` / `twitter:url` from `http://` to `https://`
-- Add `<link rel="canonical">`
-- Add `meta name="author"`
-- Add `meta name="profile:first_name"` / `profile:last_name` (Google+ legacy, still
-  consumed by some crawlers)
-- Add `meta name="description"` keyword enrichment where missing
-- Add `og:site_name`
-- Add `og:locale`
+- Add `<link rel="canonical" href="https://shaunburdick.com/">`
+- Add `<meta name="author" content="Shaun Burdick">`
+- Add `<meta name="profile:first_name">` / `<meta name="profile:last_name">`
+  (Google+ legacy profile tags, still consumed by some crawlers)
+- Add `<meta property="og:site_name">` and `<meta property="og:locale">`
+- Add `<meta property="og:image:alt">` / `<meta property="twitter:image:alt">`
+- Add a rich `<noscript>` block at the end of `<body>` containing Shaun's bio,
+  location (Syracuse, NY), areas of expertise, and key links (LinkedIn, GitHub,
+  zcal.co). Visible to no-JS clients, link previewers, and any crawler that
+  doesn't execute the JS bundle.
 
-These cost ~10 lines, are non-breaking, and improve both AI consumption and social
-sharing.
-
-### 4. Pre-render the home page (postbuild, optional but included)
-
-After `webpack --mode production` builds `build/index.html`, run a small
-`scripts/prerender.mjs` postbuild step that:
-
-1. Boots a Playwright Chromium page pointed at the static `index.html` (`file://`)
-2. Waits for `#root` to have children (React has mounted)
-3. Extracts the rendered HTML
-4. Writes the post-mount HTML back to `build/index.html`, preserving the `<script>` and
-   `<link>` references that HtmlWebpackPlugin emitted
-
-Result: a no-JS HTTP fetch of the deployed site sees:
-
-```html
-<h1>Shaun Burdick's Console</h1>
-...
-<div id="root">
-  <h1 id="page-desc">Shaun Burdick's Console</h1>
-  <div aria-describedby="page-desc">
-    <div class="shell">
-      <pre class="prompt">
-        ****************************************
-        Welcome to Shaun Burdick's Console!
-        ****************************************
-        Your last login was: never
-        Type `help` for assistance.
-      </pre>
-      <form>...input with placeholder "Type `help` for assistance."...</form>
-      ...
-    </div>
-  </div>
-</div>
-```
-
-The h1 and the welcome banner are now in static HTML. The full bio is *not* pre-rendered
-(it lives behind the `whois shaun` command in the SPA), so `llms.txt` is the only way
-to surface that — confirming the design choice.
-
-**Why Playwright over react-snap / @prerenderer/webpack-plugin:**
-
-- Playwright is already a devDep (`@playwright/test ^1.58.1`) and CI installs
-  `chromium` for tests — zero new dependencies
-- react-snap 1.23.0 is from 2022, unmaintained
-- @prerenderer/webpack-plugin 5.3.x works but adds a peer-dep on Puppeteer
-- ~50 lines of own code, fully understood and debuggable
-
-**CI/build behavior:** the prerender step is opt-in via `PRERENDER=1 npm run build`
-defaulting to enabled. If the chromium binary is missing, the build skips the step
-with a warning rather than failing (graceful degradation).
+These cost ~30 lines, are non-breaking, and improve both AI consumption and
+social sharing.
 
 ### Out of Scope
 
 - Pre-rendering the `/calendar/` redirect page (per user: not to be discovered)
 - A `sitemap.xml` (per user: discovery surface is intentionally minimal)
-- JSON-LD `Person` schema in HTML (deferred; `llms.txt` covers the AI use case;
-  can be added in a follow-up PR)
-- Server-side rendering (would require a larger refactor; not warranted for the value)
+- JSON-LD `Person` schema in HTML (deferred; can be added in a follow-up PR
+  if/when a specific consumer is identified that benefits)
+- Server-side rendering (would require a larger refactor; not warranted for the
+  value on a personal portfolio)
+- `public/llms.txt` — considered, dropped (see Decisions below)
+- Postbuild prerender — considered, dropped (see Decisions below)
 
 ## Architecture
 
 ```
-build pipeline:
-  webpack --mode production
-    └─> emits build/index.html (pre-React, static template)
-        └─> scripts/prerender.mjs
-            ├─> launches Playwright Chromium
-            ├─> loads build/index.html
-            ├─> waits for #root to populate
-            ├─> extracts rendered HTML
-            └─> writes back to build/index.html (overwrites)
-
-public/ directory (copied verbatim by CopyPlugin):
-  llms.txt                  ← new, curated AI-readable bio
-  robots.txt                ← updated with comment
-  index.html                ← updated meta tags
+public/ directory (copied verbatim by CopyWebpackPlugin):
+  robots.txt                ← updated with AI-welcome comment
+  index.html                ← updated meta tags + <noscript> fallback
   favicon.svg, manifest.json, img/, calendar/
 ```
 
+No build-time dependency on Chromium. No `postbuild` step. The output of
+`npm run build` is exactly what webpack emits.
+
 ## Acceptance Criteria
 
-1. `curl https://shaunburdick.com/llms.txt` returns valid markdown containing:
-   - `# Shaun Burdick` as H1
-   - A blockquote summary
-   - A `## About` section with name, role, location
-   - A `## Expertise` section listing 6 areas
-   - A `## Links` section with LinkedIn, GitHub, Calendar, Email
-2. `curl https://shaunburdick.com/robots.txt` still allows all agents and contains a
-   comment referencing `llms.txt`
-3. `curl https://shaunburdick.com/` (after prerender) returns HTML containing
-   `<h1 id="page-desc">` and the welcome banner text
-4. `npm run build` completes without errors when chromium is available
-5. `npm run build` completes (skipping prerender with a warning) when chromium is missing
-6. `npm run lint` passes
-7. `npm run test:unit` passes with ≥90% coverage maintained
+1. `curl https://shaunburdick.com/robots.txt` allows all agents and contains an
+   AI-crawler-welcome comment, with no `Disallow: /` rule for any bot.
+2. `curl https://shaunburdick.com/` returns HTML containing:
+   - `<link rel="canonical" href="https://shaunburdick.com/">`
+   - `<meta name="author" content="Shaun Burdick">`
+   - `<meta property="og:url" content="https://shaunburdick.com/">` (https, not http)
+   - A `<noscript>` block mentioning Syracuse, NY, the six areas of expertise,
+     and the verified social/contact links
+3. `npm run lint` passes with zero errors and zero warnings
+4. `npm run test:unit` passes with ≥90% coverage maintained
+5. `npm run build` completes successfully with no postbuild step
 
 ## Verification Steps
 
@@ -168,6 +106,51 @@ public/ directory (copied verbatim by CopyPlugin):
 npm run lint
 npm run test:unit
 npm run build
-cat build/index.html | grep -c '<h1 id="page-desc"'
-cat build/llms.txt | head -20
+curl -s https://shaunburdick.com/robots.txt
+curl -s https://shaunburdick.com/ | grep -A 30 '<noscript>'
 ```
+
+## Decisions made during implementation
+
+### `public/llms.txt` — planned, dropped
+
+Originally proposed as the primary deliverable, following the
+[llms.txt spec](https://llmstxt.org/). After implementation, 2026 evidence showed
+the format is effectively unused by AI systems:
+
+- **OtterlyAI** (90 days, 62,100 AI bot visits): 84 hits to `/llms.txt` = 0.1%
+- **Limy** (May 2026, 515M LLM events): 408 hits = "statistically negligible"
+- **SE Ranking** (Nov 2025, 300K domains): no correlation with AI citations; ML
+  model got **more** accurate when the llms.txt variable was removed
+- **Google (Mueller/Illyes)**: explicit "no AI system currently uses llms.txt" —
+  compared to the dead keywords meta tag
+- **Chrome Lighthouse** (May 2026): added llms.txt check, but only flags
+  *server errors* fetching it, not absence
+- **Attrifast 10-site controlled test** (May 2026): Perplexity +10pp, Claude
+  +3.6pp (noisy), ChatGPT 0pp, Gemini -3pp
+
+The one valid use case is **developer documentation consumed by IDE agents**
+(Cursor, Claude Code, Continue, Cline). Anthropic, Stripe, Vercel, Cloudflare,
+and Mintlify all ship `llms.txt` for that reason. shaunburdick.com is a
+personal portfolio, not docs; the rich `<noscript>` block in `index.html` is
+the better-targeted solution for this site, and the meta tags in the same
+file cover the AI-summary use case.
+
+### `scripts/prerender.js` postbuild — planned, dropped
+
+Originally proposed to launch headless Chromium after `webpack build` to capture
+the React-rendered HTML (welcome banner, `<h1>`, etc.) in `build/index.html`,
+so no-JS crawlers would see the post-mount content.
+
+Reasons to drop:
+
+- Adds a runtime dependency on Chromium launching successfully in CI; if the
+  binary, sandbox, or glibc ever misaligns, the build fails.
+- Modern AI crawlers (Google, GPTBot, ClaudeBot, PerplexityBot) all execute
+  JavaScript, so the static fallback provides minimal additional value.
+- The `<noscript>` block in `index.html` already covers the no-JS case with
+  richer, intentionally-curated content (full bio + expertise + links, not
+  just the welcome banner).
+- Playwright chromium remains installed for E2E tests in `deploy.yml`; this
+  change simply removes a separate build-time launch path that didn't carry
+  its weight.
