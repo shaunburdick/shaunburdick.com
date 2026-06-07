@@ -43,6 +43,7 @@ function CookieNoticeView({ show, onAccept, onReject }: CookieNoticeViewProps) {
                 Do you acknowledge that this site uses cookies?
                 <div style={{ textAlign: 'right' }}>
                     <button
+                        type="button"
                         onClick={onAccept}
                         data-testid="cookie-accept"
                         aria-label="Acknowledge cookie usage"
@@ -51,6 +52,7 @@ function CookieNoticeView({ show, onAccept, onReject }: CookieNoticeViewProps) {
                     </button>
                     &nbsp;
                     <button
+                        type="button"
                         onClick={onReject}
                         data-testid="cookie-reject"
                         aria-label="Decline cookie usage"

@@ -63,6 +63,9 @@ export const displayUser = (user: User) => {
     return response;
 };
 
+// Radix for generating random string identifiers
+const ID_STRING_RADIX = 36;
+
 // User data below
 USERS.set('shaun', {
     name: 'Shaun Burdick',
@@ -80,7 +83,7 @@ USERS.set('shaun', {
     links: [
         { url: 'https://www.linkedin.com/in/shaunburdick/', text: 'LinkedIn' },
         { url: 'https://github.com/shaunburdick/', text: 'GitHub' },
-        { url: `mailto://${Math.floor(Math.random() * Date.now()).toString(36)}-${atob('c2l0ZS1jb250YWN0QHNoYXVuYnVyZGljay5jb20=')}`, text: 'Email' },
+        { url: `mailto://${Math.floor(Math.random() * Date.now()).toString(ID_STRING_RADIX)}-${atob('c2l0ZS1jb250YWN0QHNoYXVuYnVyZGljay5jb20=')}`, text: 'Email' },
         { url: 'https://zcal.co/shaunburdick', text: 'Calendar' }
     ]
 });

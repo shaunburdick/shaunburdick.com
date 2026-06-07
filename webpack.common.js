@@ -16,12 +16,12 @@ const isEnvDevelopment = !isEnvProduction;
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 const { version } = packageJson;
 
-// Get commit hash
-let commitHash = 'unknown';
+// Get commit hash (falls back to 'unknown' when git is unavailable)
+let commitHash;
 try {
     commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 } catch {
-    // Silently fail if git is not available or not a git repository
+    commitHash = 'unknown';
 }
 
 // Get build date (when webpack runs)
@@ -81,7 +81,8 @@ export default {
         new WebpackManifestPlugin({
             fileName: 'asset-manifest.json',
             // publicPath: paths.publicUrlOrPath,
-            generate: (seed, files, entrypoints) => {
+            generate: (...args) => {
+                const [seed, files, entrypoints] = args;
                 const manifestFiles = files.reduce((manifest, file) => {
                     manifest[file.name] = file.path;
                     return manifest;

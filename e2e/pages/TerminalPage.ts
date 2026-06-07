@@ -13,7 +13,12 @@ import { BasePage } from './BasePage';
  * Best Practice: Use data-testid for reliable, maintainable selectors
  * that won't break when UI text or ARIA labels change
  */
+// Timeout constants for wait operations
+const COMMAND_TIMEOUT_MS = 100;
+const OUTPUT_TIMEOUT_MS = 200;
+
 export class TerminalPage extends BasePage {
+
     // Locators using data-testid for reliability
     public readonly commandInput: Locator;
     public readonly consoleOutput: Locator;
@@ -40,8 +45,8 @@ export class TerminalPage extends BasePage {
         await this.commandInput.fill(command);
         await this.commandInput.press('Enter');
 
-        // Wait a bit for command to process and render
-        await this.page.waitForTimeout(100);
+        // Wait for command to process and render
+        await this.page.waitForTimeout(COMMAND_TIMEOUT_MS);
     }
 
     /**
@@ -51,7 +56,7 @@ export class TerminalPage extends BasePage {
      */
     public async getLastOutput(): Promise<string> {
     // Wait for any new content to render
-        await this.page.waitForTimeout(200);
+        await this.page.waitForTimeout(OUTPUT_TIMEOUT_MS);
 
         // Get the last div with aria-live inside the console output pre element
         const liveRegion = this.consoleOutput.locator('[aria-live="polite"]').last();

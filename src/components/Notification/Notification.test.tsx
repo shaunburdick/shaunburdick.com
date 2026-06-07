@@ -81,25 +81,48 @@ describe('Notification', () => {
     });
 });
 
-describe('NotificationProvider', () => {
-    const TestComponent = () => {
-        const { add, remove, clear, notifications } = useNotification();
+/**
+ * Test component that exercises notification operations
+ */
+const TestComponent = () => {
+    const { add, remove, clear, notifications } = useNotification();
 
-        return (
-            <div>
-                <button onClick={() => add({ body: TEST_NOTIFICATION_TEXT }, 3000)}>Add Notification</button>
-                <button onClick={() => add({ body: QUICK_NOTIFICATION_TEXT }, 1000)}>Add Quick Notification</button>
-                <button onClick={clear}>Clear Notifications</button>
-                <button data-testid="remove-by-id" onClick={() => {
-                    if (notifications.length > 0) {
-                        remove(notifications[0].id);
-                    }
-                }}>Remove First Notification</button>
-                <Notifications />
-                <div data-testid="notification-count">{notifications.length}</div>
-            </div>
-        );
-    };
+    return (
+        <div>
+            <button type="button" onClick={() => add({ body: TEST_NOTIFICATION_TEXT }, 3000)}>Add Notification</button>
+            <button type="button" onClick={() => add({ body: QUICK_NOTIFICATION_TEXT }, 1000)}>
+                Add Quick Notification
+            </button>
+            <button type="button" onClick={clear}>Clear Notifications</button>
+            <button type="button" data-testid="remove-by-id" onClick={() => {
+                if (notifications.length > 0) {
+                    remove(notifications[0].id);
+                }
+            }}>Remove First Notification</button>
+            <Notifications />
+            <div data-testid="notification-count">{notifications.length}</div>
+        </div>
+    );
+};
+
+/**
+ * Test component for testing undefined duration fallback
+ */
+const TestComponentWithUndefinedDuration: React.FC = () => {
+    const { add, notifications } = useNotification();
+
+    return (
+        <div>
+            <button type="button" onClick={() => add({ body: 'Undefined Duration' })}>
+                Add Undefined Duration
+            </button>
+            <Notifications />
+            <div data-testid={TESTID_NOTIFICATION_COUNT}>{notifications.length}</div>
+        </div>
+    );
+};
+
+describe('NotificationProvider', () => {
 
     test('adds a notification', () => {
         render(
@@ -183,20 +206,6 @@ describe('NotificationProvider', () => {
     test('useNotification add function handles undefined duration', () => {
         // Test duration fallback to 3000
         jest.useFakeTimers();
-
-        const TestComponentWithUndefinedDuration: React.FC = () => {
-            const { add, notifications } = useNotification();
-
-            return (
-                <div>
-                    <button onClick={() => add({ body: 'Undefined Duration' })}>
-                        Add Undefined Duration
-                    </button>
-                    <Notifications />
-                    <div data-testid={TESTID_NOTIFICATION_COUNT}>{notifications.length}</div>
-                </div>
-            );
-        };
 
         render(
             <NotificationProvider>

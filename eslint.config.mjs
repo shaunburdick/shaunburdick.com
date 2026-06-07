@@ -1,6 +1,6 @@
 import shaunburdick from 'eslint-config-shaunburdick';
-// import here to solve issues with ESM import when referencing file directly
-import webpackConfig from './webpack.development.js';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import reactX from 'eslint-plugin-react-x';
 
 export default [
     ...shaunburdick.config.js,
@@ -22,18 +22,29 @@ export default [
         }
     },
     {
+        // Register eslint-plugin-react-x under the react/ prefix to provide
+        // legacy rule definitions that some configs still reference.
+        // Disable the conflicting rules in favor of @eslint-react equivalents.
+        plugins: {
+            react: reactX,
+        },
+        rules: {
+            'react/no-array-index-key': 'off',
+        },
+    },
+    {
+        settings: {
+            'import-x/resolver-next': [
+                createTypeScriptImportResolver({
+                    alwaysTryTypes: true,
+                }),
+            ],
+        },
+    },
+    {
         ignores: [
             'build/**/*',
             'coverage/**/*'
         ]
-    },
-    {
-        settings: {
-            'import/resolver': {
-                webpack: {
-                    config: webpackConfig
-                }
-            }
-        }
     }
 ];

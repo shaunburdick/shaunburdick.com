@@ -51,6 +51,20 @@ interface ConsoleOutputProps {
  * @returns JSX representing a Console output
  */
 function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
+    let responseSpans: React.JSX.Element[] | undefined;
+
+    if (commandResult) {
+        const spans: React.JSX.Element[] = [];
+        for (const commandLine of commandResult.response) {
+            const key = `line-${spans.length}`;
+            spans.push(
+                <span key={key}>
+                    {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
+                </span>
+            );
+        }
+        responseSpans = spans;
+    }
 
     return (
         <div style={{ marginTop: '1.5em' }} aria-live={ariaLive}>
@@ -60,12 +74,7 @@ function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
                     <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
                         {<span aria-hidden>$</span>} {commandResult.command}
                     </span>}
-                    {commandResult.response.map((commandLine, lineIndex) => (
-                        // eslint-disable-next-line react/no-array-index-key -- It's a line number at this point
-                        <span key={lineIndex}>
-                            {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
-                        </span>
-                    ))}
+                    {responseSpans}
                 </>}
         </div>
     );

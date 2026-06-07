@@ -109,7 +109,7 @@ test.describe('Achievements', () => {
         expect(achievements.length).toBeGreaterThan(0);
 
         // Should contain First Command achievement
-        const hasFirstCommand = achievements.some((a: { id: string }) => a.id === 'first_command');
+        const hasFirstCommand = achievements.some((achievement: { id: string }) => achievement.id === 'first_command');
         expect(hasFirstCommand).toBe(true);
     });
 });
