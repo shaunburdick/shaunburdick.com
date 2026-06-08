@@ -1,6 +1,5 @@
 import shaunburdick from 'eslint-config-shaunburdick';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
-import reactX from 'eslint-plugin-react-x';
 
 export default [
     ...shaunburdick.config.js,
@@ -20,17 +19,6 @@ export default [
                 },
             ]
         }
-    },
-    {
-        // Register eslint-plugin-react-x under the react/ prefix to provide
-        // legacy rule definitions that some configs still reference.
-        // Disable the conflicting rules in favor of @eslint-react equivalents.
-        plugins: {
-            react: reactX,
-        },
-        rules: {
-            'react/no-array-index-key': 'off',
-        },
     },
     {
         settings: {
