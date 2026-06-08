@@ -2,14 +2,18 @@ import { createContext, use } from 'react';
 import Plausible from 'plausible-tracker';
 
 /**
- * Options for tracking events
+ * Event names for Plausible analytics tracking
  */
-export const TRACKER_EVENTS: Record<string, { event: string; props?: Record<string, string> }> = {
-    HistoryUpArrow: { event: 'History', props: { action: 'UpArrow' } },
-    Help: { event: 'Help' },
-    EasterEgg: { event: 'Easter Egg' },
-    TabNav: { event: 'Tab' },
-};
+export const TRACKER_EVENTS = {
+    HistoryUpArrow: 'History',
+    Help: 'Help',
+    EasterEgg: 'Easter Egg',
+    TabNav: 'Tab',
+    AchievementUnlocked: 'AchievementUnlocked',
+    CookieAcknowledge: 'CookieAcknowledge',
+    ExecCommand: 'ExecCommand',
+    ToggleHints: 'ToggleHints',
+} as const;
 
 const tracker = Plausible({
     domain: 'shaunburdick.com',

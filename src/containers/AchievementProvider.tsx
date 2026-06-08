@@ -34,7 +34,7 @@ export interface AchievementUnlocked {
 /**
  * Interface for the achievement context value
  */
-interface AchievementContextType {
+export interface AchievementContextType {
     /** Array of unlocked achievements */
     achievements: AchievementUnlocked[];
     /** Function to unlock a new achievement */

@@ -19,6 +19,13 @@ const DEFAULT_ENVIRONMENT = new Map([
 ]);
 
 /**
+ * Type for the command update event dispatch function
+ */
+interface CommandUpdateEvent {
+    dispatch: (detail: { command: { name: string; args: string[] }; result: ConsoleLine[] }) => void;
+}
+
+/**
  * Context object passed to command handler functions
  */
 interface CommandHandlerContext {
@@ -26,7 +33,7 @@ interface CommandHandlerContext {
     environment: Map<string, string>;
     workingDir: string;
     COMMANDS: ReturnType<typeof commandsWithContext>;
-    commandUpdateEvent: ReturnType<typeof useEvent>;
+    commandUpdateEvent: CommandUpdateEvent;
     achievements: ReturnType<typeof useAchievements>;
     setConsoleLines: React.Dispatch<React.SetStateAction<CommandResult[]>>;
     setCommandHistory: (value: string[] | ((prev: string[]) => string[])) => void;
@@ -116,7 +123,7 @@ interface UseCommandCenterOptions {
     commandHistory: string[];
     commandPointer: number;
     consoleLines: CommandResult[];
-    commandUpdateEvent: ReturnType<typeof useEvent>;
+    commandUpdateEvent: CommandUpdateEvent;
     achievements: ReturnType<typeof useAchievements>;
     notifications: ReturnType<typeof useNotification>;
     setCommandPointer: (value: number) => void;
