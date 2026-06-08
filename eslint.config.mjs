@@ -1,6 +1,5 @@
 import shaunburdick from 'eslint-config-shaunburdick';
-// import here to solve issues with ESM import when referencing file directly
-import webpackConfig from './webpack.development.js';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 
 export default [
     ...shaunburdick.config.js,
@@ -22,18 +21,18 @@ export default [
         }
     },
     {
+        settings: {
+            'import-x/resolver-next': [
+                createTypeScriptImportResolver({
+                    alwaysTryTypes: true,
+                }),
+            ],
+        },
+    },
+    {
         ignores: [
             'build/**/*',
             'coverage/**/*'
         ]
-    },
-    {
-        settings: {
-            'import/resolver': {
-                webpack: {
-                    config: webpackConfig
-                }
-            }
-        }
     }
 ];

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, use, ReactNode, useEffect } from 'react';
 import { NotificationView } from '../components/Notification/NotificationView';
 
 /**
@@ -32,6 +32,22 @@ const NotificationContext = createContext<NotificationContextType>({
     notifications: [],
 });
 
+const ID_RANDOM_SUBSTRING_START = 2;
+const ID_RANDOM_SUBSTRING_END = 11;
+const ID_RANDOM_RADIX = 36;
+
+/**
+ * Generates a unique notification ID using timestamp and random string
+ *
+ * @returns Unique notification ID string
+ */
+const generateId = (): string => {
+    const randomPart = Math.random()
+        .toString(ID_RANDOM_RADIX)
+        .slice(ID_RANDOM_SUBSTRING_START, ID_RANDOM_SUBSTRING_END);
+    return `notification-${Date.now()}-${randomPart}`;
+};
+
 /**
  * Notification provider container
  * Manages global notification state
@@ -45,8 +61,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         message: { body: string; title?: string };
         duration?: number;
     }[]>([]);
-
-    const generateId = () => `notification-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
     const remove = (id: string) => {
         setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -64,9 +78,9 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <NotificationContext.Provider value={{ add, remove, clear, notifications }}>
+        <NotificationContext value={{ add, remove, clear, notifications }}>
             {children}
-        </NotificationContext.Provider>
+        </NotificationContext>
     );
 };
 
@@ -75,7 +89,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
  *
  * @returns Notification context
  */
-export const useNotification = () => useContext(NotificationContext);
+export const useNotification = () => use(NotificationContext);
 
 /**
  * Notification container component

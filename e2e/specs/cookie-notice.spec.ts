@@ -73,7 +73,7 @@ test.describe('Cookie Notice', () => {
         expect(cookieAck).toBe('true');
     });
 
-    test('should trigger Accept Cookies achievement when accepting', async ({ page }) => {
+    test('should trigger Cookie Monster achievement when accepting', async ({ page }) => {
         const cookies = new CookieNoticePage(page);
         const notifications = new NotificationPage(page);
 
@@ -81,9 +81,9 @@ test.describe('Cookie Notice', () => {
         await cookies.accept();
 
         // Should trigger achievement notification
-        await notifications.waitForNotification('Accept Cookies', 5000);
+        await notifications.waitForNotification('Cookie Monster', 5000);
 
-        const hasAchievement = await notifications.hasNotificationWithText('Accept Cookies');
+        const hasAchievement = await notifications.hasNotificationWithText('Cookie Monster');
         expect(hasAchievement).toBe(true);
     });
 

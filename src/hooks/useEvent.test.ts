@@ -46,7 +46,7 @@ describe('useEvent', () => {
      * Test that no event listener is added when callback is undefined
      */
     test('does not add event listener when callback is undefined', () => {
-        renderHook(() => useEvent('onCommand', undefined));
+        renderHook(() => useEvent('onCommand'));
 
         expect(addEventListenerSpy).not.toHaveBeenCalled();
     });

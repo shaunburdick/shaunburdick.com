@@ -18,8 +18,9 @@ function CookieNotice() {
     const tracker = useTracker();
     const { unlockAchievement } = useAchievements();
 
-    const initialShowCookie = (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'false') !== 'true';
-    const [showCookieMessage, setShowCookieMessage] = useState<boolean>(initialShowCookie);
+    const [showCookieMessage, setShowCookieMessage] = useState<boolean>(() => {
+        return (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'false') !== 'true';
+    });
 
     /**
      * Handle the user accepting cookies

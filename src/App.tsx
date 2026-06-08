@@ -17,11 +17,17 @@ function App() {
     const tracker = useTracker();
     const notifications = useNotification();
 
+    // Notification auto-dismiss timeout in milliseconds
+    const NOTIFICATION_DURATION = 5000;
+
     /**
      * Listen for achievement events and display notifications
      */
     useEvent('onAchievement', (achievement) => {
-        notifications.add({ title: `Achievement Unlocked: ${achievement.title}`, body: achievement.description }, 5000);
+        notifications.add(
+            { title: `Achievement Unlocked: ${achievement.title}`, body: achievement.description },
+            NOTIFICATION_DURATION
+        );
         tracker.trackEvent(TRACKER_EVENTS.AchievementUnlocked, {
             props: {
                 achievement: achievement.id

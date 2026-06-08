@@ -2,37 +2,37 @@ import { CommandContext, commandsWithContext } from './Command';
 import { AchievementId, AchievementUnlocked, coreAchievements } from './containers/AchievementProvider';
 import { displayUser, User } from './Users';
 
-describe('Command', () => {
-    function buildContext(): CommandContext {
-        const achievements: AchievementUnlocked[] = [];
-        return {
-            commandHistory: [],
-            environment: new Map(),
-            setConsoleLines: jest.fn(),
-            setLastCommand: jest.fn(),
-            users: new Map([['test', { name: 'test' }]]),
-            workingDir: '',
-            notifications: {
-                add: jest.fn(),
-                remove: jest.fn(),
-                clear: jest.fn(),
-                notifications: []
-            },
-            achievements: {
-                unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => achievements.push({
-                    id,
-                    title: coreAchievements[id].title,
-                    description: coreAchievements[id].description,
-                    unlockedAt: new Date().toISOString()
-                })),
-                hasAchievement: jest.fn().mockImplementation((id: AchievementId) =>
-                    achievements.some(achievement => achievement.id === id)),
-                resetAchievements: jest.fn().mockImplementation(() => achievements.splice(0)),
-                achievements
-            }
-        };
-    }
+function buildContext(): CommandContext {
+    const achievements: AchievementUnlocked[] = [];
+    return {
+        commandHistory: [],
+        environment: new Map(),
+        setConsoleLines: jest.fn(),
+        setLastCommand: jest.fn(),
+        users: new Map([['test', { name: 'test' }]]),
+        workingDir: '',
+        notifications: {
+            add: jest.fn(),
+            remove: jest.fn(),
+            clear: jest.fn(),
+            notifications: []
+        },
+        achievements: {
+            unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => achievements.push({
+                id,
+                title: coreAchievements[id].title,
+                description: coreAchievements[id].description,
+                unlockedAt: new Date().toISOString()
+            })),
+            hasAchievement: jest.fn().mockImplementation((id: AchievementId) =>
+                achievements.some(achievement => achievement.id === id)),
+            resetAchievements: jest.fn().mockImplementation(() => achievements.splice(0)),
+            achievements
+        }
+    };
+}
 
+describe('Command', () => {
     let oldOpen: typeof window.open;
 
     beforeEach(() => {
@@ -43,7 +43,7 @@ describe('Command', () => {
     });
 
     afterEach(() => {
-        // return the window.open fn
+        // Restore the original window.open function
         window.open = oldOpen;
     });
 

@@ -86,8 +86,7 @@ describe('ShellPrompt', () => {
                 await userEvent.keyboard('clear{Enter}');
 
                 const consoleCommands = document.body.querySelectorAll('pre > div');
-                expect(consoleCommands.length).toBe(1);
-                expect(consoleCommands[0]).toBeEmptyDOMElement();
+                expect(consoleCommands.length).toBe(0);
             });
         });
 

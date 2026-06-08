@@ -13,6 +13,7 @@ import { TerminalPage, CookieNoticePage, NotificationPage } from '../pages';
 
 // Constants for achievement titles
 const ACHIEVEMENT_FIRST_COMMAND = 'First Command';
+const ACHIEVEMENT_COOKIE_MONSTER = 'Cookie Monster';
 
 test.describe('Achievements', () => {
     test('should unlock "First Command" achievement', async ({ page }) => {
@@ -31,7 +32,7 @@ test.describe('Achievements', () => {
         expect(notificationText).toMatch(/achievement|unlocked/i);
     });
 
-    test('should unlock "Accept Cookies" achievement when accepting cookies', async ({ page }) => {
+    test('should unlock "Cookie Monster" achievement when accepting cookies', async ({ page }) => {
         const cookies = new CookieNoticePage(page);
         const notifications = new NotificationPage(page);
 
@@ -42,10 +43,10 @@ test.describe('Achievements', () => {
         await cookies.accept();
 
         // Wait for cookie achievement notification
-        await notifications.waitForNotification('Accept Cookies', 5000);
+        await notifications.waitForNotification(ACHIEVEMENT_COOKIE_MONSTER, 5000);
 
         // Verify achievement notification
-        const hasAchievement = await notifications.hasNotificationWithText('Accept Cookies');
+        const hasAchievement = await notifications.hasNotificationWithText(ACHIEVEMENT_COOKIE_MONSTER);
         expect(hasAchievement).toBe(true);
     });
 
@@ -109,7 +110,7 @@ test.describe('Achievements', () => {
         expect(achievements.length).toBeGreaterThan(0);
 
         // Should contain First Command achievement
-        const hasFirstCommand = achievements.some((a: { id: string }) => a.id === 'first_command');
+        const hasFirstCommand = achievements.some((achievement: { id: string }) => achievement.id === 'first_command');
         expect(hasFirstCommand).toBe(true);
     });
 });

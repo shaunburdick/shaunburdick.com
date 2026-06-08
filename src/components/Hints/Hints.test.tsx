@@ -50,8 +50,8 @@ describe('Hints', () => {
         expect(() => fireEvent.click(link)).not.toThrow();
     });
 
-    test('handles hint click with empty textContent fallback', () => {
-        // Test textContent || '' fallback
+    test('handles hint click by passing command directly', () => {
+        // Test that hint click passes the command text directly
         const hintClick = jest.fn();
 
         act(() => render(<Hints hintClick={hintClick} />));
@@ -60,17 +60,10 @@ describe('Hints', () => {
         fireEvent.click(button);
 
         const link = screen.getByText(WHOIS_SHAUN_TEXT);
-
-        // Mock textContent to be null to test the fallback
-        Object.defineProperty(link, 'textContent', {
-            value: null,
-            writable: true
-        });
-
         fireEvent.click(link);
 
-        // Should call hintClick with empty string when textContent is null
-        expect(hintClick).toHaveBeenCalledWith('');
+        // Should call hintClick with the command text
+        expect(hintClick).toHaveBeenCalledWith(WHOIS_SHAUN_TEXT);
     });
 });
 

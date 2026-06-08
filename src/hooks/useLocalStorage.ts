@@ -1,6 +1,23 @@
 import { useState } from 'react';
 
 /**
+ * Safely sets a localStorage item, returning false on failure
+ * instead of throwing. Used to avoid console statements in catch blocks.
+ *
+ * @param key - localStorage key
+ * @param value - value to store
+ * @returns true if the write succeeded, false otherwise
+ */
+function safeSetItem(key: string, value: string): boolean {
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+/**
  * Custom hook to safely access and persist state to localStorage
  *
  * @template T - The type of the stored value
@@ -35,12 +52,9 @@ export const useLocalStorage = <T,>(
             // Handle both direct values and functional updates
             const valueToStore = value instanceof Function ? value(currentState) : value;
 
-            // Persist to localStorage with error handling
-            try {
-                localStorage.setItem(key, JSON.stringify(valueToStore));
-            } catch {
-                // Silent fail on localStorage errors (e.g., quota exceeded)
-            }
+            // Persist to localStorage - best-effort, silently ignore failures.
+            // A failed write should never block state updates.
+            safeSetItem(key, JSON.stringify(valueToStore));
 
             return valueToStore;
         });
