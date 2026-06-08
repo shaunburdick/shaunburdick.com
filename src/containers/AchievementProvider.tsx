@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback, use } from 'react';
+import React, { createContext, useState, useCallback, use, Dispatch, SetStateAction } from 'react';
+import { useEvent } from '../hooks';
 
 /**
  * Alias for achievement identifier string
@@ -132,6 +133,58 @@ function saveAchievements(nextAchievements: AchievementUnlocked[]): void {
     }
 }
 
+/**
+ * Type for the achievement event dispatch function
+ */
+interface AchievementEventDispatch {
+    dispatch: (detail: AchievementUnlocked) => void;
+}
+
+/**
+ * Options for processAchievementUnlock
+ */
+interface ProcessUnlockOptions {
+    achievementId: AchievementId;
+    achievementData: Achievement;
+    setAchievements: Dispatch<SetStateAction<AchievementUnlocked[]>>;
+    achievementEvent: AchievementEventDispatch;
+}
+
+/**
+ * Process unlocking an achievement: update state, save to localStorage, dispatch event
+ */
+function processAchievementUnlock({
+    achievementId,
+    achievementData,
+    setAchievements,
+    achievementEvent
+}: ProcessUnlockOptions): void {
+    let wasUnlocked = false;
+    let unlockedEntry: AchievementUnlocked | undefined;
+
+    setAchievements((currentAchievements) => {
+        const alreadyUnlocked = currentAchievements.some((ach) => ach.id === achievementId);
+        if (alreadyUnlocked) {
+            return currentAchievements;
+        }
+
+        unlockedEntry = {
+            id: achievementId,
+            title: achievementData.title,
+            description: achievementData.description,
+            unlockedAt: new Date().toISOString()
+        };
+        wasUnlocked = true;
+        const next = [...currentAchievements, unlockedEntry];
+        saveAchievements(next);
+        return next;
+    });
+
+    if (wasUnlocked && unlockedEntry !== undefined) {
+        achievementEvent.dispatch(unlockedEntry);
+    }
+}
+
 export const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
 
 /**
@@ -143,43 +196,21 @@ export const AchievementContext = createContext<AchievementContextType | undefin
  */
 export function AchievementProvider({ children }: { children: React.ReactNode }) {
     const [achievements, setAchievements] = useState<AchievementUnlocked[]>(loadAchievements);
+    const achievementEvent = useEvent('onAchievement');
 
     const hasAchievement = useCallback((achievementId: AchievementId): boolean => {
         return achievements.some((ach) => ach.id === achievementId);
     }, [achievements]);
 
-    /**
-     * Unlock an achievement by ID. No-op if already unlocked or ID doesn't exist.
-     */
     const unlockAchievement = (achievementId: AchievementId): void => {
         const achievementData = coreAchievements[achievementId];
         if (achievementData === undefined) {
             return;
         }
 
-        setAchievements((currentAchievements) => {
-            // Check if already unlocked (using current state, not stale closure)
-            const alreadyUnlocked = currentAchievements.some((ach) => ach.id === achievementId);
-            if (alreadyUnlocked) {
-                return currentAchievements;
-            }
-
-            const unlockedAchievement: AchievementUnlocked = {
-                id: achievementId,
-                title: achievementData.title,
-                description: achievementData.description,
-                unlockedAt: new Date().toISOString()
-            };
-
-            const next = [...currentAchievements, unlockedAchievement];
-            saveAchievements(next);
-            return next;
-        });
+        processAchievementUnlock({ achievementId, achievementData, setAchievements, achievementEvent });
     };
 
-    /**
-     * Reset all achievements
-     */
     const resetAchievements = (): void => {
         setAchievements([]);
         saveAchievements([]);
