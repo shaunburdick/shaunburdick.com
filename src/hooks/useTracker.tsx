@@ -17,7 +17,7 @@ export const TRACKER_EVENTS = {
 
 const tracker = Plausible({
     domain: 'shaunburdick.com',
-    apiHost: 'https://plausible.io'
+    apiHost: 'https://analytics.public.burdick.dev'
 });
 
 /**
