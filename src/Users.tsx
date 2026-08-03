@@ -69,7 +69,7 @@ const ID_STRING_RADIX = 36;
 // User data below
 USERS.set('shaun', {
     name: 'Shaun Burdick',
-    image: 'img/shaun.png',
+    image: 'img/shaun.jpg',
     occupation: [ 'Father', 'Husband', 'Leader', 'Engineer' ],
     location: 'Syracuse, NY',
     expertise: [
