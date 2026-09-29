@@ -6,21 +6,23 @@ const SHOW_HINTS_TEXT = 'Show Hints';
 const WHOIS_SHAUN_TEXT = 'whois shaun';
 
 describe('Hints', () => {
-    test('Display a button to toggle hints, with the table hidden initially', () => {
-        act(() => render(<Hints />));
+    test('Display a button to toggle hints, with the table hidden initially', async () => {
+        await act(() => render(<Hints />));
 
         expect(screen.getByText(SHOW_HINTS_TEXT)).toBeInTheDocument();
         expect(document.body.querySelector('table')).not.toBeInTheDocument();
     });
 
-    test('Display a table of hints and fire event when hint is clicked', (done) => {
+    test('Display a table of hints and fire event when hint is clicked', async () => {
+        // Recorded rather than asserted from inside the callback: a `done`
+        // callback cannot be async, and collecting the calls lets the
+        // expectation run after the click instead of ending the test mid-way.
+        const clickedHints: string[] = [];
         const hintClick = (text: string) => {
-            expect(text).toEqual(WHOIS_SHAUN_TEXT);
-
-            done();
+            clickedHints.push(text);
         };
 
-        act(() => render(<Hints hintClick={hintClick} />));
+        await act(() => render(<Hints hintClick={hintClick} />));
 
         const button = screen.getByText(SHOW_HINTS_TEXT);
 
@@ -35,11 +37,13 @@ describe('Hints', () => {
 
         const link = screen.getByText(WHOIS_SHAUN_TEXT);
         fireEvent.click(link);
+
+        expect(clickedHints).toEqual([WHOIS_SHAUN_TEXT]);
     });
 
-    test('handles hint click when hintClick callback is undefined', () => {
+    test('handles hint click when hintClick callback is undefined', async () => {
         // Test hintClick is optional
-        act(() => render(<Hints />));
+        await act(() => render(<Hints />));
 
         const button = screen.getByText(SHOW_HINTS_TEXT);
         fireEvent.click(button);
@@ -50,11 +54,11 @@ describe('Hints', () => {
         expect(() => fireEvent.click(link)).not.toThrow();
     });
 
-    test('handles hint click by passing command directly', () => {
+    test('handles hint click by passing command directly', async () => {
         // Test that hint click passes the command text directly
         const hintClick = jest.fn();
 
-        act(() => render(<Hints hintClick={hintClick} />));
+        await act(() => render(<Hints hintClick={hintClick} />));
 
         const button = screen.getByText(SHOW_HINTS_TEXT);
         fireEvent.click(button);

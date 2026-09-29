@@ -19,7 +19,7 @@ function CookieNotice() {
     const { unlockAchievement } = useAchievements();
 
     const [showCookieMessage, setShowCookieMessage] = useState<boolean>(() => {
-        return (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'false') !== 'true';
+        return (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) ?? 'false') !== 'true';
     });
 
     /**

@@ -1,7 +1,8 @@
-import { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
-import { displayUser, User } from './Users';
-import { NotificationContextType } from './containers/NotificationProvider';
-import { AchievementContextType } from './containers/AchievementProvider';
+import type { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
+import type { User } from './Users';
+import { displayUser } from './Users';
+import type { NotificationContextType } from './containers/NotificationProvider';
+import type { AchievementContextType } from './containers/AchievementProvider';
 
 /**
  * Interface for a terminal command
@@ -87,7 +88,7 @@ function createEnvCommand(environment: Map<string, string>): Command {
 function createExportCommand(environment: Map<string, string>): Command {
     return {
         description: 'Set an environment variable',
-        run: (key, value) => {
+        run: (key: string, value?: string) => {
             if (key.includes('=')) {
                 const splitIndex = key.indexOf('=');
                 value = key.slice(splitIndex + 1);
@@ -112,15 +113,21 @@ function createHelpCommand(commands: Map<string, Command>): Command {
         description: 'Provides a list of commands. Usage: `help [command]`',
         run: (commandName?: string) => {
             if (commandName) {
-                if (commands.get(commandName)?.secret) {
+                const command = commands.get(commandName);
+                // `secret` is optional, so a bare `if (command.secret)` is a
+                // nullable-boolean conditional while `=== true` is a redundant
+                // boolean-literal comparison. Defaulting explicitly satisfies
+                // both readings and states the intent: absent means not secret.
+                const isSecret = command?.secret ?? false;
+                if (isSecret) {
                     return [['I\'m not helping you. It\'s a secret!']];
                 }
-                return [[commands.get(commandName)?.description || `Unknown command: ${commandName}`]];
+                return [[command?.description ?? `Unknown command: ${commandName}`]];
             }
             return [
                 ['List of Commands:'],
                 ...[...commands]
-                    .filter(cmd => !cmd[1].secret)
+                    .filter(([, info]) => !(info.secret ?? false))
                     .map(([name, info]) => [`${name}:`, info.description])
             ];
         }
@@ -218,9 +225,9 @@ function createVersionCommand(): Command {
     return {
         description: 'Show application version and build information',
         run: () => {
-            const version = process.env.REACT_APP_VERSION || 'unknown';
-            const commitHash = process.env.REACT_APP_COMMIT_HASH || 'unknown';
-            const buildDate = process.env.REACT_APP_BUILD_DATE || 'unknown';
+            const version = process.env.REACT_APP_VERSION ?? 'unknown';
+            const commitHash = process.env.REACT_APP_COMMIT_HASH ?? 'unknown';
+            const buildDate = process.env.REACT_APP_BUILD_DATE ?? 'unknown';
 
             return [
                 ['Application Version Information:'],
@@ -275,7 +282,7 @@ function createWhoisCommand(users: Map<string, User>, achievements: AchievementC
         description: 'Tell you a little about a user. Usage: `whois <username>`',
         run: (username: string) => {
             const user = users.get(username);
-            if (user) {
+            if (user !== undefined) {
                 if (username === 'mario') {
                     achievements.unlockAchievement('old_spice_mario');
                 }

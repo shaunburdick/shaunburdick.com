@@ -1,7 +1,10 @@
-import { CommandContext, commandsWithContext } from './Command';
+import type { CommandContext } from './Command';
+import { commandsWithContext } from './Command';
 import type { ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
-import { AchievementId, AchievementUnlocked, coreAchievements } from './containers/AchievementProvider';
-import { displayUser, User } from './Users';
+import type { AchievementId, AchievementUnlocked } from './containers/AchievementProvider';
+import { coreAchievements } from './containers/AchievementProvider';
+import type { User } from './Users';
+import { displayUser } from './Users';
 
 function buildContext(): CommandContext {
     const achievements: AchievementUnlocked[] = [];
@@ -20,10 +23,14 @@ function buildContext(): CommandContext {
         },
         achievements: {
             unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => {
+                const achievementData = coreAchievements[id];
+                if (achievementData === undefined) {
+                    return;
+                }
                 achievements.push({
                     id,
-                    title: coreAchievements[id].title,
-                    description: coreAchievements[id].description,
+                    title: achievementData.title,
+                    description: achievementData.description,
                     unlockedAt: new Date().toISOString()
                 });
             }),
@@ -177,8 +184,8 @@ describe('Command', () => {
         expect(open?.run('https://foo.com')).toEqual([
             ['Opening https://foo.com...']
         ]);
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://foo.com');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://foo.com');
 
         expect(open?.run('ftp://foo.com')).toEqual([
             ['Unknown protocol: ftp:']
@@ -207,8 +214,8 @@ describe('Command', () => {
 
         const response = commands.get('rm')?.run();
 
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
         expect(response).toEqual([
             ['rm never gonna give you up!']
@@ -252,8 +259,8 @@ describe('Command', () => {
 
         const response = commands.get('view-source')?.run();
 
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://github.com/shaunburdick/shaunburdick.com');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://github.com/shaunburdick/shaunburdick.com');
 
         expect(response).toEqual([
             ['Opening GH Page...']
@@ -287,8 +294,8 @@ describe('Command', () => {
         expect(whois?.run('miki')).toEqual([
             ['Hello, miki']
         ]);
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://www.youtube.com/watch?v=YjyUIwKPAxA');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://www.youtube.com/watch?v=YjyUIwKPAxA');
 
         const gfResponse = whois?.run('gamefront');
         expect(Array.isArray(gfResponse)).toBe(true);

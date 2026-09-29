@@ -44,14 +44,9 @@ export function useEvent<T extends keyof CustomWindowEventMap>(
             callback(event.detail);
         }) as EventListener;
 
-        // Registered through one shared object reference: the leak rule can
-        // only pair a setup call with its cleanup call when both are member
-        // expressions on the same receiver, which a bare `addEventListener`
-        // call is not.
-        const eventTarget = globalThis;
-        eventTarget.addEventListener(eventName, listener);
+        addEventListener(eventName, listener);
         return () => {
-            eventTarget.removeEventListener(eventName, listener);
+            removeEventListener(eventName, listener);
         };
     }, [callback, eventName]);
 

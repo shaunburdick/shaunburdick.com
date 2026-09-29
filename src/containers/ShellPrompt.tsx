@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { CommandResult, ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
+import type { CommandResult, ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
 import ShellPromptView from '../components/ShellPrompt/ShellPromptView';
 import { TRACKER_EVENTS, useTracker } from '../hooks/use-tracker';
 import { useEvent, useLocalStorage } from '../hooks';
@@ -75,12 +75,12 @@ function execCommand({ commandName, context, args }: ExecCommandOptions): Consol
     }
 
     const command = context.COMMANDS.get(commandName.toLowerCase());
-    const result = command
-        ? command.run(...args)
-        : [
+    const result = command === undefined
+        ? [
             ['Unknown Command: ', commandName],
             ['Type `help` for assistance']
-        ];
+        ]
+        : command.run(...args);
 
     context.commandUpdateEvent.dispatch({
         command: { name: commandName.toLowerCase(), args },
@@ -211,7 +211,7 @@ function onArrowDown({
 function onEscape({ event, setCommandPointer, setInputValue, inputRef }: EscapeParams): void {
     event.preventDefault();
     setCommandPointer(DEFAULT_COMMAND_POINTER);
-    if (inputRef.current) {
+    if (inputRef.current !== null) {
         inputRef.current.value = '';
     }
     setInputValue('');
@@ -264,7 +264,7 @@ function useCommandCenter({
     );
     const onHintClick = (hint: string) => {
         setInputValue(hint);
-        if (inputRef.current) {
+        if (inputRef.current !== null) {
             inputRef.current.focus();
         }
     };
@@ -284,7 +284,7 @@ interface ShellInit {
  * Creates the initial shell state including the welcome message
  */
 function createShellInit(): ShellInit {
-    const login = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
+    const login = localStorage.getItem(LS_KEY_LAST_LOGIN) ?? 'never';
     const welcome: CommandResult = {
         timestamp: new Date(),
         response: [

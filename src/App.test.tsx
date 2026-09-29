@@ -47,8 +47,8 @@ describe('App', () => {
         jest.clearAllMocks();
     });
 
-    test('Shows an h1 title', () => {
-        act(() => render(
+    test('Shows an h1 title', async () => {
+        await act(() => render(
             <TestWrapper>
                 <App />
             </TestWrapper>

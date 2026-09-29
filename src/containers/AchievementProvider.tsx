@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback, use, Dispatch, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { createContext, useState, useCallback, use } from 'react';
 import { useEvent } from '../hooks';
 
 /**
@@ -49,7 +50,7 @@ export interface AchievementContextType {
 /**
  * Dictionary of core achievements that can be unlocked
  */
-export const coreAchievements: Record<string, Achievement> = {
+export const coreAchievements: Partial<Record<string, Achievement>> = {
     first_command: {
         id: 'first_command',
         title: 'First Command',
@@ -159,29 +160,40 @@ function processAchievementUnlock({
     setAchievements,
     achievementEvent
 }: ProcessUnlockOptions): void {
-    let wasUnlocked = false;
-    let unlockedEntry: AchievementUnlocked | undefined;
+    // Outcome is held in an object rather than in a pair of local `let`s.
+    // TypeScript never models the state updater running, so a local flag stays
+    // narrowed to its initial `false` here and the guard below is reported as
+    // dead code. Property reads are re-evaluated after each call, which is
+    // what actually happens at runtime. Keeping the duplicate check inside the
+    // updater is what makes two unlocks in the same tick collapse to one
+    // entry: `whois mario` unlocks `old_spice_mario` while the shell is still
+    // unlocking `first_command`, and the second updater must see the first
+    // one's result.
+    const outcome: { unlocked: boolean; entry: AchievementUnlocked | undefined } = {
+        unlocked: false,
+        entry: undefined
+    };
 
     setAchievements((currentAchievements) => {
-        const alreadyUnlocked = currentAchievements.some((ach) => ach.id === achievementId);
-        if (alreadyUnlocked) {
+        const isAlreadyUnlocked = currentAchievements.some((ach) => ach.id === achievementId);
+        if (isAlreadyUnlocked) {
             return currentAchievements;
         }
 
-        unlockedEntry = {
+        outcome.entry = {
             id: achievementId,
             title: achievementData.title,
             description: achievementData.description,
             unlockedAt: new Date().toISOString()
         };
-        wasUnlocked = true;
-        const next = [...currentAchievements, unlockedEntry];
+        outcome.unlocked = true;
+        const next = [...currentAchievements, outcome.entry];
         saveAchievements(next);
         return next;
     });
 
-    if (wasUnlocked && unlockedEntry !== undefined) {
-        achievementEvent.dispatch(unlockedEntry);
+    if (outcome.unlocked && outcome.entry !== undefined) {
+        achievementEvent.dispatch(outcome.entry);
     }
 }
 
@@ -208,7 +220,9 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
             return;
         }
 
-        processAchievementUnlock({ achievementId, achievementData, setAchievements, achievementEvent });
+        processAchievementUnlock({
+            achievementId, achievementData, setAchievements, achievementEvent
+        });
     };
 
     const resetAchievements = (): void => {

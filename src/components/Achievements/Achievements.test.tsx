@@ -32,7 +32,7 @@ describe('Achievements React Hooks', () => {
         // Check achievement was added
         expect(result.current.achievements.length).toBe(1);
         expect(result.current.achievements[0].id).toBe('first_command');
-        expect(result.current.achievements[0].title).toBe(coreAchievements.first_command.title);
+        expect(result.current.achievements[0].title).toBe(coreAchievements.first_command?.title);
     });
 
     test('useAchievements prevents duplicate achievements', () => {
@@ -95,7 +95,7 @@ describe('Achievements React Hooks', () => {
 
         // Check localStorage was updated
         const storedAchievements: { id: string }[] =
-            JSON.parse(localStorage.getItem('achievements') || '[]');
+            JSON.parse(localStorage.getItem('achievements') ?? '[]');
         expect(storedAchievements.map(stored => stored.id)).toEqual(['first_command']);
     });
 
@@ -113,7 +113,7 @@ describe('Achievements React Hooks', () => {
                 // Yield to a microtask first so the unlocks interleave the way
                 // they would if each one had come from a separate event.
                 await Promise.resolve();
-                return result.current.unlockAchievement(id as keyof typeof coreAchievements);
+                return result.current.unlockAchievement(id);
             }));
 
             // Execute all promises concurrently
@@ -128,7 +128,7 @@ describe('Achievements React Hooks', () => {
         expect(result.current.hasAchievement('secret_command')).toBe(true);
 
         // Verify localStorage was updated correctly with all achievements
-        const storedAchievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+        const storedAchievements = JSON.parse(localStorage.getItem('achievements') ?? '[]');
         expect(storedAchievements.length).toBe(4);
 
         // Try unlocking the same achievements again
@@ -154,8 +154,7 @@ describe('Achievements React Hooks', () => {
 
     test('localStorage error handling in getStoredValue', () => {
         // Test localStorage error handling
-        const originalGetItem = Storage.prototype.getItem;
-        Storage.prototype.getItem = jest.fn(() => {
+        const getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
             throw new Error('localStorage error');
         });
 
@@ -164,13 +163,12 @@ describe('Achievements React Hooks', () => {
         // Should return empty array as initial value when localStorage fails
         expect(result.current.achievements).toEqual([]);
 
-        Storage.prototype.getItem = originalGetItem;
+        getItemSpy.mockRestore();
     });
 
     test('localStorage error handling in setValue', () => {
         // Test localStorage.setItem error handling
-        const originalSetItem = Storage.prototype.setItem;
-        Storage.prototype.setItem = jest.fn(() => {
+        const setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
             throw new Error('localStorage setItem error');
         });
 
@@ -183,6 +181,6 @@ describe('Achievements React Hooks', () => {
             });
         }).not.toThrow();
 
-        Storage.prototype.setItem = originalSetItem;
+        setItemSpy.mockRestore();
     });
 });

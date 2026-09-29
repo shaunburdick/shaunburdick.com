@@ -40,7 +40,7 @@ function Hints({ hintClick }: HintsProps) {
      * @param hint - The hint text that was clicked
      */
     const handleHintClick = (hint: string) => {
-        if (hintClick) {
+        if (hintClick !== undefined) {
             hintClick(hint);
         }
     };

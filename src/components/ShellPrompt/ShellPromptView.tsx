@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import ConsoleOutput, { CommandResult, joinConsoleLine } from '../ConsoleOutput/ConsoleOutput';
+import type { CommandResult } from '../ConsoleOutput/ConsoleOutput';
+import ConsoleOutput, { joinConsoleLine } from '../ConsoleOutput/ConsoleOutput';
 import Hints from '../../containers/Hints';
 import './ShellPrompt.css';
 
@@ -153,7 +154,7 @@ function useScrollToBottom(consoleLines: CommandResult[]) {
 
     useEffect(() => {
         const timerId = setTimeout(() => {
-            if (preBottomRef.current?.scrollIntoView) {
+            if (typeof preBottomRef.current?.scrollIntoView === 'function') {
                 preBottomRef.current.scrollIntoView({ behavior: 'smooth' });
             }
         }, 0);
@@ -198,7 +199,7 @@ function ShellPromptView({
                 aria-description='This area is meant to depict an older styled computer console
                 where commands can be typed and responses will be shown.'>
                 {consoleOutputs}
-                {lastCommand && <LastCommandOutput commandResult={lastCommand} />}
+                {lastCommand !== undefined && <LastCommandOutput commandResult={lastCommand} />}
                 <span ref={preBottomRef} />
             </pre>
             <ShellForm

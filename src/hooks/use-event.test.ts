@@ -10,11 +10,9 @@ describe('useEvent', () => {
     /**
      * Spies installed on the global event APIs for the whole suite.
      */
-    const globalEventSpies = {
-        addListener: jest.spyOn(globalThis, 'addEventListener'),
-        removeListener: jest.spyOn(globalThis, 'removeEventListener'),
-        dispatchListener: jest.spyOn(globalThis, 'dispatchEvent'),
-    };
+    const addEventListenerSpy = jest.spyOn(globalThis, 'addEventListener');
+    const removeEventListenerSpy = jest.spyOn(globalThis, 'removeEventListener');
+    const dispatchEventSpy = jest.spyOn(globalThis, 'dispatchEvent');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -27,8 +25,8 @@ describe('useEvent', () => {
         const mockCallback = jest.fn();
         renderHook(() => useEvent('onCommand', mockCallback));
 
-        expect(globalEventSpies.addListener).toHaveBeenCalledTimes(1);
-        expect(globalEventSpies.addListener).toHaveBeenCalledWith('onCommand', expect.any(Function));
+        expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+        expect(addEventListenerSpy).toHaveBeenCalledWith('onCommand', expect.any(Function));
     });
 
     /**
@@ -40,8 +38,8 @@ describe('useEvent', () => {
 
         unmount();
 
-        expect(globalEventSpies.removeListener).toHaveBeenCalledTimes(1);
-        expect(globalEventSpies.removeListener).toHaveBeenCalledWith('onCommand', expect.any(Function));
+        expect(removeEventListenerSpy).toHaveBeenCalledTimes(1);
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('onCommand', expect.any(Function));
     });
 
     /**
@@ -50,7 +48,7 @@ describe('useEvent', () => {
     test('does not add event listener when callback is undefined', () => {
         renderHook(() => useEvent('onCommand'));
 
-        expect(globalEventSpies.addListener).not.toHaveBeenCalled();
+        expect(addEventListenerSpy).not.toHaveBeenCalled();
     });
 
     /**
@@ -114,8 +112,8 @@ describe('useEvent', () => {
             result.current.dispatch(mockCommandEvent);
         });
 
-        expect(globalEventSpies.dispatchListener).toHaveBeenCalledTimes(1);
-        expect(globalEventSpies.dispatchListener).toHaveBeenCalledWith(
+        expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
+        expect(dispatchEventSpy).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: 'onCommand',
                 detail: mockCommandEvent

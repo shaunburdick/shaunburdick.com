@@ -1,4 +1,4 @@
-import { ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
+import type { ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
 
 /**
  * User interface representing a user in the system
@@ -42,16 +42,16 @@ export function displayUser(user: User): ConsoleLine[] {
         response.push([<img src={user.image} alt={user.name} key={user.name} width={'50%'}/>]);
     }
     response.push(['Name: ', user.name]);
-    if (user.occupation) {
+    if (user.occupation !== undefined) {
         response.push(['Occupation: ', JSON.stringify(user.occupation)]);
     }
     if (user.location) {
         response.push(['Location: ', user.location]);
     }
-    if (user.expertise) {
+    if (user.expertise !== undefined) {
         response.push(['Expertise: ', JSON.stringify(user.expertise, null, 2)]);
     }
-    if (user.links) {
+    if (user.links !== undefined) {
         response.push(['Links: ', ...user.links.map(link => <a key={link.url} href={link.url}>{link.text}</a>)]);
     }
 

@@ -1,4 +1,5 @@
-import React, { createContext, useState, use, ReactNode, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import React, { createContext, useState, use, useEffect } from 'react';
 import { NotificationView } from '../components/Notification/NotificationView';
 
 /**
@@ -109,7 +110,7 @@ export function Notification({ id, message, duration = 3000, onClose }: Notifica
             setVisible(false);
             // Remove from provider state after hiding
             remove(id);
-            if (onClose) {
+            if (onClose !== undefined) {
                 onClose();
             }
         }, duration);

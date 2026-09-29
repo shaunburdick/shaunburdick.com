@@ -75,7 +75,7 @@ export function joinConsoleLine(cells: ConsoleLine): React.ReactNode {
 function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
     let responseSpans: React.JSX.Element[] | undefined;
 
-    if (commandResult) {
+    if (commandResult !== undefined) {
         const spans: React.JSX.Element[] = [];
         for (const commandLine of commandResult.response) {
             const key = `line-${spans.length}`;
@@ -90,7 +90,7 @@ function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
 
     return (
         <div style={{ marginTop: '1.5em' }} aria-live={ariaLive}>
-            {commandResult &&
+            {commandResult !== undefined &&
                 <>
                     {'command' in commandResult &&
                     <span title={commandResult.timestamp.toISOString()} aria-label='The command that was run'>
