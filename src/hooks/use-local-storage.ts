@@ -8,13 +8,28 @@ import { useState } from 'react';
  * @param value - value to store
  * @returns true if the write succeeded, false otherwise
  */
-function safeSetItem(key: string, value: string): boolean {
+function canSetItem(key: string, value: string): boolean {
     try {
         localStorage.setItem(key, value);
         return true;
     } catch {
         return false;
     }
+}
+
+/**
+ * Narrow a `T | updater` union to its function arm.
+ *
+ * A bare `typeof value === 'function'` only narrows to `T & Function`, which
+ * TypeScript does not treat as callable, so the explicit predicate does the
+ * narrowing that `instanceof Function` used to do (and which
+ * `unicorn/no-instanceof-builtins` forbids).
+ *
+ * @param value - Value that may be a state updater
+ * @returns Whether `value` is callable
+ */
+function isStateUpdater<T>(value: T | ((prev: T) => T)): value is (prev: T) => T {
+    return typeof value === 'function';
 }
 
 /**
@@ -29,11 +44,10 @@ function safeSetItem(key: string, value: string): boolean {
  * const [name, setName] = useLocalStorage('userName', 'Anonymous');
  * setName('John'); // Stores to localStorage and updates state
  */
-export const useLocalStorage = <T,>(
+export function useLocalStorage<T>(
     key: string,
     initialValue: T
-): [T, (value: T | ((prev: T) => T)) => void] => {
-    // Get from localStorage on initial render
+): [T, (value: T | ((prev: T) => T)) => void] {
     const getStoredValue = (): T => {
         try {
             const item = localStorage.getItem(key);
@@ -50,15 +64,15 @@ export const useLocalStorage = <T,>(
         // Use React's functional update to access current state reliably
         setStoredValue((currentState) => {
             // Handle both direct values and functional updates
-            const valueToStore = value instanceof Function ? value(currentState) : value;
+            const valueToStore = isStateUpdater(value) ? value(currentState) : value;
 
             // Persist to localStorage - best-effort, silently ignore failures.
             // A failed write should never block state updates.
-            safeSetItem(key, JSON.stringify(valueToStore));
+            canSetItem(key, JSON.stringify(valueToStore));
 
             return valueToStore;
         });
     };
 
     return [storedValue, setValue];
-};
+}

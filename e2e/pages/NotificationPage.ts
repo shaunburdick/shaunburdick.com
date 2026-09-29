@@ -81,7 +81,7 @@ export class NotificationPage extends BasePage {
      * @param timeout - Maximum wait time in milliseconds
      * @returns Promise that resolves when all notifications are gone
      */
-    public async waitForAllNotificationsToDisappear(timeout = 10000): Promise<void> {
+    public async waitForAllNotificationsToDisappear(timeout = 10_000): Promise<void> {
         await this.page.waitForSelector('[role="alert"].notification', {
             state: 'hidden',
             timeout

@@ -3,16 +3,16 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { AchievementProvider } from '../../containers/AchievementProvider';
 import CookieNotice, { LS_COOKIE_ACKNOWLEDGE } from '../../containers/CookieNotice';
 
-describe('CookieNotice', () => {
-    // Helper function to wrap component with providers
-    const renderWithProviders = (component: React.ReactElement) => {
-        return render(
-            <AchievementProvider>
-                {component}
-            </AchievementProvider>
-        );
-    };
+// Helper function to wrap component with providers
+const renderWithProviders = (component: React.ReactElement) => {
+    return render(
+        <AchievementProvider>
+            {component}
+        </AchievementProvider>
+    );
+};
 
+describe('CookieNotice', () => {
     const COOKIE_NOTICE_SELECTOR = '[aria-label="Cookie Notice"]';
 
     beforeEach(() => {

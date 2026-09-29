@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/base';
+import { test, expect } from '../fixtures/test';
 import { TerminalPage } from '../pages';
 
 /**

@@ -30,4 +30,6 @@ export const TrackerContext = createContext(tracker);
  *
  * @returns Plausible tracker instance for tracking events and pageviews
  */
-export const useTracker = () => use(TrackerContext);
+export function useTracker(): typeof tracker {
+    return use(TrackerContext);
+}

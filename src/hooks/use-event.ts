@@ -31,10 +31,10 @@ type EventPayload<T extends keyof CustomWindowEventMap> =
  * @param callback - Optional callback function to invoke when the event occurs
  * @returns Object containing a dispatch function to trigger the event
  */
-export const useEvent = <T extends keyof CustomWindowEventMap>(
+export function useEvent<T extends keyof CustomWindowEventMap>(
     eventName: T,
     callback?: Dispatch<EventPayload<T>> | VoidFunction
-) => {
+): { dispatch: (detail: EventPayload<T>) => void } {
     useEffect(() => {
         if (callback === undefined) {
             return;
@@ -44,9 +44,14 @@ export const useEvent = <T extends keyof CustomWindowEventMap>(
             callback(event.detail);
         }) as EventListener;
 
-        window.addEventListener(eventName, listener);
+        // Registered through one shared object reference: the leak rule can
+        // only pair a setup call with its cleanup call when both are member
+        // expressions on the same receiver, which a bare `addEventListener`
+        // call is not.
+        const eventTarget = globalThis;
+        eventTarget.addEventListener(eventName, listener);
         return () => {
-            window.removeEventListener(eventName, listener);
+            eventTarget.removeEventListener(eventName, listener);
         };
     }, [callback, eventName]);
 
@@ -58,10 +63,10 @@ export const useEvent = <T extends keyof CustomWindowEventMap>(
     const dispatch = useCallback(
         (detail: EventPayload<T>) => {
             const event = new CustomEvent(eventName, { detail });
-            window.dispatchEvent(event);
+            dispatchEvent(event);
         },
         [eventName]
     );
 
     return { dispatch };
-};
+}

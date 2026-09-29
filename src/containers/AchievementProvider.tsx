@@ -194,7 +194,7 @@ export const AchievementContext = createContext<AchievementContextType | undefin
  * @param props - Component props containing children
  * @returns AchievementProvider wrapping children
  */
-export function AchievementProvider({ children }: { children: React.ReactNode }) {
+export function AchievementProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const [achievements, setAchievements] = useState<AchievementUnlocked[]>(loadAchievements);
     const achievementEvent = useEvent('onAchievement');
 
@@ -233,10 +233,10 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
  *
  * @returns Achievement context
  */
-export const useAchievements = (): AchievementContextType => {
+export function useAchievements(): AchievementContextType {
     const context = use(AchievementContext);
     if (context === undefined) {
         throw new Error('useAchievements must be used within an AchievementProvider');
     }
     return context;
-};
+}

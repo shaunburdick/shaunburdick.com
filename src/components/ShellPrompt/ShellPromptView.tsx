@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import ConsoleOutput, { CommandResult } from '../ConsoleOutput/ConsoleOutput';
+import ConsoleOutput, { CommandResult, joinConsoleLine } from '../ConsoleOutput/ConsoleOutput';
 import Hints from '../../containers/Hints';
 import './ShellPrompt.css';
 
@@ -70,7 +70,7 @@ function LastCommandOutput({ commandResult }: LastCommandOutputProps) {
         const key = `line-${responseLines.length}`;
         responseLines.push(
             <span key={key}>
-                {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
+                {'\n'}{joinConsoleLine(commandLine)}
             </span>
         );
     }
@@ -156,7 +156,7 @@ function useScrollToBottom(consoleLines: CommandResult[]) {
             if (preBottomRef.current?.scrollIntoView) {
                 preBottomRef.current.scrollIntoView({ behavior: 'smooth' });
             }
-        });
+        }, 0);
 
         return () => clearTimeout(timerId);
     }, [consoleLines]);
@@ -182,7 +182,8 @@ function ShellPromptView({
     onInputChange
 }: ShellPromptViewProps) {
     const consoleOutputs: React.JSX.Element[] = [];
-    for (const commandResult of consoleLines.slice(0, -1)) {
+    const settledLines = consoleLines.slice(0, -1);
+    for (const commandResult of settledLines) {
         const key = `cmd-${consoleOutputs.length}`;
         consoleOutputs.push(<ConsoleOutput key={key} commandResult={commandResult}/>);
     }

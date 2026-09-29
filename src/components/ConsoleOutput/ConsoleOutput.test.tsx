@@ -45,7 +45,7 @@ describe('ConsoleOutput', () => {
 
         expect(screen.getByText(`${testCommands.basic.command}`)).toBeInTheDocument();
         expect(screen.getByText(`${testCommands.basic.response[0][0]}`)).toBeInTheDocument();
-        expect(document.body.querySelector('div [aria-live=polite]')).toBeInTheDocument();
+        expect(document.body.querySelector(':scope div [aria-live=polite]')).toBeInTheDocument();
     });
 
     test('Show empty command if an empty command is sent', () => {
@@ -70,7 +70,8 @@ describe('ConsoleOutput', () => {
         expect(screen.getByText(`${testCommands.multiLine.command}`)).toBeInTheDocument();
 
         for (const line of testCommands.multiLine.response) {
-            expect(screen.getByText(`${line[0]}`)).toBeInTheDocument();
+            const [first = ''] = line;
+            expect(screen.getByText(`${first}`)).toBeInTheDocument();
         }
     });
 });

@@ -42,6 +42,28 @@ interface ConsoleOutputProps {
 }
 
 /**
+ * Join the cells of a single console line with single spaces.
+ *
+ * Implemented as a loop rather than `Array#reduce` and without a `.map()` of
+ * children, so no array-index keys are needed. Cells that are JSX (links,
+ * avatars) are kept as elements rather than being stringified.
+ *
+ * @param cells - Cells making up one console line
+ * @returns The joined line as a single child, or null for an empty line
+ */
+export function joinConsoleLine(cells: ConsoleLine): React.ReactNode {
+    let joined: React.ReactNode = null;
+
+    for (const cell of cells) {
+        joined = joined === null
+            ? cell
+            : <>{joined}{' '}{cell}</>;
+    }
+
+    return joined;
+}
+
+/**
  * Creates a representation of a Console output
  * Displays the command that was run and its response
  *
@@ -59,7 +81,7 @@ function ConsoleOutput({ ariaLive, commandResult }: ConsoleOutputProps) {
             const key = `line-${spans.length}`;
             spans.push(
                 <span key={key}>
-                    {'\n'}{commandLine.reduce((result, item) => <>{result}{' '}{item}</>)}
+                    {'\n'}{joinConsoleLine(commandLine)}
                 </span>
             );
         }

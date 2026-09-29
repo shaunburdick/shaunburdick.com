@@ -58,7 +58,6 @@ export class TerminalPage extends BasePage {
     // Wait for any new content to render
         await this.page.waitForTimeout(OUTPUT_TIMEOUT_MS);
 
-        // Get the last div with aria-live inside the console output pre element
         const liveRegion = this.consoleOutput.locator('[aria-live="polite"]').last();
         const text = await liveRegion.textContent();
         return text ?? '';
@@ -157,7 +156,6 @@ export class TerminalPage extends BasePage {
      * @returns Promise that resolves when hint is clicked
      */
     public async clickHint(hintText: string): Promise<void> {
-        // Get all hint buttons and find the one with matching text
         const hintButtons = this.page.getByTestId('hint-button');
         const count = await hintButtons.count();
 

@@ -60,7 +60,7 @@ function createClearCommand(
             setTimeout(() => {
                 setConsoleLines([]);
                 setLastCommand(undefined);
-            });
+            }, 0);
 
             return [];
         }
@@ -74,11 +74,7 @@ function createEnvCommand(environment: Map<string, string>): Command {
     return {
         description: 'Print Environment',
         run: () => {
-            const response: ConsoleLine[] = [];
-
-            for (const [key, value] of environment.entries()) {
-                response.push([`${key}=${value}`]);
-            }
+            const response: ConsoleLine[] = Array.from(environment, ([key, value]) => [`${key}=${value}`]);
 
             return response;
         }
@@ -98,13 +94,12 @@ function createExportCommand(environment: Map<string, string>): Command {
                 key = key.slice(0, splitIndex);
             }
 
-            if (typeof value === 'undefined') {
+            if (value === undefined) {
                 environment.delete(key);
                 return [[`${key}=`]];
-            } else {
-                environment.set(key, value);
-                return [[`${key}=${value}`]];
             }
+            environment.set(key, value);
+            return [[`${key}=${value}`]];
         }
     };
 }
@@ -119,17 +114,15 @@ function createHelpCommand(commands: Map<string, Command>): Command {
             if (commandName) {
                 if (commands.get(commandName)?.secret) {
                     return [['I\'m not helping you. It\'s a secret!']];
-                } else {
-                    return [[commands.get(commandName)?.description || `Unknown command: ${commandName}`]];
                 }
-            } else {
-                return [
-                    ['List of Commands:'],
-                    ...[...commands]
-                        .filter(cmd => !cmd[1].secret)
-                        .map(([name, info]) => [`${name}:`, info.description])
-                ];
+                return [[commands.get(commandName)?.description || `Unknown command: ${commandName}`]];
             }
+            return [
+                ['List of Commands:'],
+                ...[...commands]
+                    .filter(cmd => !cmd[1].secret)
+                    .map(([name, info]) => [`${name}:`, info.description])
+            ];
         }
     };
 }
@@ -156,9 +149,8 @@ function createOpenCommand(): Command {
                 if (['http:', 'https:'].includes(url.protocol)) {
                     window.open(target);
                     return [[`Opening ${target}...`]];
-                } else {
-                    return [[`Unknown protocol: ${url.protocol}`]];
                 }
+                return [[`Unknown protocol: ${url.protocol}`]];
             } catch {
                 return [[`Cannot open: ${target}`]];
             }
@@ -210,7 +202,12 @@ function createSecretCommand(achievements: AchievementContextType): Command {
 function createUsersCommand(users: Map<string, User>): Command {
     return {
         description: 'List users',
-        run: () => [...users.keys()].sort().map(userName => [userName])
+        run: () =>
+            users
+                .keys()
+                .toArray()
+                .toSorted((left, right) => (left < right ? -1 : Number(left > right)))
+                .map(username => [username])
     };
 }
 
@@ -283,14 +280,15 @@ function createWhoisCommand(users: Map<string, User>, achievements: AchievementC
                     achievements.unlockAchievement('old_spice_mario');
                 }
                 return displayUser(user);
-            } else if (/miki|mikey|faktrl/.test(username)) {
+            }
+            if (/miki|mikey|faktrl/.test(username)) {
                 window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
                 return [[`Hello, ${username}`]];
-            } else if (username === 'gamefront') {
-                return [[<a key='gf-link' href='https://gamefront.com'>Gamefront</a>, 'is just FilesNetwork with a better skin']];
-            } else {
-                return [[`Unknown user: ${username || ''}`]];
             }
+            if (username === 'gamefront') {
+                return [[<a key='gf-link' href='https://gamefront.com'>Gamefront</a>, 'is just FilesNetwork with a better skin']];
+            }
+            return [[`Unknown user: ${username || ''}`]];
         }
     };
 }
@@ -301,7 +299,7 @@ function createWhoisCommand(users: Map<string, User>, achievements: AchievementC
  * @param context - The command context containing system state
  * @returns Map of command names to command implementations
  */
-export const commandsWithContext = ({
+export function commandsWithContext({
     commandHistory,
     environment,
     setConsoleLines,
@@ -309,25 +307,27 @@ export const commandsWithContext = ({
     users,
     workingDir,
     achievements
-}: CommandContext): Map<string, Command> => {
-    const COMMANDS = new Map<string, Command>();
+}: CommandContext): Map<string, Command> {
+    const commandEntries: [string, Command][] = [
+        ['clear', createClearCommand(setConsoleLines, setLastCommand)],
+        ['env', createEnvCommand(environment)],
+        ['export', createExportCommand(environment)],
+        ['history', createHistoryCommand(commandHistory)],
+        ['open', createOpenCommand()],
+        ['pwd', createPwdCommand(workingDir)],
+        ['rm', createRmCommand(achievements)],
+        ['secret', createSecretCommand(achievements)],
+        ['users', createUsersCommand(users)],
+        ['version', createVersionCommand()],
+        ['view-source', createViewSourceCommand()],
+        ['whoami', createWhoamiCommand(achievements)],
+        ['whois', createWhoisCommand(users, achievements)]
+    ];
 
-    COMMANDS.set('clear', createClearCommand(setConsoleLines, setLastCommand));
-    COMMANDS.set('env', createEnvCommand(environment));
-    COMMANDS.set('export', createExportCommand(environment));
-    COMMANDS.set('history', createHistoryCommand(commandHistory));
-    COMMANDS.set('open', createOpenCommand());
-    COMMANDS.set('pwd', createPwdCommand(workingDir));
-    COMMANDS.set('rm', createRmCommand(achievements));
-    COMMANDS.set('secret', createSecretCommand(achievements));
-    COMMANDS.set('users', createUsersCommand(users));
-    COMMANDS.set('version', createVersionCommand());
-    COMMANDS.set('view-source', createViewSourceCommand());
-    COMMANDS.set('whoami', createWhoamiCommand(achievements));
-    COMMANDS.set('whois', createWhoisCommand(users, achievements));
+    const commandMap = new Map<string, Command>(commandEntries);
 
     // help command needs access to the full command map for lookups
-    COMMANDS.set('help', createHelpCommand(COMMANDS));
+    commandMap.set('help', createHelpCommand(commandMap));
 
-    return COMMANDS;
-};
+    return commandMap;
+}

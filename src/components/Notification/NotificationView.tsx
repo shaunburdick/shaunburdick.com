@@ -18,7 +18,7 @@ interface NotificationViewProps {
  * @param props - Component props
  * @returns Notification JSX
  */
-export function NotificationView({ id, message, duration, visible }: NotificationViewProps) {
+export function NotificationView({ id, message, duration, visible }: NotificationViewProps): React.JSX.Element | null {
     if (!visible) {
         return null;
     }

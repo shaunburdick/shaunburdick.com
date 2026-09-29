@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TRACKER_EVENTS, useTracker } from '../hooks/useTracker';
+import { TRACKER_EVENTS, useTracker } from '../hooks/use-tracker';
 import HintsView from '../components/Hints/HintsView';
 
 /**
@@ -29,9 +29,9 @@ function Hints({ hintClick }: HintsProps) {
      * Toggle the visibility of hints and track the event
      */
     const handleToggle = () => {
-        const newState = !showHints;
-        tracker.trackEvent(TRACKER_EVENTS.ToggleHints, { props: { ack: newState } });
-        setShowHints(newState);
+        const isNewState = !showHints;
+        tracker.trackEvent(TRACKER_EVENTS.ToggleHints, { props: { ack: isNewState } });
+        setShowHints(isNewState);
     };
 
     /**

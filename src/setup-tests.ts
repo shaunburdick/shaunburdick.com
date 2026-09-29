@@ -4,8 +4,6 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-global.console = {
-    ...console,
-    // disable warnings due to Plausible library...
-    warn: jest.fn()
-};
+// Plausible logs through console.warn; replace just that channel in tests so
+// the rest of the console surface (error, log, debug) stays intact.
+Object.assign(console, { warn: jest.fn() });

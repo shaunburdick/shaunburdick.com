@@ -31,7 +31,7 @@ export class BasePage {
      * @param locator - Playwright locator
      * @param timeout - Maximum wait time in milliseconds
      */
-    public async waitForVisible(locator: Locator, timeout = 10000): Promise<void> {
+    public async waitForVisible(locator: Locator, timeout = 10_000): Promise<void> {
         await locator.waitFor({ state: 'visible', timeout });
     }
 
@@ -41,7 +41,7 @@ export class BasePage {
      * @param locator - Playwright locator
      * @param timeout - Maximum wait time in milliseconds
      */
-    public async waitForHidden(locator: Locator, timeout = 10000): Promise<void> {
+    public async waitForHidden(locator: Locator, timeout = 10_000): Promise<void> {
         await locator.waitFor({ state: 'hidden', timeout });
     }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CookieNoticeView from '../components/CookieNotice/CookieNoticeView';
-import { TRACKER_EVENTS, useTracker } from '../hooks/useTracker';
+import { TRACKER_EVENTS, useTracker } from '../hooks/use-tracker';
 import { useAchievements } from './AchievementProvider';
 
 /**
@@ -37,7 +37,7 @@ function CookieNotice() {
      */
     const handleReject = () => {
         tracker.trackEvent(TRACKER_EVENTS.CookieAcknowledge, { props: { ack: false } });
-        window.location.href = 'https://www.oreo.com/';
+        location.assign('https://www.oreo.com/');
     };
 
     return (

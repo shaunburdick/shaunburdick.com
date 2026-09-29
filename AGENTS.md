@@ -19,7 +19,7 @@ This is a **terminal-style React personal website** that simulates a retro VT te
 - **Example**: Adding new commands requires updating the COMMANDS Map in `commandsWithContext()`
 
 ### Event-Driven Architecture
-- **Custom Events**: `src/hooks/useEvent.ts` provides typed custom events (`onAchievement`, `onCommand`)
+- **Custom Events**: `src/hooks/use-event.ts` provides typed custom events (`onAchievement`, `onCommand`)
 - **Achievement System**: `src/containers/AchievementProvider.tsx` manages unlockable easter eggs
 - **Analytics Integration**: Plausible tracker automatically captures command usage and achievements
 
@@ -73,7 +73,7 @@ src/
 - **Directory Structure**:
   ```
   e2e/
-  ├── fixtures/base.ts        # Extended test fixture with setup/teardown
+  ├── fixtures/test.ts        # Extended test fixture with setup/teardown
   ├── pages/                  # Page Object Model
   │   ├── BasePage.ts        # Base class with common functionality
   │   ├── TerminalPage.ts    # Terminal/console interactions

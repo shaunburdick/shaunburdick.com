@@ -94,9 +94,9 @@ describe('Achievements React Hooks', () => {
         });
 
         // Check localStorage was updated
-        const storedAchievements = JSON.parse(localStorage.getItem('achievements') || '[]');
-        expect(storedAchievements.length).toBe(1);
-        expect(storedAchievements[0].id).toBe('first_command');
+        const storedAchievements: { id: string }[] =
+            JSON.parse(localStorage.getItem('achievements') || '[]');
+        expect(storedAchievements.map(stored => stored.id)).toEqual(['first_command']);
     });
 
     test('handles concurrent achievement unlocks atomically', async () => {
@@ -104,13 +104,15 @@ describe('Achievements React Hooks', () => {
 
         // Simulate multiple concurrent achievement unlocks
         await act(async () => {
-            // Create an array of achievement unlock promises
             const unlockPromises = [
                 'first_command',
                 'who_are_you',
                 'accept_cookies',
                 'secret_command'
-            ].map(id => Promise.resolve().then(() => {
+            ].map(id => Promise.try(async () => {
+                // Yield to a microtask first so the unlocks interleave the way
+                // they would if each one had come from a separate event.
+                await Promise.resolve();
                 return result.current.unlockAchievement(id as keyof typeof coreAchievements);
             }));
 

@@ -14,6 +14,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 const CONSOLE_INPUT_SELECTOR = '#console-input';
+const CONSOLE_LINE_SELECTOR = ':scope pre > div';
 const ARROW_DOWN_KEY = '{ArrowDown}';
 const ARROW_UP_KEY = '{ArrowUp}';
 const WHOIS_SHAUN_TEXT = 'whois shaun';
@@ -51,7 +52,7 @@ describe('ShellPrompt', () => {
                 await userEvent.keyboard('command2{Enter}');
                 await userEvent.keyboard('command3{Enter}');
 
-                const consoleCommands = document.body.querySelectorAll('pre > div');
+                const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
                 expect(consoleCommands.length).toBe(4); // +1 for welcome message
                 expect(localStorage.getItem(LS_KEY_COMMAND_HISTORY))
                     .toEqual(JSON.stringify(['command1', 'command2', 'command3']));
@@ -85,7 +86,7 @@ describe('ShellPrompt', () => {
 
                 await userEvent.keyboard('clear{Enter}');
 
-                const consoleCommands = document.body.querySelectorAll('pre > div');
+                const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
                 expect(consoleCommands.length).toBe(0);
             });
         });
@@ -172,7 +173,6 @@ describe('ShellPrompt', () => {
             // Test null check for inputRef.current
             const component = renderWithProviders(<ShellPrompt />);
 
-            // Get the ShellPrompt instance to access internal methods
             const input = screen.getByRole('textbox') as HTMLInputElement;
 
             // Mock inputRef.current to be null temporarily
@@ -201,7 +201,7 @@ describe('ShellPrompt', () => {
             // Test non-existent command
             await userEvent.keyboard('nonexistent{Enter}');
 
-            const consoleCommands = document.body.querySelectorAll('pre > div');
+            const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
             expect(consoleCommands.length).toBeGreaterThan(4);
         });
 
@@ -248,7 +248,7 @@ describe('ShellPrompt', () => {
             await userEvent.keyboard('{Enter}');
 
             // Should still have console output
-            const consoleCommands = document.body.querySelectorAll('pre > div');
+            const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
             expect(consoleCommands.length).toBeGreaterThan(0);
         });
 

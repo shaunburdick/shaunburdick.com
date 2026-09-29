@@ -2,7 +2,7 @@ import './App.css';
 
 import ShellPrompt from './containers/ShellPrompt';
 import CookieNotice from './containers/CookieNotice';
-import { TRACKER_EVENTS, useTracker } from './hooks/useTracker';
+import { TRACKER_EVENTS, useTracker } from './hooks/use-tracker';
 import { Notifications, useNotification } from './containers/NotificationProvider';
 import { useEvent } from './hooks';
 
@@ -12,7 +12,7 @@ import { useEvent } from './hooks';
  *
  * @returns The main application component with terminal-style UI
  */
-function App() {
+export default function App(): React.JSX.Element {
 
     const tracker = useTracker();
     const notifications = useNotification();
@@ -58,5 +58,3 @@ function App() {
         </>
     );
 }
-
-export default App;

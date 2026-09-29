@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { CommandResult, ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
 import ShellPromptView from '../components/ShellPrompt/ShellPromptView';
-import { TRACKER_EVENTS, useTracker } from '../hooks/useTracker';
+import { TRACKER_EVENTS, useTracker } from '../hooks/use-tracker';
 import { useEvent, useLocalStorage } from '../hooks';
 import { USERS } from '../Users';
 import { commandsWithContext } from '../Command';
@@ -177,11 +177,14 @@ function onArrowUp({
 }: ArrowUpParams): void {
     event.preventDefault();
     tracker.trackEvent(TRACKER_EVENTS.HistoryUpArrow);
-    if (commandPointer < commandHistory.length) {
-        const newPointer = commandPointer + 1;
-        setCommandPointer(newPointer);
-        setInputValue(commandHistory[commandHistory.length - newPointer]);
+
+    if (commandPointer >= commandHistory.length) {
+        return;
     }
+
+    const newPointer = commandPointer + 1;
+    setCommandPointer(newPointer);
+    setInputValue(commandHistory[commandHistory.length - newPointer]);
 }
 
 /**
@@ -192,11 +195,14 @@ function onArrowDown({
     setCommandPointer, setInputValue
 }: ArrowDownParams): void {
     event.preventDefault();
-    if (commandPointer > DEFAULT_COMMAND_POINTER) {
-        const newPointer = commandPointer - 1;
-        setCommandPointer(newPointer);
-        setInputValue(newPointer === 0 ? '' : commandHistory[commandHistory.length - newPointer]);
+
+    if (commandPointer <= DEFAULT_COMMAND_POINTER) {
+        return;
     }
+
+    const newPointer = commandPointer - 1;
+    setCommandPointer(newPointer);
+    setInputValue(newPointer === 0 ? '' : commandHistory[commandHistory.length - newPointer]);
 }
 
 /**
@@ -368,7 +374,7 @@ function useShellState(): ShellState {
  *
  * @returns Shell prompt container
  */
-function ShellPrompt() {
+export default function ShellPrompt(): React.JSX.Element {
     const {
         consoleLines,
         lastCommand,
@@ -393,5 +399,3 @@ function ShellPrompt() {
         />
     );
 }
-
-export default ShellPrompt;

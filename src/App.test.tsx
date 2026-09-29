@@ -3,16 +3,15 @@ import { render, screen } from '@testing-library/react';
 import { AchievementProvider } from './containers/AchievementProvider';
 import { NotificationProvider } from './containers/NotificationProvider';
 import App from './App';
-import { TRACKER_EVENTS } from './hooks/useTracker';
+import { TRACKER_EVENTS } from './hooks/use-tracker';
 
-// Create mock functions
 const mockTrackEvent = jest.fn();
 const mockTrackPageview = jest.fn();
 const mockEnableAutoOutboundTracking = jest.fn();
 const mockAddNotification = jest.fn();
 
 // Mock the useTracker hook
-jest.mock('./hooks/useTracker', () => ({
+jest.mock('./hooks/use-tracker', () => ({
     TRACKER_EVENTS: {
         AchievementUnlocked: 'achievement_unlocked',
         ExecCommand: 'exec_command',
@@ -73,7 +72,7 @@ describe('App', () => {
         };
 
         act(() => {
-            window.dispatchEvent(new CustomEvent('onAchievement', {
+            dispatchEvent(new CustomEvent('onAchievement', {
                 detail: achievementDetail
             }));
         });
@@ -112,7 +111,7 @@ describe('App', () => {
         };
 
         act(() => {
-            window.dispatchEvent(new CustomEvent('onCommand', {
+            dispatchEvent(new CustomEvent('onCommand', {
                 detail: commandDetail
             }));
         });

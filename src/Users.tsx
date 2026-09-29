@@ -30,17 +30,12 @@ export interface User {
 }
 
 /**
- * A map of users known on the system
- */
-export const USERS = new Map<string, User>();
-
-/**
  * Format a user object into console-friendly output lines
  *
  * @param user - User object to display
  * @returns Array of console lines representing the user's information
  */
-export const displayUser = (user: User) => {
+export function displayUser(user: User): ConsoleLine[] {
     const response: ConsoleLine[] = [];
 
     if (user.image) {
@@ -61,59 +56,65 @@ export const displayUser = (user: User) => {
     }
 
     return response;
-};
+}
 
 // Radix for generating random string identifiers
 const ID_STRING_RADIX = 36;
 
-// User data below
-USERS.set('shaun', {
-    name: 'Shaun Burdick',
-    image: 'img/shaun.jpg',
-    occupation: [ 'Father', 'Husband', 'Leader', 'Engineer' ],
-    location: 'Syracuse, NY',
-    expertise: [
-        'Engineering Leader',
-        'Web Architecture and Design',
-        'Large scale data collection',
-        'API Design and Implementation',
-        'Agile/Scrum team management',
-        'Project Management'
-    ],
-    links: [
-        { url: 'https://www.linkedin.com/in/shaunburdick/', text: 'LinkedIn' },
-        { url: 'https://github.com/shaunburdick/', text: 'GitHub' },
-        { url: `mailto://${Math.floor(Math.random() * Date.now()).toString(ID_STRING_RADIX)}-${atob('c2l0ZS1jb250YWN0QHNoYXVuYnVyZGljay5jb20=')}`, text: 'Email' },
-        { url: 'https://zcal.co/shaunburdick', text: 'Calendar' }
-    ]
-});
-
-USERS.set('mario', {
-    name: 'Mario Mario',
-    occupation: [ 'Plumber', 'Brother', 'Emergency Contact' ],
-    location: 'Level 1, Mushroom Kingdom',
-    expertise: [
-        'Plumbing',
-        'Jumping',
-        'Fireball Throwing',
-        'Princess Saving',
-        'Mushroom Eating',
-    ],
-    links: [
-        { url: 'https://www.youtube.com/watch?v=6Ajhzlq42f0', text: 'Theme Song' },
-    ]
-});
-
-USERS.set('badger', {
-    name: 'Badger Badger Badger',
-    occupation: [ 'Badger', 'Mushroom', 'Snake' ],
-    location: 'The bushes of the internet',
-    expertise: [
-        'Badgering',
-        'Mushrooming',
-        'Snaking',
-    ],
-    links: [
-        { url: 'https://www.youtube.com/watch?v=EIyixC9NsLI', text: 'Badger Badger Badger' },
-    ]
-});
+/**
+ * A map of users known on the system, keyed by their handle.
+ *
+ * Built as a single literal rather than by mutating an exported map, so that
+ * importing this module has no observable side effect beyond evaluating the
+ * user records themselves.
+ */
+export const USERS = new Map<string, User>([
+    ['shaun', {
+        name: 'Shaun Burdick',
+        image: 'img/shaun.jpg',
+        occupation: [ 'Father', 'Husband', 'Leader', 'Engineer' ],
+        location: 'Syracuse, NY',
+        expertise: [
+            'Engineering Leader',
+            'Web Architecture and Design',
+            'Large scale data collection',
+            'API Design and Implementation',
+            'Agile/Scrum team management',
+            'Project Management'
+        ],
+        links: [
+            { url: 'https://www.linkedin.com/in/shaunburdick/', text: 'LinkedIn' },
+            { url: 'https://github.com/shaunburdick/', text: 'GitHub' },
+            { url: `mailto://${Math.floor(Math.random() * Date.now()).toString(ID_STRING_RADIX)}-${atob('c2l0ZS1jb250YWN0QHNoYXVuYnVyZGljay5jb20=')}`, text: 'Email' },
+            { url: 'https://zcal.co/shaunburdick', text: 'Calendar' }
+        ]
+    }],
+    ['mario', {
+        name: 'Mario Mario',
+        occupation: [ 'Plumber', 'Brother', 'Emergency Contact' ],
+        location: 'Level 1, Mushroom Kingdom',
+        expertise: [
+            'Plumbing',
+            'Jumping',
+            'Fireball Throwing',
+            'Princess Saving',
+            'Mushroom Eating',
+        ],
+        links: [
+            { url: 'https://www.youtube.com/watch?v=6Ajhzlq42f0', text: 'Theme Song' },
+        ]
+    }],
+    ['badger', {
+        name: 'Badger Badger Badger',
+        occupation: [ 'Badger', 'Mushroom', 'Snake' ],
+        location: 'The bushes of the internet',
+        expertise: [
+            'Badgering',
+            'Mushrooming',
+            'Snaking',
+        ],
+        links: [
+            { url: 'https://www.youtube.com/watch?v=EIyixC9NsLI', text: 'Badger Badger Badger' },
+        ]
+    }]
+]);

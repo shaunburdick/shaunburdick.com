@@ -55,7 +55,7 @@ const generateId = (): string => {
  * @param props - Component props
  * @returns Provider component
  */
-export const NotificationProvider = ({ children }: { children: ReactNode }) => {
+export function NotificationProvider({ children }: { children: ReactNode }): React.JSX.Element {
     const [notifications, setNotifications] = useState<{
         id: string;
         message: { body: string; title?: string };
@@ -82,14 +82,16 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
             {children}
         </NotificationContext>
     );
-};
+}
 
 /**
  * Hook to access notification context
  *
  * @returns Notification context
  */
-export const useNotification = () => use(NotificationContext);
+export function useNotification(): NotificationContextType {
+    return use(NotificationContext);
+}
 
 /**
  * Notification container component
@@ -98,7 +100,7 @@ export const useNotification = () => use(NotificationContext);
  * @param props - Component props
  * @returns Notification container
  */
-export function Notification({ id, message, duration = 3000, onClose }: NotificationProps) {
+export function Notification({ id, message, duration = 3000, onClose }: NotificationProps): React.JSX.Element {
     const [visible, setVisible] = useState(true);
     const { remove } = useNotification();
 
@@ -131,7 +133,7 @@ export function Notification({ id, message, duration = 3000, onClose }: Notifica
  *
  * @returns Notifications component
  */
-export function Notifications() {
+export function Notifications(): React.JSX.Element {
     const { notifications } = useNotification();
 
     return (
