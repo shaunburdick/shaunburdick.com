@@ -6,33 +6,37 @@ export default [
     ...shaunburdick.config.ts,
     ...shaunburdick.config.react,
     {
-        // Filename conventions.
+        // Filename and directory case.
         //
-        // `unicorn/filename-case` accepts exactly one case (kebab or camel),
-        // but this repo documents a mixed scheme in AGENTS.md that it cannot
-        // express. Exempted here, with reason:
-        //   - src/components/** and src/containers/** are PascalCase because
-        //     they are React components, and AGENTS.md mandates the
-        //     Container/View naming `YourFeature/YourFeatureView.tsx`.
-        //   - e2e/pages/** are PascalCase Page Object classes.
-        //   - src/{App,Command,Users}.tsx are named as AGENTS.md "Key Files
-        //     for New Features"; renaming them would silently invalidate
-        //     that document.
-        // Not exempted: src/hooks/**, src/setup-tests.ts, scripts/** — all
-        // converted to kebab-case in this branch.
+        // unicorn/filename-case applies one case style to every path segment
+        // of a matched file, including directories, so this repo's mixed
+        // scheme needs two blocks rather than an exemption.
+        //
+        // 1. The whole tree allows exactly kebab-case or PascalCase. That
+        //    still forbids snake_case, camelCase and unclassified names while
+        //    accepting the two conventions AGENTS.md documents.
+        rules: {
+            'unicorn/filename-case': ['error', { cases: { kebabCase: true, pascalCase: true } }]
+        }
+    },
+    {
+        // 2. Scopes that are kebab-case end to end tighten to kebab-only, so
+        //    a relapse such as `useLocalStorage.ts` is caught here rather than
+        //    slipping through the two-case allowance above.
+        //
+        // The component tree cannot be Pascal-only: `src` and `components`
+        // are kebab directories, and the rule checks them alongside the
+        // PascalCase component files.
         files: [
-            'src/components/**',
-            'src/containers/**',
-            'src/App.tsx',
-            'src/App.test.tsx',
-            'src/Command.tsx',
-            'src/Command.test.tsx',
-            'src/Users.tsx',
-            'src/Users.test.tsx',
-            'e2e/pages/**'
+            'src/hooks/**',
+            'src/setup-tests.ts',
+            'scripts/**',
+            'tests/**',
+            'e2e/fixtures/**',
+            'e2e/specs/**'
         ],
         rules: {
-            'unicorn/filename-case': 'off'
+            'unicorn/filename-case': ['error', { case: 'kebabCase' }]
         }
     },
     {
