@@ -30,7 +30,7 @@ function Hints({ hintClick }: HintsProps) {
      */
     const handleToggle = () => {
         const isNewState = !showHints;
-        tracker.trackEvent(TRACKER_EVENTS.ToggleHints, { props: { ack: isNewState } });
+        tracker.trackEvent(TRACKER_EVENTS.toggleHints, { props: { ack: isNewState } });
         setShowHints(isNewState);
     };
 

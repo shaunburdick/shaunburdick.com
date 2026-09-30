@@ -32,7 +32,7 @@ describe('Achievements React Hooks', () => {
         // Check achievement was added
         expect(result.current.achievements.length).toBe(1);
         expect(result.current.achievements[0].id).toBe('first_command');
-        expect(result.current.achievements[0].title).toBe(coreAchievements.first_command?.title);
+        expect(result.current.achievements[0].title).toBe(coreAchievements.get('first_command')?.title);
     });
 
     test('useAchievements prevents duplicate achievements', () => {

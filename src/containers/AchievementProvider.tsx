@@ -48,59 +48,67 @@ export interface AchievementContextType {
 }
 
 /**
- * Dictionary of core achievements that can be unlocked
+ * Core achievements that can be unlocked, keyed by their persisted id.
+ *
+ * A `Map` rather than an object literal because the ids are snake_case on
+ * purpose — they are written to localStorage, so renaming them would orphan
+ * every existing user's unlocked set. As object literal keys they fall under
+ * `naming-convention`'s camelCase format; as `Map` keys they are ordinary
+ * string arguments that the rule never inspects. `get` also returns
+ * `Achievement | undefined`, so a lookup miss is representable without
+ * weakening the value type.
  */
-export const coreAchievements: Partial<Record<string, Achievement>> = {
-    first_command: {
+export const coreAchievements = new Map<AchievementId, Achievement>([
+    ['first_command', {
         id: 'first_command',
         title: 'First Command',
         description: 'Run your first command on the site',
         secret: true,
         emoji: '🎮'
-    },
-    rick_rolled: {
+    }],
+    ['rick_rolled', {
         id: 'rick_rolled',
         title: 'Rickrolled',
         description: 'Get rickrolled by the whois command',
         secret: true,
         emoji: '🎵'
-    },
-    secret_command: {
+    }],
+    ['secret_command', {
         id: 'secret_command',
         title: 'Secret Commander',
         description: 'Find a secret command',
         secret: true,
         emoji: '🤫'
-    },
-    who_are_you: {
+    }],
+    ['who_are_you', {
         id: 'who_are_you',
         title: 'Who Am I?',
         description: 'Use the whoami command.',
         secret: true,
         emoji: '👤'
-    },
-    old_spice_mario: {
+    }],
+    ['old_spice_mario', {
         id: 'old_spice_mario',
         title: 'Old Spice Mario',
         description: 'Look at the man you could be',
         secret: true,
         emoji: '🧔'
-    },
-    accept_cookies: {
+    }],
+    ['accept_cookies', {
         id: 'accept_cookies',
         title: 'Cookie Monster',
         description: 'Accept the cookie notice',
         secret: true,
         emoji: '🍪'
-    },
-    click_all_the_things: {
+    }],
+    ['click_all_the_things', {
         id: 'click_all_the_things',
         title: 'Click All The Things',
         description: 'Click many things',
         secret: true,
         emoji: '🖱️'
-    }
-};
+    }]
+]);
 
 /**
  * Key used to store achievements in localStorage
@@ -215,7 +223,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     }, [achievements]);
 
     const unlockAchievement = (achievementId: AchievementId): void => {
-        const achievementData = coreAchievements[achievementId];
+        const achievementData = coreAchievements.get(achievementId);
         if (achievementData === undefined) {
             return;
         }

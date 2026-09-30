@@ -28,7 +28,7 @@ export default function App(): React.JSX.Element {
             { title: `Achievement Unlocked: ${achievement.title}`, body: achievement.description },
             NOTIFICATION_DURATION
         );
-        tracker.trackEvent(TRACKER_EVENTS.AchievementUnlocked, {
+        tracker.trackEvent(TRACKER_EVENTS.achievementUnlocked, {
             props: {
                 achievement: achievement.id
             }
@@ -39,7 +39,7 @@ export default function App(): React.JSX.Element {
      * Track command execution events
      */
     useEvent('onCommand', ({ command }) => {
-        tracker.trackEvent(TRACKER_EVENTS.ExecCommand,
+        tracker.trackEvent(TRACKER_EVENTS.execCommand,
             { props: { commandName: command.name, args: command.args.join(' ') } });
     });
 

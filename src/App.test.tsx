@@ -10,12 +10,12 @@ const mockTrackPageview = jest.fn();
 const mockEnableAutoOutboundTracking = jest.fn();
 const mockAddNotification = jest.fn();
 
-// Mock the useTracker hook
+// Mock the useTracker hook. TRACKER_EVENTS is inherited from the real module
+// rather than re-declared: a jest.mock factory has to mirror the module's
+// exports key-for-key, and the assertions already read the same object the
+// component does, so overriding the values only ever made them disagree.
 jest.mock('./hooks/use-tracker', () => ({
-    TRACKER_EVENTS: {
-        AchievementUnlocked: 'achievement_unlocked',
-        ExecCommand: 'exec_command',
-    },
+    ...jest.requireActual('./hooks/use-tracker'),
     useTracker: () => ({
         trackEvent: mockTrackEvent,
         trackPageview: mockTrackPageview,
@@ -88,7 +88,7 @@ describe('App', () => {
 
         // Verify event was tracked
         expect(mockTrackEvent).toHaveBeenCalledWith(
-            TRACKER_EVENTS.AchievementUnlocked,
+            TRACKER_EVENTS.achievementUnlocked,
             {
                 props: { achievement: achievementDetail.id }
             }
@@ -118,7 +118,7 @@ describe('App', () => {
 
         // Verify event was tracked
         expect(mockTrackEvent).toHaveBeenCalledWith(
-            TRACKER_EVENTS.ExecCommand,
+            TRACKER_EVENTS.execCommand,
             {
                 props: {
                     commandName: commandDetail.command.name,

@@ -5,14 +5,14 @@ import Plausible from 'plausible-tracker';
  * Event names for Plausible analytics tracking
  */
 export const TRACKER_EVENTS = {
-    HistoryUpArrow: 'History',
-    Help: 'Help',
-    EasterEgg: 'Easter Egg',
-    TabNav: 'Tab',
-    AchievementUnlocked: 'AchievementUnlocked',
-    CookieAcknowledge: 'CookieAcknowledge',
-    ExecCommand: 'ExecCommand',
-    ToggleHints: 'ToggleHints',
+    historyUpArrow: 'History',
+    help: 'Help',
+    easterEgg: 'Easter Egg',
+    tabNav: 'Tab',
+    achievementUnlocked: 'AchievementUnlocked',
+    cookieAcknowledge: 'CookieAcknowledge',
+    execCommand: 'ExecCommand',
+    toggleHints: 'ToggleHints',
 } as const;
 
 const tracker = Plausible({

@@ -26,7 +26,7 @@ function CookieNotice() {
      * Handle the user accepting cookies
      */
     const handleAccept = () => {
-        tracker.trackEvent(TRACKER_EVENTS.CookieAcknowledge, { props: { ack: true } });
+        tracker.trackEvent(TRACKER_EVENTS.cookieAcknowledge, { props: { ack: true } });
         setShowCookieMessage(false);
         localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'true');
         unlockAchievement('accept_cookies');
@@ -36,7 +36,7 @@ function CookieNotice() {
      * Handle the user rejecting cookies (easter egg)
      */
     const handleReject = () => {
-        tracker.trackEvent(TRACKER_EVENTS.CookieAcknowledge, { props: { ack: false } });
+        tracker.trackEvent(TRACKER_EVENTS.cookieAcknowledge, { props: { ack: false } });
         location.assign('https://www.oreo.com/');
     };
 

@@ -23,7 +23,7 @@ function buildContext(): CommandContext {
         },
         achievements: {
             unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => {
-                const achievementData = coreAchievements[id];
+                const achievementData = coreAchievements.get(id);
                 if (achievementData === undefined) {
                     return;
                 }

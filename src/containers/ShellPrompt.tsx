@@ -32,7 +32,7 @@ interface CommandHandlerContext {
     commandHistory: string[];
     environment: Map<string, string>;
     workingDir: string;
-    COMMANDS: ReturnType<typeof commandsWithContext>;
+    commands: ReturnType<typeof commandsWithContext>;
     commandUpdateEvent: CommandUpdateEvent;
     achievements: ReturnType<typeof useAchievements>;
     setConsoleLines: React.Dispatch<React.SetStateAction<CommandResult[]>>;
@@ -74,7 +74,7 @@ function execCommand({ commandName, context, args }: ExecCommandOptions): Consol
         context.achievements.unlockAchievement('first_command');
     }
 
-    const command = context.COMMANDS.get(commandName.toLowerCase());
+    const command = context.commands.get(commandName.toLowerCase());
     const result = command === undefined
         ? [
             ['Unknown Command: ', commandName],
@@ -176,7 +176,7 @@ function onArrowUp({
     setCommandPointer, setInputValue, tracker
 }: ArrowUpParams): void {
     event.preventDefault();
-    tracker.trackEvent(TRACKER_EVENTS.HistoryUpArrow);
+    tracker.trackEvent(TRACKER_EVENTS.historyUpArrow);
 
     if (commandPointer >= commandHistory.length) {
         return;
@@ -218,7 +218,7 @@ function onEscape({ event, setCommandPointer, setInputValue, inputRef }: EscapeP
 }
 
 /**
- * Creates COMMANDS, command context, and callback handlers for the shell
+ * Creates the command map, command context, and callback handlers for the shell
  */
 function useCommandCenter({
     commandHistory, commandPointer, consoleLines,
@@ -227,7 +227,7 @@ function useCommandCenter({
     setConsoleLines, setCommandHistory, setLastCommand,
     inputRef, tracker
 }: UseCommandCenterOptions) {
-    const COMMANDS = commandsWithContext({
+    const commands = commandsWithContext({
         commandHistory, environment: DEFAULT_ENVIRONMENT,
         setConsoleLines, setLastCommand,
         workingDir: '/', users: USERS,
@@ -235,10 +235,10 @@ function useCommandCenter({
     });
     const commandContext = useMemo((): CommandHandlerContext => ({
         commandHistory, environment: DEFAULT_ENVIRONMENT,
-        workingDir: '/', COMMANDS, commandUpdateEvent,
+        workingDir: '/', commands, commandUpdateEvent,
         achievements, setConsoleLines, setCommandHistory,
         setCommandPointer, setLastCommand, setInputValue
-    }), [commandHistory, COMMANDS, commandUpdateEvent, achievements,
+    }), [commandHistory, commands, commandUpdateEvent, achievements,
         setConsoleLines, setCommandHistory, setCommandPointer,
         setLastCommand, setInputValue]);
 
