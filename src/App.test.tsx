@@ -3,20 +3,19 @@ import { render, screen } from '@testing-library/react';
 import { AchievementProvider } from './containers/AchievementProvider';
 import { NotificationProvider } from './containers/NotificationProvider';
 import App from './App';
-import { TRACKER_EVENTS } from './hooks/useTracker';
+import { TRACKER_EVENTS } from './hooks/use-tracker';
 
-// Create mock functions
 const mockTrackEvent = jest.fn();
 const mockTrackPageview = jest.fn();
 const mockEnableAutoOutboundTracking = jest.fn();
 const mockAddNotification = jest.fn();
 
-// Mock the useTracker hook
-jest.mock('./hooks/useTracker', () => ({
-    TRACKER_EVENTS: {
-        AchievementUnlocked: 'achievement_unlocked',
-        ExecCommand: 'exec_command',
-    },
+// Mock the useTracker hook. TRACKER_EVENTS is inherited from the real module
+// rather than re-declared: a jest.mock factory has to mirror the module's
+// exports key-for-key, and the assertions already read the same object the
+// component does, so overriding the values only ever made them disagree.
+jest.mock('./hooks/use-tracker', () => ({
+    ...jest.requireActual('./hooks/use-tracker'),
     useTracker: () => ({
         trackEvent: mockTrackEvent,
         trackPageview: mockTrackPageview,
@@ -48,8 +47,8 @@ describe('App', () => {
         jest.clearAllMocks();
     });
 
-    test('Shows an h1 title', () => {
-        act(() => render(
+    test('Shows an h1 title', async () => {
+        await act(() => render(
             <TestWrapper>
                 <App />
             </TestWrapper>
@@ -73,7 +72,7 @@ describe('App', () => {
         };
 
         act(() => {
-            window.dispatchEvent(new CustomEvent('onAchievement', {
+            dispatchEvent(new CustomEvent('onAchievement', {
                 detail: achievementDetail
             }));
         });
@@ -89,7 +88,7 @@ describe('App', () => {
 
         // Verify event was tracked
         expect(mockTrackEvent).toHaveBeenCalledWith(
-            TRACKER_EVENTS.AchievementUnlocked,
+            TRACKER_EVENTS.achievementUnlocked,
             {
                 props: { achievement: achievementDetail.id }
             }
@@ -112,14 +111,14 @@ describe('App', () => {
         };
 
         act(() => {
-            window.dispatchEvent(new CustomEvent('onCommand', {
+            dispatchEvent(new CustomEvent('onCommand', {
                 detail: commandDetail
             }));
         });
 
         // Verify event was tracked
         expect(mockTrackEvent).toHaveBeenCalledWith(
-            TRACKER_EVENTS.ExecCommand,
+            TRACKER_EVENTS.execCommand,
             {
                 props: {
                     commandName: commandDetail.command.name,

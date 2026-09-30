@@ -1,4 +1,4 @@
-import { resolve } from 'node:path';
+import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import process from 'node:process';
@@ -12,7 +12,6 @@ import webpack from 'webpack';
 const isEnvProduction = process.env.NODE_ENV === 'production';
 const isEnvDevelopment = !isEnvProduction;
 
-// Get version from package.json
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 const { version } = packageJson;
 
@@ -50,22 +49,20 @@ export default {
             templateParameters: {
                 PUBLIC_URL: process.env.PUBLIC_URL,
             },
-            ...(isEnvProduction
-                ? {
-                    minify: {
-                        removeComments: true,
-                        collapseWhitespace: true,
-                        removeRedundantAttributes: true,
-                        useShortDoctype: true,
-                        removeEmptyAttributes: true,
-                        removeStyleLinkTypeAttributes: true,
-                        keepClosingSlash: true,
-                        minifyJS: true,
-                        minifyCSS: true,
-                        minifyURLs: true,
-                    },
-                }
-                : undefined),
+            ...(isEnvProduction && {
+                minify: {
+                    removeComments: true,
+                    collapseWhitespace: true,
+                    removeRedundantAttributes: true,
+                    useShortDoctype: true,
+                    removeEmptyAttributes: true,
+                    removeStyleLinkTypeAttributes: true,
+                    keepClosingSlash: true,
+                    minifyJS: true,
+                    minifyCSS: true,
+                    minifyURLs: true,
+                },
+            }),
         }),
         new CopyPlugin({
             patterns: [
@@ -82,11 +79,13 @@ export default {
             fileName: 'asset-manifest.json',
             // publicPath: paths.publicUrlOrPath,
             generate: (...args) => {
-                const [seed, files, entrypoints] = args;
-                const manifestFiles = files.reduce((manifest, file) => {
-                    manifest[file.name] = file.path;
-                    return manifest;
-                }, seed);
+                // Defaults keep the destructuring safe when the plugin passes
+                // fewer entries than this manifest shape needs.
+                const [seed = {}, files = [], entrypoints = { main: [] }] = args;
+                const manifestFiles = { ...seed };
+                for (const file of files) {
+                    manifestFiles[file.name] = file.path;
+                }
                 const entrypointFiles = entrypoints.main.filter(
                     (fileName) => !fileName.endsWith('.map')
                 );
@@ -139,7 +138,7 @@ export default {
         ]
     },
     output: {
-        path: resolve('build'),
+        path: path.resolve('build'),
         // Add /* filename */ comments to generated require()s in the output.
         pathinfo: isEnvDevelopment,
         // There will be one main bundle, and one file per asynchronous chunk.

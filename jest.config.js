@@ -2,7 +2,7 @@ export default {
     verbose: true,
     preset: 'ts-jest',
     testEnvironment: 'jsdom',
-    setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+    setupFilesAfterEnv: ['<rootDir>/src/setup-tests.ts'],
     testPathIgnorePatterns: [
         '/node_modules/',
         '/e2e/',
@@ -18,7 +18,7 @@ export default {
         '!playwright.config.ts'
     ],
     transform: {
-        '^.+\\.css$': '<rootDir>/scripts/jest/cssTransform.js'
+        '^.+\\.css$': '<rootDir>/scripts/jest/css-transform.js'
     },
     coverageThreshold: {
         global: {

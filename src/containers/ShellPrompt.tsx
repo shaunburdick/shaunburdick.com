@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { CommandResult, ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
+import type { CommandResult, ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
 import ShellPromptView from '../components/ShellPrompt/ShellPromptView';
-import { TRACKER_EVENTS, useTracker } from '../hooks/useTracker';
+import { TRACKER_EVENTS, useTracker } from '../hooks/use-tracker';
 import { useEvent, useLocalStorage } from '../hooks';
 import { USERS } from '../Users';
 import { commandsWithContext } from '../Command';
@@ -32,7 +32,7 @@ interface CommandHandlerContext {
     commandHistory: string[];
     environment: Map<string, string>;
     workingDir: string;
-    COMMANDS: ReturnType<typeof commandsWithContext>;
+    commands: ReturnType<typeof commandsWithContext>;
     commandUpdateEvent: CommandUpdateEvent;
     achievements: ReturnType<typeof useAchievements>;
     setConsoleLines: React.Dispatch<React.SetStateAction<CommandResult[]>>;
@@ -74,13 +74,13 @@ function execCommand({ commandName, context, args }: ExecCommandOptions): Consol
         context.achievements.unlockAchievement('first_command');
     }
 
-    const command = context.COMMANDS.get(commandName.toLowerCase());
-    const result = command
-        ? command.run(...args)
-        : [
+    const command = context.commands.get(commandName.toLowerCase());
+    const result = command === undefined
+        ? [
             ['Unknown Command: ', commandName],
             ['Type `help` for assistance']
-        ];
+        ]
+        : command.run(...args);
 
     context.commandUpdateEvent.dispatch({
         command: { name: commandName.toLowerCase(), args },
@@ -176,12 +176,15 @@ function onArrowUp({
     setCommandPointer, setInputValue, tracker
 }: ArrowUpParams): void {
     event.preventDefault();
-    tracker.trackEvent(TRACKER_EVENTS.HistoryUpArrow);
-    if (commandPointer < commandHistory.length) {
-        const newPointer = commandPointer + 1;
-        setCommandPointer(newPointer);
-        setInputValue(commandHistory[commandHistory.length - newPointer]);
+    tracker.trackEvent(TRACKER_EVENTS.historyUpArrow);
+
+    if (commandPointer >= commandHistory.length) {
+        return;
     }
+
+    const newPointer = commandPointer + 1;
+    setCommandPointer(newPointer);
+    setInputValue(commandHistory[commandHistory.length - newPointer]);
 }
 
 /**
@@ -192,11 +195,14 @@ function onArrowDown({
     setCommandPointer, setInputValue
 }: ArrowDownParams): void {
     event.preventDefault();
-    if (commandPointer > DEFAULT_COMMAND_POINTER) {
-        const newPointer = commandPointer - 1;
-        setCommandPointer(newPointer);
-        setInputValue(newPointer === 0 ? '' : commandHistory[commandHistory.length - newPointer]);
+
+    if (commandPointer <= DEFAULT_COMMAND_POINTER) {
+        return;
     }
+
+    const newPointer = commandPointer - 1;
+    setCommandPointer(newPointer);
+    setInputValue(newPointer === 0 ? '' : commandHistory[commandHistory.length - newPointer]);
 }
 
 /**
@@ -205,14 +211,14 @@ function onArrowDown({
 function onEscape({ event, setCommandPointer, setInputValue, inputRef }: EscapeParams): void {
     event.preventDefault();
     setCommandPointer(DEFAULT_COMMAND_POINTER);
-    if (inputRef.current) {
+    if (inputRef.current !== null) {
         inputRef.current.value = '';
     }
     setInputValue('');
 }
 
 /**
- * Creates COMMANDS, command context, and callback handlers for the shell
+ * Creates the command map, command context, and callback handlers for the shell
  */
 function useCommandCenter({
     commandHistory, commandPointer, consoleLines,
@@ -221,7 +227,7 @@ function useCommandCenter({
     setConsoleLines, setCommandHistory, setLastCommand,
     inputRef, tracker
 }: UseCommandCenterOptions) {
-    const COMMANDS = commandsWithContext({
+    const commands = commandsWithContext({
         commandHistory, environment: DEFAULT_ENVIRONMENT,
         setConsoleLines, setLastCommand,
         workingDir: '/', users: USERS,
@@ -229,10 +235,10 @@ function useCommandCenter({
     });
     const commandContext = useMemo((): CommandHandlerContext => ({
         commandHistory, environment: DEFAULT_ENVIRONMENT,
-        workingDir: '/', COMMANDS, commandUpdateEvent,
+        workingDir: '/', commands, commandUpdateEvent,
         achievements, setConsoleLines, setCommandHistory,
         setCommandPointer, setLastCommand, setInputValue
-    }), [commandHistory, COMMANDS, commandUpdateEvent, achievements,
+    }), [commandHistory, commands, commandUpdateEvent, achievements,
         setConsoleLines, setCommandHistory, setCommandPointer,
         setLastCommand, setInputValue]);
 
@@ -258,7 +264,7 @@ function useCommandCenter({
     );
     const onHintClick = (hint: string) => {
         setInputValue(hint);
-        if (inputRef.current) {
+        if (inputRef.current !== null) {
             inputRef.current.focus();
         }
     };
@@ -278,7 +284,7 @@ interface ShellInit {
  * Creates the initial shell state including the welcome message
  */
 function createShellInit(): ShellInit {
-    const login = localStorage.getItem(LS_KEY_LAST_LOGIN) || 'never';
+    const login = localStorage.getItem(LS_KEY_LAST_LOGIN) ?? 'never';
     const welcome: CommandResult = {
         timestamp: new Date(),
         response: [
@@ -368,7 +374,7 @@ function useShellState(): ShellState {
  *
  * @returns Shell prompt container
  */
-function ShellPrompt() {
+export default function ShellPrompt(): React.JSX.Element {
     const {
         consoleLines,
         lastCommand,
@@ -393,5 +399,3 @@ function ShellPrompt() {
         />
     );
 }
-
-export default ShellPrompt;

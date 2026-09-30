@@ -3,30 +3,30 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { AchievementProvider } from '../../containers/AchievementProvider';
 import CookieNotice, { LS_COOKIE_ACKNOWLEDGE } from '../../containers/CookieNotice';
 
-describe('CookieNotice', () => {
-    // Helper function to wrap component with providers
-    const renderWithProviders = (component: React.ReactElement) => {
-        return render(
-            <AchievementProvider>
-                {component}
-            </AchievementProvider>
-        );
-    };
+// Helper function to wrap component with providers
+const renderWithProviders = (component: React.ReactElement) => {
+    return render(
+        <AchievementProvider>
+            {component}
+        </AchievementProvider>
+    );
+};
 
+describe('CookieNotice', () => {
     const COOKIE_NOTICE_SELECTOR = '[aria-label="Cookie Notice"]';
 
     beforeEach(() => {
         localStorage.clear();
     });
 
-    test('Display the cookie notice', () => {
-        act(() => renderWithProviders(<CookieNotice />));
+    test('Display the cookie notice', async () => {
+        await act(() => renderWithProviders(<CookieNotice />));
 
         expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).toBeInTheDocument();
     });
 
-    test('Hide cookie notice once clicked', () => {
-        act(() => renderWithProviders(<CookieNotice />));
+    test('Hide cookie notice once clicked', async () => {
+        await act(() => renderWithProviders(<CookieNotice />));
 
         const button = screen.getByText('Yes');
 
@@ -39,16 +39,16 @@ describe('CookieNotice', () => {
         expect(localStorage.getItem(LS_COOKIE_ACKNOWLEDGE)).toEqual('true');
     });
 
-    test('Hide cookie notice if they have already accepted', () => {
+    test('Hide cookie notice if they have already accepted', async () => {
         localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'true');
 
-        act(() => renderWithProviders(<CookieNotice />));
+        await act(() => renderWithProviders(<CookieNotice />));
 
         expect(document.body.querySelector(COOKIE_NOTICE_SELECTOR)).not.toBeInTheDocument();
     });
 
-    test('Show cookie joke if you click no', () => {
-        act(() => renderWithProviders(<CookieNotice />));
+    test('Show cookie joke if you click no', async () => {
+        await act(() => renderWithProviders(<CookieNotice />));
 
         const button = screen.getByText('No');
 

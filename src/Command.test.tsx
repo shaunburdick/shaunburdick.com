@@ -1,6 +1,10 @@
-import { CommandContext, commandsWithContext } from './Command';
-import { AchievementId, AchievementUnlocked, coreAchievements } from './containers/AchievementProvider';
-import { displayUser, User } from './Users';
+import type { CommandContext } from './Command';
+import { commandsWithContext } from './Command';
+import type { ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
+import type { AchievementId, AchievementUnlocked } from './containers/AchievementProvider';
+import { coreAchievements } from './containers/AchievementProvider';
+import type { User } from './Users';
+import { displayUser } from './Users';
 
 function buildContext(): CommandContext {
     const achievements: AchievementUnlocked[] = [];
@@ -18,12 +22,18 @@ function buildContext(): CommandContext {
             notifications: []
         },
         achievements: {
-            unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => achievements.push({
-                id,
-                title: coreAchievements[id].title,
-                description: coreAchievements[id].description,
-                unlockedAt: new Date().toISOString()
-            })),
+            unlockAchievement: jest.fn().mockImplementation((id: AchievementId) => {
+                const achievementData = coreAchievements.get(id);
+                if (achievementData === undefined) {
+                    return;
+                }
+                achievements.push({
+                    id,
+                    title: achievementData.title,
+                    description: achievementData.description,
+                    unlockedAt: new Date().toISOString()
+                });
+            }),
             hasAchievement: jest.fn().mockImplementation((id: AchievementId) =>
                 achievements.some(achievement => achievement.id === id)),
             resetAchievements: jest.fn().mockImplementation(() => achievements.splice(0)),
@@ -32,19 +42,29 @@ function buildContext(): CommandContext {
     };
 }
 
+/**
+ * Render a console line as text, tolerating lines that are unexpectedly empty.
+ *
+ * @param line - A single console output line
+ * @returns The line's first cell as a string
+ */
+function lineText(line: ConsoleLine): string {
+    const [first = ''] = line;
+    return first.toString();
+}
+
 describe('Command', () => {
-    let oldOpen: typeof window.open;
+    // jsdom defines window.open but throws "not implemented" when it is
+    // called, so spy on it for the duration of each test instead of
+    // overwriting the global property.
+    let openSpy: jest.Spied<typeof globalThis.open>;
 
     beforeEach(() => {
-        // Stash the window.open fn and set a mock fn
-        // jsDom doesn't implement the function and throws an error
-        oldOpen = window.open;
-        window.open = jest.fn();
+        openSpy = jest.spyOn(globalThis, 'open').mockImplementation(() => null);
     });
 
     afterEach(() => {
-        // Restore the original window.open function
-        window.open = oldOpen;
+        openSpy.mockRestore();
     });
 
     test('Get a command map', () => {
@@ -65,7 +85,7 @@ describe('Command', () => {
             expect(ctx.setLastCommand).toHaveBeenCalledWith(undefined);
 
             done();
-        });
+        }, 0);
     });
 
     test('env', () => {
@@ -125,7 +145,10 @@ describe('Command', () => {
         expect(Array.isArray(response)).toBe(true);
 
         // make sure no secret commands are listed
-        expect(response?.filter(line => (line[0] as string).startsWith('secret'))).toEqual([]);
+        expect(response?.filter(line => {
+            const [first = ''] = line;
+            return (first as string).startsWith('secret');
+        })).toEqual([]);
     });
 
     test('help (with args)', () => {
@@ -158,11 +181,11 @@ describe('Command', () => {
 
         const open = commands.get('open');
 
-        expect(open?.run('http://foo.com')).toEqual([
-            ['Opening http://foo.com...']
+        expect(open?.run('https://foo.com')).toEqual([
+            ['Opening https://foo.com...']
         ]);
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('http://foo.com');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://foo.com');
 
         expect(open?.run('ftp://foo.com')).toEqual([
             ['Unknown protocol: ftp:']
@@ -191,8 +214,8 @@ describe('Command', () => {
 
         const response = commands.get('rm')?.run();
 
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
         expect(response).toEqual([
             ['rm never gonna give you up!']
@@ -236,8 +259,8 @@ describe('Command', () => {
 
         const response = commands.get('view-source')?.run();
 
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://github.com/shaunburdick/shaunburdick.com');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://github.com/shaunburdick/shaunburdick.com');
 
         expect(response).toEqual([
             ['Opening GH Page...']
@@ -271,8 +294,8 @@ describe('Command', () => {
         expect(whois?.run('miki')).toEqual([
             ['Hello, miki']
         ]);
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.open).toHaveBeenCalledWith('https://www.youtube.com/watch?v=YjyUIwKPAxA');
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(openSpy).toHaveBeenCalledWith('https://www.youtube.com/watch?v=YjyUIwKPAxA');
 
         const gfResponse = whois?.run('gamefront');
         expect(Array.isArray(gfResponse)).toBe(true);
@@ -298,8 +321,9 @@ describe('Command', () => {
         const response = commands.get('version')?.run();
 
         expect(Array.isArray(response)).toBe(true);
-        expect(response?.some(line => line[0] && line[0].toString().includes('Version:'))).toBe(true);
-        expect(response?.some(line => line[0] && line[0].toString().includes('Commit:'))).toBe(true);
-        expect(response?.some(line => line[0] && line[0].toString().includes('Build Date:'))).toBe(true);
+
+        expect(response?.some(line => lineText(line).includes('Version:'))).toBe(true);
+        expect(response?.some(line => lineText(line).includes('Commit:'))).toBe(true);
+        expect(response?.some(line => lineText(line).includes('Build Date:'))).toBe(true);
     });
 });

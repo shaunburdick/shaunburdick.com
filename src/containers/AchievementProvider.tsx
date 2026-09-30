@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback, use, Dispatch, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { createContext, useState, useCallback, use } from 'react';
 import { useEvent } from '../hooks';
 
 /**
@@ -47,59 +48,67 @@ export interface AchievementContextType {
 }
 
 /**
- * Dictionary of core achievements that can be unlocked
+ * Core achievements that can be unlocked, keyed by their persisted id.
+ *
+ * A `Map` rather than an object literal because the ids are snake_case on
+ * purpose — they are written to localStorage, so renaming them would orphan
+ * every existing user's unlocked set. As object literal keys they fall under
+ * `naming-convention`'s camelCase format; as `Map` keys they are ordinary
+ * string arguments that the rule never inspects. `get` also returns
+ * `Achievement | undefined`, so a lookup miss is representable without
+ * weakening the value type.
  */
-export const coreAchievements: Record<string, Achievement> = {
-    first_command: {
+export const coreAchievements = new Map<AchievementId, Achievement>([
+    ['first_command', {
         id: 'first_command',
         title: 'First Command',
         description: 'Run your first command on the site',
         secret: true,
         emoji: '🎮'
-    },
-    rick_rolled: {
+    }],
+    ['rick_rolled', {
         id: 'rick_rolled',
         title: 'Rickrolled',
         description: 'Get rickrolled by the whois command',
         secret: true,
         emoji: '🎵'
-    },
-    secret_command: {
+    }],
+    ['secret_command', {
         id: 'secret_command',
         title: 'Secret Commander',
         description: 'Find a secret command',
         secret: true,
         emoji: '🤫'
-    },
-    who_are_you: {
+    }],
+    ['who_are_you', {
         id: 'who_are_you',
         title: 'Who Am I?',
         description: 'Use the whoami command.',
         secret: true,
         emoji: '👤'
-    },
-    old_spice_mario: {
+    }],
+    ['old_spice_mario', {
         id: 'old_spice_mario',
         title: 'Old Spice Mario',
         description: 'Look at the man you could be',
         secret: true,
         emoji: '🧔'
-    },
-    accept_cookies: {
+    }],
+    ['accept_cookies', {
         id: 'accept_cookies',
         title: 'Cookie Monster',
         description: 'Accept the cookie notice',
         secret: true,
         emoji: '🍪'
-    },
-    click_all_the_things: {
+    }],
+    ['click_all_the_things', {
         id: 'click_all_the_things',
         title: 'Click All The Things',
         description: 'Click many things',
         secret: true,
         emoji: '🖱️'
-    }
-};
+    }]
+]);
 
 /**
  * Key used to store achievements in localStorage
@@ -159,29 +168,40 @@ function processAchievementUnlock({
     setAchievements,
     achievementEvent
 }: ProcessUnlockOptions): void {
-    let wasUnlocked = false;
-    let unlockedEntry: AchievementUnlocked | undefined;
+    // Outcome is held in an object rather than in a pair of local `let`s.
+    // TypeScript never models the state updater running, so a local flag stays
+    // narrowed to its initial `false` here and the guard below is reported as
+    // dead code. Property reads are re-evaluated after each call, which is
+    // what actually happens at runtime. Keeping the duplicate check inside the
+    // updater is what makes two unlocks in the same tick collapse to one
+    // entry: `whois mario` unlocks `old_spice_mario` while the shell is still
+    // unlocking `first_command`, and the second updater must see the first
+    // one's result.
+    const outcome: { unlocked: boolean; entry: AchievementUnlocked | undefined } = {
+        unlocked: false,
+        entry: undefined
+    };
 
     setAchievements((currentAchievements) => {
-        const alreadyUnlocked = currentAchievements.some((ach) => ach.id === achievementId);
-        if (alreadyUnlocked) {
+        const isAlreadyUnlocked = currentAchievements.some((ach) => ach.id === achievementId);
+        if (isAlreadyUnlocked) {
             return currentAchievements;
         }
 
-        unlockedEntry = {
+        outcome.entry = {
             id: achievementId,
             title: achievementData.title,
             description: achievementData.description,
             unlockedAt: new Date().toISOString()
         };
-        wasUnlocked = true;
-        const next = [...currentAchievements, unlockedEntry];
+        outcome.unlocked = true;
+        const next = [...currentAchievements, outcome.entry];
         saveAchievements(next);
         return next;
     });
 
-    if (wasUnlocked && unlockedEntry !== undefined) {
-        achievementEvent.dispatch(unlockedEntry);
+    if (outcome.unlocked && outcome.entry !== undefined) {
+        achievementEvent.dispatch(outcome.entry);
     }
 }
 
@@ -194,7 +214,7 @@ export const AchievementContext = createContext<AchievementContextType | undefin
  * @param props - Component props containing children
  * @returns AchievementProvider wrapping children
  */
-export function AchievementProvider({ children }: { children: React.ReactNode }) {
+export function AchievementProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const [achievements, setAchievements] = useState<AchievementUnlocked[]>(loadAchievements);
     const achievementEvent = useEvent('onAchievement');
 
@@ -203,12 +223,14 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     }, [achievements]);
 
     const unlockAchievement = (achievementId: AchievementId): void => {
-        const achievementData = coreAchievements[achievementId];
+        const achievementData = coreAchievements.get(achievementId);
         if (achievementData === undefined) {
             return;
         }
 
-        processAchievementUnlock({ achievementId, achievementData, setAchievements, achievementEvent });
+        processAchievementUnlock({
+            achievementId, achievementData, setAchievements, achievementEvent
+        });
     };
 
     const resetAchievements = (): void => {
@@ -233,10 +255,10 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
  *
  * @returns Achievement context
  */
-export const useAchievements = (): AchievementContextType => {
+export function useAchievements(): AchievementContextType {
     const context = use(AchievementContext);
     if (context === undefined) {
         throw new Error('useAchievements must be used within an AchievementProvider');
     }
     return context;
-};
+}

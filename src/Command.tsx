@@ -1,7 +1,8 @@
-import { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
-import { displayUser, User } from './Users';
-import { NotificationContextType } from './containers/NotificationProvider';
-import { AchievementContextType } from './containers/AchievementProvider';
+import type { CommandResult, ConsoleLine } from './components/ConsoleOutput/ConsoleOutput';
+import type { User } from './Users';
+import { displayUser } from './Users';
+import type { NotificationContextType } from './containers/NotificationProvider';
+import type { AchievementContextType } from './containers/AchievementProvider';
 
 /**
  * Interface for a terminal command
@@ -60,7 +61,7 @@ function createClearCommand(
             setTimeout(() => {
                 setConsoleLines([]);
                 setLastCommand(undefined);
-            });
+            }, 0);
 
             return [];
         }
@@ -74,11 +75,7 @@ function createEnvCommand(environment: Map<string, string>): Command {
     return {
         description: 'Print Environment',
         run: () => {
-            const response: ConsoleLine[] = [];
-
-            for (const [key, value] of environment.entries()) {
-                response.push([`${key}=${value}`]);
-            }
+            const response: ConsoleLine[] = Array.from(environment, ([key, value]) => [`${key}=${value}`]);
 
             return response;
         }
@@ -91,20 +88,19 @@ function createEnvCommand(environment: Map<string, string>): Command {
 function createExportCommand(environment: Map<string, string>): Command {
     return {
         description: 'Set an environment variable',
-        run: (key, value) => {
+        run: (key: string, value?: string) => {
             if (key.includes('=')) {
                 const splitIndex = key.indexOf('=');
                 value = key.slice(splitIndex + 1);
                 key = key.slice(0, splitIndex);
             }
 
-            if (typeof value === 'undefined') {
+            if (value === undefined) {
                 environment.delete(key);
                 return [[`${key}=`]];
-            } else {
-                environment.set(key, value);
-                return [[`${key}=${value}`]];
             }
+            environment.set(key, value);
+            return [[`${key}=${value}`]];
         }
     };
 }
@@ -117,19 +113,23 @@ function createHelpCommand(commands: Map<string, Command>): Command {
         description: 'Provides a list of commands. Usage: `help [command]`',
         run: (commandName?: string) => {
             if (commandName) {
-                if (commands.get(commandName)?.secret) {
+                const command = commands.get(commandName);
+                // `secret` is optional, so a bare `if (command.secret)` is a
+                // nullable-boolean conditional while `=== true` is a redundant
+                // boolean-literal comparison. Defaulting explicitly satisfies
+                // both readings and states the intent: absent means not secret.
+                const isSecret = command?.secret ?? false;
+                if (isSecret) {
                     return [['I\'m not helping you. It\'s a secret!']];
-                } else {
-                    return [[commands.get(commandName)?.description || `Unknown command: ${commandName}`]];
                 }
-            } else {
-                return [
-                    ['List of Commands:'],
-                    ...[...commands]
-                        .filter(cmd => !cmd[1].secret)
-                        .map(([name, info]) => [`${name}:`, info.description])
-                ];
+                return [[command?.description ?? `Unknown command: ${commandName}`]];
             }
+            return [
+                ['List of Commands:'],
+                ...[...commands]
+                    .filter(([, info]) => !(info.secret ?? false))
+                    .map(([name, info]) => [`${name}:`, info.description])
+            ];
         }
     };
 }
@@ -156,9 +156,8 @@ function createOpenCommand(): Command {
                 if (['http:', 'https:'].includes(url.protocol)) {
                     window.open(target);
                     return [[`Opening ${target}...`]];
-                } else {
-                    return [[`Unknown protocol: ${url.protocol}`]];
                 }
+                return [[`Unknown protocol: ${url.protocol}`]];
             } catch {
                 return [[`Cannot open: ${target}`]];
             }
@@ -210,7 +209,12 @@ function createSecretCommand(achievements: AchievementContextType): Command {
 function createUsersCommand(users: Map<string, User>): Command {
     return {
         description: 'List users',
-        run: () => [...users.keys()].sort().map(userName => [userName])
+        run: () =>
+            users
+                .keys()
+                .toArray()
+                .toSorted((left, right) => (left < right ? -1 : Number(left > right)))
+                .map(username => [username])
     };
 }
 
@@ -221,9 +225,9 @@ function createVersionCommand(): Command {
     return {
         description: 'Show application version and build information',
         run: () => {
-            const version = process.env.REACT_APP_VERSION || 'unknown';
-            const commitHash = process.env.REACT_APP_COMMIT_HASH || 'unknown';
-            const buildDate = process.env.REACT_APP_BUILD_DATE || 'unknown';
+            const version = process.env.REACT_APP_VERSION ?? 'unknown';
+            const commitHash = process.env.REACT_APP_COMMIT_HASH ?? 'unknown';
+            const buildDate = process.env.REACT_APP_BUILD_DATE ?? 'unknown';
 
             return [
                 ['Application Version Information:'],
@@ -278,19 +282,20 @@ function createWhoisCommand(users: Map<string, User>, achievements: AchievementC
         description: 'Tell you a little about a user. Usage: `whois <username>`',
         run: (username: string) => {
             const user = users.get(username);
-            if (user) {
+            if (user !== undefined) {
                 if (username === 'mario') {
                     achievements.unlockAchievement('old_spice_mario');
                 }
                 return displayUser(user);
-            } else if (/miki|mikey|faktrl/.test(username)) {
+            }
+            if (/miki|mikey|faktrl/.test(username)) {
                 window.open('https://www.youtube.com/watch?v=YjyUIwKPAxA');
                 return [[`Hello, ${username}`]];
-            } else if (username === 'gamefront') {
-                return [[<a key='gf-link' href='https://gamefront.com'>Gamefront</a>, 'is just FilesNetwork with a better skin']];
-            } else {
-                return [[`Unknown user: ${username || ''}`]];
             }
+            if (username === 'gamefront') {
+                return [[<a key='gf-link' href='https://gamefront.com'>Gamefront</a>, 'is just FilesNetwork with a better skin']];
+            }
+            return [[`Unknown user: ${username || ''}`]];
         }
     };
 }
@@ -301,7 +306,7 @@ function createWhoisCommand(users: Map<string, User>, achievements: AchievementC
  * @param context - The command context containing system state
  * @returns Map of command names to command implementations
  */
-export const commandsWithContext = ({
+export function commandsWithContext({
     commandHistory,
     environment,
     setConsoleLines,
@@ -309,25 +314,27 @@ export const commandsWithContext = ({
     users,
     workingDir,
     achievements
-}: CommandContext): Map<string, Command> => {
-    const COMMANDS = new Map<string, Command>();
+}: CommandContext): Map<string, Command> {
+    const commandEntries: [string, Command][] = [
+        ['clear', createClearCommand(setConsoleLines, setLastCommand)],
+        ['env', createEnvCommand(environment)],
+        ['export', createExportCommand(environment)],
+        ['history', createHistoryCommand(commandHistory)],
+        ['open', createOpenCommand()],
+        ['pwd', createPwdCommand(workingDir)],
+        ['rm', createRmCommand(achievements)],
+        ['secret', createSecretCommand(achievements)],
+        ['users', createUsersCommand(users)],
+        ['version', createVersionCommand()],
+        ['view-source', createViewSourceCommand()],
+        ['whoami', createWhoamiCommand(achievements)],
+        ['whois', createWhoisCommand(users, achievements)]
+    ];
 
-    COMMANDS.set('clear', createClearCommand(setConsoleLines, setLastCommand));
-    COMMANDS.set('env', createEnvCommand(environment));
-    COMMANDS.set('export', createExportCommand(environment));
-    COMMANDS.set('history', createHistoryCommand(commandHistory));
-    COMMANDS.set('open', createOpenCommand());
-    COMMANDS.set('pwd', createPwdCommand(workingDir));
-    COMMANDS.set('rm', createRmCommand(achievements));
-    COMMANDS.set('secret', createSecretCommand(achievements));
-    COMMANDS.set('users', createUsersCommand(users));
-    COMMANDS.set('version', createVersionCommand());
-    COMMANDS.set('view-source', createViewSourceCommand());
-    COMMANDS.set('whoami', createWhoamiCommand(achievements));
-    COMMANDS.set('whois', createWhoisCommand(users, achievements));
+    const commandMap = new Map<string, Command>(commandEntries);
 
     // help command needs access to the full command map for lookups
-    COMMANDS.set('help', createHelpCommand(COMMANDS));
+    commandMap.set('help', createHelpCommand(commandMap));
 
-    return COMMANDS;
-};
+    return commandMap;
+}

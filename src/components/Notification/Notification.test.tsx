@@ -131,9 +131,9 @@ describe('NotificationProvider', () => {
             </NotificationProvider>
         );
 
-        const addButton = screen.getByText('Add Notification');
+        const notificationButton = screen.getByText('Add Notification');
         act(() => {
-            addButton.click();
+            notificationButton.click();
         });
 
         expect(screen.getByText(TEST_NOTIFICATION_TEXT)).toBeInTheDocument();
@@ -147,12 +147,12 @@ describe('NotificationProvider', () => {
             </NotificationProvider>
         );
 
-        const addButton = screen.getByText('Add Notification');
+        const notificationButton = screen.getByText('Add Notification');
         const clearButton = screen.getByText('Clear Notifications');
 
         act(() => {
-            addButton.click();
-            addButton.click();
+            notificationButton.click();
+            notificationButton.click();
         });
 
         expect(screen.getAllByText(TEST_NOTIFICATION_TEXT).length).toBe(2);
@@ -213,9 +213,9 @@ describe('NotificationProvider', () => {
             </NotificationProvider>
         );
 
-        const addButton = screen.getByText('Add Undefined Duration');
+        const notificationButton = screen.getByText('Add Undefined Duration');
         act(() => {
-            addButton.click();
+            notificationButton.click();
         });
 
         expect(screen.getByTestId(TESTID_NOTIFICATION_COUNT).textContent).toBe('1');

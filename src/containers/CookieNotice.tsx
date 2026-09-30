@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CookieNoticeView from '../components/CookieNotice/CookieNoticeView';
-import { TRACKER_EVENTS, useTracker } from '../hooks/useTracker';
+import { TRACKER_EVENTS, useTracker } from '../hooks/use-tracker';
 import { useAchievements } from './AchievementProvider';
 
 /**
@@ -19,14 +19,14 @@ function CookieNotice() {
     const { unlockAchievement } = useAchievements();
 
     const [showCookieMessage, setShowCookieMessage] = useState<boolean>(() => {
-        return (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) || 'false') !== 'true';
+        return (localStorage.getItem(LS_COOKIE_ACKNOWLEDGE) ?? 'false') !== 'true';
     });
 
     /**
      * Handle the user accepting cookies
      */
     const handleAccept = () => {
-        tracker.trackEvent(TRACKER_EVENTS.CookieAcknowledge, { props: { ack: true } });
+        tracker.trackEvent(TRACKER_EVENTS.cookieAcknowledge, { props: { ack: true } });
         setShowCookieMessage(false);
         localStorage.setItem(LS_COOKIE_ACKNOWLEDGE, 'true');
         unlockAchievement('accept_cookies');
@@ -36,8 +36,8 @@ function CookieNotice() {
      * Handle the user rejecting cookies (easter egg)
      */
     const handleReject = () => {
-        tracker.trackEvent(TRACKER_EVENTS.CookieAcknowledge, { props: { ack: false } });
-        window.location.href = 'https://www.oreo.com/';
+        tracker.trackEvent(TRACKER_EVENTS.cookieAcknowledge, { props: { ack: false } });
+        location.assign('https://www.oreo.com/');
     };
 
     return (

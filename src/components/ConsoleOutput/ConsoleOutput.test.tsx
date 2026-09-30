@@ -1,9 +1,10 @@
 import React, { act } from 'react';
 import { render, screen } from '@testing-library/react';
-import ConsoleOutput, { CommandResult } from './ConsoleOutput';
+import type { CommandResult } from './ConsoleOutput';
+import ConsoleOutput from './ConsoleOutput';
 
 describe('ConsoleOutput', () => {
-    const testCommands: Record<string, CommandResult> = {
+    const testCommands = {
         basic: {
             timestamp: new Date(),
             command: 'test command',
@@ -31,25 +32,25 @@ describe('ConsoleOutput', () => {
                 ['line 3']
             ]
         }
-    };
+    } satisfies Record<string, CommandResult>;
 
-    test('Display a command result', () => {
-        act(() => render(<ConsoleOutput commandResult={testCommands.basic} />));
+    test('Display a command result', async () => {
+        await act(() => render(<ConsoleOutput commandResult={testCommands.basic} />));
 
-        expect(screen.getByText(`${testCommands.basic.command}`)).toBeInTheDocument();
-        expect(screen.getByText(`${testCommands.basic.response[0][0]}`)).toBeInTheDocument();
+        expect(screen.getByText(testCommands.basic.command)).toBeInTheDocument();
+        expect(screen.getByText(testCommands.basic.response[0][0])).toBeInTheDocument();
     });
 
-    test('Set an aria-live value', () => {
-        act(() => render(<ConsoleOutput commandResult={testCommands.basic} ariaLive='polite' />));
+    test('Set an aria-live value', async () => {
+        await act(() => render(<ConsoleOutput commandResult={testCommands.basic} ariaLive='polite' />));
 
-        expect(screen.getByText(`${testCommands.basic.command}`)).toBeInTheDocument();
-        expect(screen.getByText(`${testCommands.basic.response[0][0]}`)).toBeInTheDocument();
-        expect(document.body.querySelector('div [aria-live=polite]')).toBeInTheDocument();
+        expect(screen.getByText(testCommands.basic.command)).toBeInTheDocument();
+        expect(screen.getByText(testCommands.basic.response[0][0])).toBeInTheDocument();
+        expect(document.body.querySelector(':scope div [aria-live=polite]')).toBeInTheDocument();
     });
 
-    test('Show empty command if an empty command is sent', () => {
-        act(() => render(<ConsoleOutput commandResult={testCommands.emptyCommand} />));
+    test('Show empty command if an empty command is sent', async () => {
+        await act(() => render(<ConsoleOutput commandResult={testCommands.emptyCommand} />));
 
         const commandSpan = document.body.querySelector('[aria-hidden]');
         expect(commandSpan).toBeInTheDocument();
@@ -57,20 +58,21 @@ describe('ConsoleOutput', () => {
         expect(document.body.querySelector('[aria-label="The command that was run"]')).toBeInTheDocument();
     });
 
-    test('Show no command if none is provided', () => {
-        act(() => render(<ConsoleOutput commandResult={testCommands.noCommand} />));
+    test('Show no command if none is provided', async () => {
+        await act(() => render(<ConsoleOutput commandResult={testCommands.noCommand} />));
 
-        expect(screen.getByText(`${testCommands.noCommand.response[0][0]}`)).toBeInTheDocument();
+        expect(screen.getByText(testCommands.noCommand.response[0][0])).toBeInTheDocument();
         expect(document.body.querySelector('[aria-label="The command that was run"]')).not.toBeInTheDocument();
     });
 
-    test('Show multiple lines of output', () => {
-        act(() => render(<ConsoleOutput commandResult={testCommands.multiLine} />));
+    test('Show multiple lines of output', async () => {
+        await act(() => render(<ConsoleOutput commandResult={testCommands.multiLine} />));
 
-        expect(screen.getByText(`${testCommands.multiLine.command}`)).toBeInTheDocument();
+        expect(screen.getByText(testCommands.multiLine.command)).toBeInTheDocument();
 
         for (const line of testCommands.multiLine.response) {
-            expect(screen.getByText(`${line[0]}`)).toBeInTheDocument();
+            const [first = ''] = line;
+            expect(screen.getByText(first)).toBeInTheDocument();
         }
     });
 });

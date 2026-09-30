@@ -30,7 +30,7 @@ export const test = base.extend({
         // Wait for app to be ready (terminal input should be visible)
         await page.getByTestId('console-input').waitFor({
             state: 'visible',
-            timeout: 10000
+            timeout: 10_000
         });
 
         // Run the test with the configured page

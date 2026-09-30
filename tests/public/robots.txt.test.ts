@@ -6,10 +6,10 @@
  */
 
 import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import path from 'node:path';
 
-const REPO_ROOT = join(__dirname, '..', '..');
-const ROBOTS_TXT_PATH = join(REPO_ROOT, 'public', 'robots.txt');
+const REPO_ROOT = path.join(__dirname, '..', '..');
+const ROBOTS_TXT_PATH = path.join(REPO_ROOT, 'public', 'robots.txt');
 
 const readRobots = () => readFileSync(ROBOTS_TXT_PATH, 'utf8');
 

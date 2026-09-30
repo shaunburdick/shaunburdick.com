@@ -1,2 +1,2 @@
-export * from './useEvent';
-export * from './useLocalStorage';
+export * from './use-event';
+export * from './use-local-storage';

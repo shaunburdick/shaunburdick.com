@@ -14,6 +14,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 const CONSOLE_INPUT_SELECTOR = '#console-input';
+const CONSOLE_LINE_SELECTOR = ':scope pre > div';
 const ARROW_DOWN_KEY = '{ArrowDown}';
 const ARROW_UP_KEY = '{ArrowUp}';
 const WHOIS_SHAUN_TEXT = 'whois shaun';
@@ -24,8 +25,8 @@ describe('ShellPrompt', () => {
         localStorage.clear();
     });
 
-    test('Shows the console', () => {
-        act(() => renderWithProviders(<ShellPrompt />));
+    test('Shows the console', async () => {
+        await act(() => renderWithProviders(<ShellPrompt />));
         expect(document.body.querySelector('.shell')).toBeInTheDocument();
     });
 
@@ -33,7 +34,7 @@ describe('ShellPrompt', () => {
         localStorage.setItem(LS_KEY_COMMAND_HISTORY, '"');
 
         userEvent.setup();
-        act(() => renderWithProviders(<ShellPrompt />));
+        await act(() => renderWithProviders(<ShellPrompt />));
 
         // Component should handle invalid data gracefully by falling back to empty array
         // Verify by submitting a command and checking it's properly saved
@@ -45,13 +46,13 @@ describe('ShellPrompt', () => {
         describe('history', () => {
             test('should save your history', async () => {
                 userEvent.setup();
-                act(() => renderWithProviders(<ShellPrompt />));
+                await act(() => renderWithProviders(<ShellPrompt />));
 
                 await userEvent.keyboard('command1{Enter}');
                 await userEvent.keyboard('command2{Enter}');
                 await userEvent.keyboard('command3{Enter}');
 
-                const consoleCommands = document.body.querySelectorAll('pre > div');
+                const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
                 expect(consoleCommands.length).toBe(4); // +1 for welcome message
                 expect(localStorage.getItem(LS_KEY_COMMAND_HISTORY))
                     .toEqual(JSON.stringify(['command1', 'command2', 'command3']));
@@ -61,38 +62,38 @@ describe('ShellPrompt', () => {
                 expect(input).toBeInTheDocument();
 
                 // it should start empty
-                expect(input?.value).toEqual('');
+                expect(input.value).toEqual('');
 
                 await userEvent.keyboard('{ArrowUp}');
-                expect(input?.value).toEqual('command3');
+                expect(input.value).toEqual('command3');
 
                 await userEvent.keyboard('{ArrowUp}');
-                expect(input?.value).toEqual('command2');
+                expect(input.value).toEqual('command2');
 
                 await userEvent.keyboard(ARROW_DOWN_KEY);
-                expect(input?.value).toEqual('command3');
+                expect(input.value).toEqual('command3');
 
                 // Todo: Fix this bug, should just be one
                 await userEvent.keyboard(`${ARROW_DOWN_KEY}${ARROW_DOWN_KEY}`);
-                expect(input?.value).toEqual('');
+                expect(input.value).toEqual('');
             });
         });
 
         describe('clear', () => {
             test('should clear the screen', async () => {
                 userEvent.setup();
-                act(() => renderWithProviders(<ShellPrompt />));
+                await act(() => renderWithProviders(<ShellPrompt />));
 
                 await userEvent.keyboard('clear{Enter}');
 
-                const consoleCommands = document.body.querySelectorAll('pre > div');
+                const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
                 expect(consoleCommands.length).toBe(0);
             });
         });
 
         test('Empty command should show an empty result', async () => {
             userEvent.setup();
-            act(() => renderWithProviders(<ShellPrompt />));
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             await userEvent.keyboard('{Enter}');
 
@@ -104,8 +105,8 @@ describe('ShellPrompt', () => {
     });
 
     describe('Hints', () => {
-        test('Clicking hint should update input with value', () => {
-            act(() => renderWithProviders(<ShellPrompt />));
+        test('Clicking hint should update input with value', async () => {
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             const button = screen.getByText('Show Hints');
             fireEvent.click(button);
@@ -115,7 +116,7 @@ describe('ShellPrompt', () => {
 
             const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
             expect(input).toBeInTheDocument();
-            expect(input?.value).toEqual('whois shaun');
+            expect(input.value).toEqual('whois shaun');
         });
     });
 
@@ -123,7 +124,7 @@ describe('ShellPrompt', () => {
         describe('tab completions', () => {
             test('should prevent loss of focus on the input if there is content', async () => {
                 userEvent.setup();
-                act(() => renderWithProviders(<ShellPrompt />));
+                await act(() => renderWithProviders(<ShellPrompt />));
 
                 const cmdInput = document.querySelector(CONSOLE_INPUT_SELECTOR);
                 expect(cmdInput).not.toBeNull();
@@ -150,7 +151,7 @@ describe('ShellPrompt', () => {
         describe('escape', () => {
             test('should clear the input', async () => {
                 userEvent.setup();
-                act(() => renderWithProviders(<ShellPrompt />));
+                await act(() => renderWithProviders(<ShellPrompt />));
 
                 const cmdInput = document.querySelector(CONSOLE_INPUT_SELECTOR);
                 expect(cmdInput).not.toBeNull();
@@ -172,8 +173,7 @@ describe('ShellPrompt', () => {
             // Test null check for inputRef.current
             const component = renderWithProviders(<ShellPrompt />);
 
-            // Get the ShellPrompt instance to access internal methods
-            const input = screen.getByRole('textbox') as HTMLInputElement;
+            const input = screen.getByRole<HTMLInputElement>('textbox');
 
             // Mock inputRef.current to be null temporarily
             Object.defineProperty(input, 'current', { value: null });
@@ -187,7 +187,7 @@ describe('ShellPrompt', () => {
         test('command execution branches', async () => {
             // Test different command execution paths
             userEvent.setup();
-            act(() => renderWithProviders(<ShellPrompt />));
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             // Test empty command (line 117)
             await userEvent.keyboard('{Enter}');
@@ -201,14 +201,14 @@ describe('ShellPrompt', () => {
             // Test non-existent command
             await userEvent.keyboard('nonexistent{Enter}');
 
-            const consoleCommands = document.body.querySelectorAll('pre > div');
+            const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
             expect(consoleCommands.length).toBeGreaterThan(4);
         });
 
         test('handleTabKey prevents default when input has value', async () => {
             // Test tab key behavior for better coverage
             userEvent.setup();
-            act(() => renderWithProviders(<ShellPrompt />));
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
 
@@ -223,7 +223,7 @@ describe('ShellPrompt', () => {
         test('escape key clears input and resets command pointer', async () => {
             // Test escape key functionality
             userEvent.setup();
-            act(() => renderWithProviders(<ShellPrompt />));
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
 
@@ -242,19 +242,19 @@ describe('ShellPrompt', () => {
         test('handleEnterKey with empty command', async () => {
             // Test empty command execution
             userEvent.setup();
-            act(() => renderWithProviders(<ShellPrompt />));
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             // Enter with empty input
             await userEvent.keyboard('{Enter}');
 
             // Should still have console output
-            const consoleCommands = document.body.querySelectorAll('pre > div');
+            const consoleCommands = document.body.querySelectorAll(CONSOLE_LINE_SELECTOR);
             expect(consoleCommands.length).toBeGreaterThan(0);
         });
 
-        test('hintClick functionality', () => {
+        test('hintClick functionality', async () => {
             // Test hintClick method
-            act(() => renderWithProviders(<ShellPrompt />));
+            await act(() => renderWithProviders(<ShellPrompt />));
 
             const input = document.body.querySelector(CONSOLE_INPUT_SELECTOR) as HTMLInputElement;
 

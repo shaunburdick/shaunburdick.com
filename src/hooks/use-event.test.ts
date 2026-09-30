@@ -1,18 +1,18 @@
 import { act, renderHook } from '@testing-library/react';
 import type { AchievementUnlocked } from '../containers/AchievementProvider';
 import type { ConsoleLine } from '../components/ConsoleOutput/ConsoleOutput';
-import { useEvent } from './useEvent';
+import { useEvent } from './use-event';
 
 /**
  * Tests for the useEvent hook
  */
 describe('useEvent', () => {
     /**
-     * Mock event listeners
+     * Spies installed on the global event APIs for the whole suite.
      */
-    const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
-    const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
-    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+    const addEventListenerSpy = jest.spyOn(globalThis, 'addEventListener');
+    const removeEventListenerSpy = jest.spyOn(globalThis, 'removeEventListener');
+    const dispatchEventSpy = jest.spyOn(globalThis, 'dispatchEvent');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -67,7 +67,7 @@ describe('useEvent', () => {
         };
 
         act(() => {
-            window.dispatchEvent(new CustomEvent('onCommand', { detail: mockCommandEvent }));
+            dispatchEvent(new CustomEvent('onCommand', { detail: mockCommandEvent }));
         });
 
         expect(mockCallback).toHaveBeenCalledWith(mockCommandEvent);
@@ -88,7 +88,7 @@ describe('useEvent', () => {
         };
 
         act(() => {
-            window.dispatchEvent(new CustomEvent('onAchievement', { detail: mockAchievement }));
+            dispatchEvent(new CustomEvent('onAchievement', { detail: mockAchievement }));
         });
 
         expect(mockCallback).toHaveBeenCalledWith(mockAchievement);

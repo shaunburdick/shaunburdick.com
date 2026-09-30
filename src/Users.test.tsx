@@ -1,4 +1,5 @@
-import { displayUser, User, USERS } from './Users';
+import type { User } from './Users';
+import { displayUser, USERS } from './Users';
 
 describe('Users', () => {
     test('should display a user', () => {
